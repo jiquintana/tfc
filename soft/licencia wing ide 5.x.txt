@@ -1,0 +1,75 @@
+Thanks for purchasing Wing IDE from Wingware!
+
+Your customer number is 08210060
+Your order number is 20130821-0031
+
+Licenses purchased or upgraded:
+
+Wing IDE Pro -- Restricted Use Free License v. 5.x (1 user):
+
+  NN32K-HDBM2-CR6RF-3YPF8
+
+Each license code is for a single developer.  To activate a license,
+run Wing IDE and enter the license code when prompted at startup.
+
+If you have not already done so, you may download the IDE from
+http://wingware.com/downloads .  If you downloaded a trialThanks for purchasing Wing IDE from Wingware!
+
+Your customer number is 08210060
+Your order number is 20130821-0031
+
+Licenses purchased or upgraded:
+
+Wing IDE Pro -- Restricted Use Free License v. 5.x (1 user):
+
+  NN32K-HDBM2-CR6RF-3YPF8
+
+Each license code is for a single developer.  To activate a license,
+run Wing IDE and enter the license code when prompted at startup.
+
+If you have not already done so, you may download the IDE from
+http://wingware.com/downloads .  If you downloaded a trial
+version previously, you can use that version with your permanent
+license.  However, we recommend using the latest version
+if newer versions are now available.
+
+We recommend signing up on our product announcements mailing list
+at http://wingware.com/lists/announce so you will be notified of
+new software releases.  You may also wish to join the Wing IDE
+users mailing list at http://wingware.com/lists/wingide
+
+If you wish to obtain the Wing IDE source code, you will need to
+sign and send us the non-disclosure agreement, which is available
+at http://wingware.com/pub/wingide/support/source-non-discl.pdf
+
+For installation support, send email to support@wingware.com.
+For additional resources, see http://wingware.com/support
+
+Thanks for your purchase!
+
+Sincerely,
+
+The Wingware Team
+
+version previously, you can use that version with your permanent
+license.  However, we recommend using the latest version
+if newer versions are now available.
+
+We recommend signing up on our product announcements mailing list
+at http://wingware.com/lists/announce so you will be notified of
+new software releases.  You may also wish to join the Wing IDE
+users mailing list at http://wingware.com/lists/wingide
+
+If you wish to obtain the Wing IDE source code, you will need to
+sign and send us the non-disclosure agreement, which is available
+at http://wingware.com/pub/wingide/support/source-non-discl.pdf
+
+For installation support, send email to support@wingware.com.
+For additional resources, see http://wingware.com/support
+
+Thanks for your purchase!
+
+Sincerely,
+
+The Wingware Team
+
