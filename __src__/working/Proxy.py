@@ -24,7 +24,11 @@ class Proxy(BaseHTTPRequestHandler):
         """
     
     def do_HEAD(self):
-        self.send_response(200)
+	self.send_response(200)
+	if self.bodySize != None:
+	    self.send_header('Content-Type', 'text/html;charset=UTF-8')
+	    self.send_header('Content-Length', self.bodySize)	    
+
         self.end_headers()
         return
 
@@ -60,11 +64,7 @@ class Proxy(BaseHTTPRequestHandler):
         return message
 
     def parse_query(self):
-              #', method: '  +self.headers.get('command')
-              #', path: '    +str(self.headers.get('path'))
-        self.parsed_path = urlparse.urlparse(self.path)
-	
-	#pprint(parsed_path)
+        self.parsed_path = urlparse.urlparse(self.path)	
 	'''
         #print self.log_request.code
 
@@ -85,119 +85,77 @@ class Proxy(BaseHTTPRequestHandler):
     #TODO: dividir en 407 (proxy) y Authentication http
     
     def handle_PROXY_AUTH(self):
+	
+	# Tenemos una cabecera con autenticacion Proxy?
 	if self.headers.has_key('Proxy-Authorization'):
-	    #if self.headers.('Proxy-Authorization'):
-	    #print "Got Auth"
 	    self.authorization = self.headers.get('Proxy-Authorization')
 	    self.authorization = self.authorization.split()
 	
+	    # Han usado una autenticación básica?
 	    if self.authorization[0].lower() == "basic":
 		try:
+		    # Sí, intentamos obtener el usuario y passwd
 		    self.authorization = base64.decodestring(self.authorization[1])
+		
 		except binascii.Error:
-		    pass
+		    # Error, entonces KO
+		    return 0 
+		    
 		else:
+		    # Tenemos usuario & paswd y lo hemos podido decodificar
 		    self.authorization = self.authorization.split(':')
 		    self.user=self.authorization[0]
 		    self.password=self.authorization[1]
-		    ##print self.authorization
-	
-			#if self.authorization[0].upper == 'BASIC':
-			#    self.userpass = base64.decodestring(self.authorization[1])
-			#    print self.authorization[0]
-			#    print self.authorization[1]
-			    #print base64.decodestring(self.authorization[1])
-			    #print self.userpass
-			#print ">>> Got Auth"+base64.b64decode(self.headers.get('Proxy-Authorization'))
-		    #print vars(self.headers)
-		    ##pprint (vars(self))
-		    ### dump headers
-		    ####pprint (vars(self.headers),indent=1, width=80, depth=None)
-		    
-	    #self.do_HEAD()  
-	    return 1
+		    if self.user == 'proxyUser' and self.password == 'proxyPass':
+			#Autenticacion = OK
+			return 1
+		    else:
+			#Autenticacion = KO
+			return 0	    
+    
+	# No está autenticado
 	else:
-	    #print "NOT Got Auth. ASK"
 	    return 0
-	    #self.do_GETAUTH()
-		    #self.close_connection()
 	
-	return
     
     def do_GET(self):
-        #self.parse()
-        #print(self.dump())
         self.parse_query()
-
-	## Handle authentication
-
 	
-	
+
+	# Comprobamos si nos están pidiendo nuestra URL
+	# Por defecto no nos piden a nosotros
+	selfquery = False
 	
 	if self.parsed_path.netloc =='':
-	    
+	    selfquery = True;
+	elif self.parsed_path.netloc =='127.0.0.1':
+	    selfquery = True;
+	elif self.parsed_path.netloc =='localhost':
+	    selfquery = True;
+	
+	# Si es una dirección local, atendemos la petición HTTP
+	if selfquery:
+	    content = "<HTML><BODY><PRE>"+self.dump()+"</PRE></BODY></HTML>\n"
+	    self.bodySize = len(content)
             self.do_HEAD()
-            self.wfile.write("<HTML><BODY><PRE>"+self.dump()+"</PRE></BODY></HTML>")
+            self.wfile.write(content)
+	    print '_ src: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tUSR: '+self.user+',\tSRV: '+self.path
 	    
-	    print '_ src: '+self.client_address[0] +',\tPermit:'+str(self.Allowed)+',\tUSR: '+self.user+',\tSRV: '+self.path
-	    #pprint(self.parsed_path)
-	    
-	    
+	# Tratamos la peticion como PROXY    
 	else:
-	    #print 'LOG: src: '+self.client_address[0] +', PRX: '+self.path
+	    # Está autenticado?
 	    self.Allowed = self.handle_PROXY_AUTH()
 	    
+	    # SI
 	    if self.Allowed == 1:
 		self.do_HEAD()
+		# TODO:: AQUI TENEMOS QUE GESTIONAR EL USUARIO CONTRA LA BBDD
+	    # NO, 
 	    else:
 		self.do_HEAD_AUTH()	    
 		
-	    print '_ src: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+', USR:\t'+self.user+',\tPRX: '+self.path
-	    #pprint(self.parsed_path)	    
+	    print '_ src: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tUSR: '+self.user+',\tPRX: '+self.path
 	    
-        '''
-	if self.client_address[0] == '127.0.0.1':
-            #self.do_HEAD()
-            #self.parse_query()
-            #self.wfile.write("<HTML><BODY><PRE>"+self.dump()+"</PRE></BODY></HTML>")
-
-
-            #self.send_response(200)
-            ##self.end_headers()        
-            #self.wfile.write("<HTML><BODY></BODY></HTML>") 
-	    
-	    
-        else:
-            print '>>> foreign'
-            if self.headers.has_key('Proxy-Authorization'):
-                #if self.headers.('Proxy-Authorization'):
-                self.authorization = self.headers.get('Proxy-Authorization')
-                self.authorization = self.authorization.split()
-
-                if self.authorization[0].lower() == "basic":
-                    try:
-                        self.authorization = base64.decodestring(self.authorization[1])
-                    except binascii.Error:
-                        pass
-                    else:
-                        self.authorization = self.authorization.split(':')
-                        print self.authorization
-
-                #if self.authorization[0].upper == 'BASIC':
-                #    self.userpass = base64.decodestring(self.authorization[1])
-                #    print self.authorization[0]
-                #    print self.authorization[1]
-                    #print base64.decodestring(self.authorization[1])
-                    #print self.userpass
-                #print ">>> Got Auth"+base64.b64decode(self.headers.get('Proxy-Authorization'))
-            ##print vars(self.headers)
-            ##pprint (vars(self))
-            #pprint (vars(self.headers))
-
-
-            self.do_GETAUTH()
-            #self.close_connection()
-	'''
         return
 
     def do_PUSH(self):
