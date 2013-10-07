@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
 
+import urlparse, base64, binascii, re
 from BaseHTTPServer import BaseHTTPRequestHandler
-import urlparse, base64, binascii
 from pprint import pprint
 
 
@@ -16,6 +16,8 @@ class Proxy(BaseHTTPRequestHandler):
     password= ''
     Allowed = 0
     
+    LocalServices = {re.compile(r"/STOP", re.IGNORECASE), re.compile(r"/CONFIG", re.IGNORECASE)}
+    
     def log_request(self, code='-', size='-'):
     
         """Log an accepted request.
@@ -27,9 +29,9 @@ class Proxy(BaseHTTPRequestHandler):
 	self.send_response(200)
 	if self.bodySize != None:
 	    self.send_header('Content-Type', 'text/html;charset=UTF-8')
-	    self.send_header('Content-Length', self.bodySize)	    
+	    self.send_header('Content-Length', self.bodySize)	
+	self.end_headers()
 
-        self.end_headers()
         return
 
     def do_HEAD_AUTH(self):
@@ -135,9 +137,26 @@ class Proxy(BaseHTTPRequestHandler):
 	
 	# Si es una dirección local, atendemos la petición HTTP
 	if selfquery:
+	    
+	    pprint(self.parsed_path)
+
+		      
+	    for URL in self.LocalServices:
+		print URL.pattern,'->'
+		result=URL.match(self.parsed_path.path)
+		print result
+		self.LocalServices.index()
+			      
+			  
+		      #for URL in self.LocalServices:	    
+		      #    print URL.pattern,'->',URL.match(self.parsed_path.path)
+		      #if (self.parsed_path.path)
+		      
 	    content = "<HTML><BODY><PRE>"+self.dump()+"</PRE></BODY></HTML>\n"
 	    self.bodySize = len(content)
-            self.do_HEAD()
+	    self.do_HEAD()
+
+	    
             self.wfile.write(content)
 	    print '_ src: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tUSR: '+self.user+',\tSRV: '+self.path
 	    

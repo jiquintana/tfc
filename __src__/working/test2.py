@@ -2,24 +2,14 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
 
-#from SocketServer import ThreadingMixIn
-#from Queue import Queue
-#import threading, socket
+
 import socket, time, signal
 from pprint import pprint
 from ThreadPool import ThreadPoolMixIn
 from Proxy import Proxy
-from SimpleHTTPServer import SimpleHTTPRequestHandler
 from SocketServer import TCPServer
 
-
-    
-
-        
-   
-
-if __name__ == '__main__':
-    
+if __name__ == '__main__':   
     
     class ThreadedServer(ThreadPoolMixIn, TCPServer):
         ## Changed: Start
