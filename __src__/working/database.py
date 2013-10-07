@@ -5,6 +5,7 @@
 import sqlite3 as lite
 import sys, os
 
+
 configdb = "database/config.db"
 
 dir = os.path.dirname(configdb)

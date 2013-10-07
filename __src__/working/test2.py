@@ -3,13 +3,21 @@
 # vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
 
 
-import socket, time, signal
+import socket, time, signal, os
 from pprint import pprint
 from ThreadPool import ThreadPoolMixIn
 from Proxy import Proxy
 from SocketServer import TCPServer
 
+#if os.name import Console
+
+
 if __name__ == '__main__':   
+ 
+    if os.name == 'nt':
+        import Console
+        win32Cons= Console.Console()
+        win32Cons.process_Ctrl_C()
     
     class ThreadedServer(ThreadPoolMixIn, TCPServer):
         ## Changed: Start

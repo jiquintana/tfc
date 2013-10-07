@@ -145,12 +145,12 @@ class Proxy(BaseHTTPRequestHandler):
 		print URL.pattern,'->'
 		result=URL.match(self.parsed_path.path)
 		print result
-		self.LocalServices.index()
+		#self.LocalServices.index(URL.pattern)
 			      
 			  
-		      #for URL in self.LocalServices:	    
-		      #    print URL.pattern,'->',URL.match(self.parsed_path.path)
-		      #if (self.parsed_path.path)
+		#for URL in self.LocalServices:	    
+		#    print URL.pattern,'->',URL.match(self.parsed_path.path)
+		#if (self.parsed_path.path)
 		      
 	    content = "<HTML><BODY><PRE>"+self.dump()+"</PRE></BODY></HTML>\n"
 	    self.bodySize = len(content)
