@@ -28,12 +28,8 @@ class Proxy(BaseHTTPRequestHandler):
     
 
     def svc_hndl_STOP(self,parms):
-	print "svc_hndl_STOP called with parms: "+parms	
-	#Proxy.threadServer.server_close()
-	#print Proxy.threadServer.force_shutdown
-	print Proxy.threadServer.keep_running()
+	print "svc_hndl_STOP called with parms:"+parms
 	Proxy.threadServer.force_shutdown()
-	print Proxy.threadServer.keep_running()
 	return
     
     def svc_hndl_CONFIG(self,parms):
@@ -41,7 +37,7 @@ class Proxy(BaseHTTPRequestHandler):
 	return
     
     def svc_hndl_NOOP(self,parms):
-	print "svc_hndl_UNDEF called with parms:"+parms
+	print "svc_hndl_NOOP called with parms:"+parms
 	return
 
     
@@ -156,8 +152,6 @@ class Proxy(BaseHTTPRequestHandler):
     
     def do_GET(self):
         self.parse_query()
-	
-
 	# Comprobamos si nos están pidiendo nuestra URL
 	# Por defecto no nos piden a nosotros
 	selfquery = False
