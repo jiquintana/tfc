@@ -1,5 +1,9 @@
-from Queue import Queue
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+# vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
+
 import threading, socket, os, sys, time
+from Queue import Queue
 from Proxy import Proxy
 from ThreadPool import ThreadPoolMixIn
 from SocketServer import TCPServer
@@ -11,9 +15,8 @@ def run(HandlerClass = Proxy,
         ServerClass = ThreadedServer, 
         protocol="HTTP/1.0"):
     '''
-    Test: Run an HTTP server on port 8002
+    Run an HTTP server on port 8002
     '''
-
     port = 8002
     server_address = ('', port)
 
@@ -23,13 +26,15 @@ def run(HandlerClass = Proxy,
     
     sa = RQServer.socket.getsockname()
     print "Serving HTTP on", sa[0], "port", sa[1], "..."
-    RQServer.serve_forever()
-    
     try:
-        RQHandler.serve_forever()
+        RQServer.serve_forever()
     except KeyboardInterrupt:
         print time.asctime(), "Catched Ctrl+C, trying to shutdown", "..."
-        RQHandler.server_close()
+        RQServer.server_close()
+        os._exit(1)
+    
+    #RQHandler.serve_forever()
+
 
 if __name__ == '__main__':       
     run()               

@@ -4,17 +4,23 @@
 
 import sqlite3 as lite
 import sys, os
+from config import dbFiles
+
+class database:
+    
+    def __init__(self):
+        for database in dbFiles:
+            print database.items()
+        return
+    
+    
+
+mydatabase = database()
 
 
-configdb = "database/config.db"
-
-dir = os.path.dirname(configdb)
-
-
-
-
+'''
 try:
     os.stat(dir)
 except:
     os.mkdir(dir)
-    
+'''    

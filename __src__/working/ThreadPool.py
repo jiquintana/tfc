@@ -2,6 +2,12 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
 
+https://github.com/pirateproxy/PirateProxy/blob/master/pirateproxy-0.4/Proxy.py
+http://stackoverflow.com/questions/4287019/stuck-with-python-http-server-with-basic-authentication-using-basehttp/8153189#8153189
+http://en.wikipedia.org/wiki/List_of_HTTP_header_fields
+
+
+
 from SocketServer import ThreadingMixIn
 from Queue import Queue
 import threading
@@ -13,7 +19,7 @@ class ThreadPoolMixIn(ThreadingMixIn):
     '''
     use a thread pool instead of a new thread on every request
     '''
-    numThreads = 10
+    numThreads = 20
     allow_reuse_address = True  # seems to fix socket.error on server restart
     KEEP_RUNNING = True
     ## Changed: Start
