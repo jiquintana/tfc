@@ -17,37 +17,45 @@ class Proxy(BaseHTTPRequestHandler):
     user = 'none'
     password= ''
     Allowed = 0
-    
-    LocalServices = {
-        re.compile(r"/STOP/", re.IGNORECASE),
-        re.compile(r"/CONFIG/", re.IGNORECASE)
-    }
-    
+
     def __init__(self, request, client_address, server):
 	BaseHTTPRequestHandler.__init__(self, request, client_address, server)
     
+    def send_html_message(self, what):
+	content = "<HTML><BODY><H1>"+what+"</H1></BODY></HTML>\n"
+	self.bodySize = len(content)
+	self.do_HEAD()
+	self.wfile.write(content)
+	return
 
     def svc_hndl_STOP(self,parms):
 	print "svc_hndl_STOP called with parms:"+parms
+	self.send_html_message("FORCED SHUTDOWN")
 	Proxy.threadServer.force_shutdown()
 	return
     
     def svc_hndl_CONFIG(self,parms):
 	print "svc_hndl_CONFIG called with parms:"+parms
+	self.send_html_message("CONFIG")
 	return
     
     def svc_hndl_NOOP(self,parms):
 	print "svc_hndl_NOOP called with parms:"+parms
+	self.send_html_message("NOOP")
 	return
 
-    
-    ServiceHandle = {
-        "STOP": svc_hndl_STOP,
-        "CONFIG": svc_hndl_CONFIG,
-        "NOOP": svc_hndl_NOOP
+    LocalServices = {
+	    re.compile(r"/STOP/", re.IGNORECASE),
+	    re.compile(r"/CONFIG/", re.IGNORECASE),
+	    re.compile(r"/NOOP/", re.IGNORECASE)
     }
+	
+    ServiceHandle = {
+	    "STOP": svc_hndl_STOP,
+	    "CONFIG": svc_hndl_CONFIG,
+	    "NOOP": svc_hndl_NOOP
+    }    
      
-   	    
     def log_request(self, code='-', size='-'):
     
         """Log an accepted request.
