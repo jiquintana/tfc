@@ -2,9 +2,12 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
 
-https://github.com/pirateproxy/PirateProxy/blob/master/pirateproxy-0.4/Proxy.py
-http://stackoverflow.com/questions/4287019/stuck-with-python-http-server-with-basic-authentication-using-basehttp/8153189#8153189
-http://en.wikipedia.org/wiki/List_of_HTTP_header_fields
+#https://github.com/pirateproxy/PirateProxy/blob/master/pirateproxy-0.4/Proxy.py
+#http://stackoverflow.com/questions/4287019/stuck-with-python-http-server-with-basic-authentication-using-basehttp/8153189#8153189
+#http://en.wikipedia.org/wiki/List_of_HTTP_header_fields
+#http://stackoverflow.com/questions/2018026/should-i-use-urllib-or-urllib2-or-requests
+#http://www.rmunn.com/sqlalchemy-tutorial/tutorial.html
+#http://stackoverflow.com/questions/7942547/using-or-in-sqlalchemy
 
 
 

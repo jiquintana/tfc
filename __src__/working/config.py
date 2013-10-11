@@ -4,8 +4,8 @@
 
 configPath = "./database"
 
-dbFiles = dict(
-    name('config'): path(configPath+'/config.db'),
-    name('rules'): path(configPath+'/rules.db'),
-    name('log'): path(configPath+'/log.db')
-)
+dbFiles = {
+    'config': configPath+'/config.db',
+    'rules': configPath+'/rules.db',
+    'log': configPath+'/log.db'
+}

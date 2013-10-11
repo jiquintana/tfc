@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
 
+from __future__ import unicode_literals
 import urlparse, base64, binascii, re
 import BaseHTTPServer
+import requests
 from BaseHTTPServer import BaseHTTPRequestHandler
 from pprint import pprint
-
 
 
 class Proxy(BaseHTTPRequestHandler):
@@ -15,12 +16,12 @@ class Proxy(BaseHTTPRequestHandler):
     server_version = "HTTP_Proxy/" + __version__
     realm = 'Basic realm="'+server_version+' Authentication required"'
     user = 'none'
+    bodySize = None
     password= ''
     Allowed = 0
 
-    def __init__(self, request, client_address, server):
-	BaseHTTPRequestHandler.__init__(self, request, client_address, server)
     
+   
     def send_html_message(self, what):
 	content = "<HTML><BODY><H1>"+what+"</H1></BODY></HTML>\n"
 	self.bodySize = len(content)
@@ -156,13 +157,16 @@ class Proxy(BaseHTTPRequestHandler):
 	# No está autenticado
 	else:
 	    return 0
-	
+    
     
     def do_GET(self):
         self.parse_query()
 	# Comprobamos si nos están pidiendo nuestra URL
 	# Por defecto no nos piden a nosotros
 	selfquery = False
+	
+	print '_ src: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tUSR: '+self.user+',\tPRX: '+self.path
+	
 	
 	if self.parsed_path.netloc =='':
 	    selfquery = True;
@@ -216,13 +220,55 @@ class Proxy(BaseHTTPRequestHandler):
 	    
 	    # SI
 	    if self.Allowed == 1:
-		self.do_HEAD()
+		serverheaders=self.headers.dict.copy()
+		
+		del serverheaders['proxy-authorization']
+		serverheaders['Via'] = str(self.server_version)
+		
+		'''
+		del clientheaders['proxy-authorization']
+		clientheaders['Via'] = str(self.server_version)
+		#return r    		
+		
+		#clientheaders = self.remove_header_key(self.headers,'Proxy-Authorization')
+		'''
+		
+		#pprint (self.headers.dict)
+		#pprint (serverheaders)
+		
+		#self.do_HEAD()
 		# TODO:: AQUI TENEMOS QUE GESTIONAR EL USUARIO CONTRA LA BBDD
+		
+		
+		resp = requests.get(self.path, headers=serverheaders)
+		
+		
+		
+		print resp.status_code
+		pprint(resp.headers)
+		print resp.encoding
+		
+		
+		self.send_response(resp.status_code)
+		self.headers.dict=resp.headers.copy()
+		self.end_headers()
+		#self.wfile.encode(resp.encoding)
+		self.wfile.write(unicode.encode(resp.text,resp.encoding) )
+		
+		
+		'''	
+		self.send_response(resp.status_code)
+		pprint(resp.headers)
+		self.end_headers()
+		self.wfile.write(resp.text)
+		'''        
+		
+		
+		
 	    # NO, 
 	    else:
 		self.do_HEAD_AUTH()	    
 		
-	    print '_ src: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tUSR: '+self.user+',\tPRX: '+self.path
 	    
         return
 
