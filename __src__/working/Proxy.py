@@ -3,9 +3,9 @@
 # vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
 
 from __future__ import unicode_literals
-import urlparse, base64, binascii, re
+import urlparse, base64, binascii, re, string
 import BaseHTTPServer
-from requests import Timeout, URLRequired, TooManyRedirects, HTTPError, ConnectionError
+from requests import *
 import requests
 #import (
 #    RequestException, Timeout, URLRequired,
@@ -14,7 +14,7 @@ import requests
 from BaseHTTPServer import BaseHTTPRequestHandler
 from pprint import pprint
 
-DEBUG = True
+DEBUG = False
 
 class Proxy(BaseHTTPRequestHandler):
     threadServer = None
@@ -242,6 +242,7 @@ class Proxy(BaseHTTPRequestHandler):
 		try:
 		    if DEBUG: print 'try'
 		    resp = requests.get(self.path, stream=True)
+		    
 		except Timeout:
 		    print 'exception Timeout'
 		    self.send_response(504)
@@ -253,7 +254,82 @@ class Proxy(BaseHTTPRequestHandler):
 		else:
 		    #if DEBUG: print 'else'
 		    if DEBUG: pprint(vars(resp))
-		    self.send_response(resp.status_code)
+		    if  (resp.status_code == requests.codes.ok):
+			self.send_response(200)
+		    
+		    for k, v in resp.headers.items():
+			
+			if (k == 'date'):
+			    pass
+			elif (k == 'server'):
+			    pass
+			elif (k == 'set-cookie'):
+			    from requests.cookies import get_cookie_header
+			    #pprint(resp.cookies)
+			    #pprint(vars(self.request ))
+			    #pprint(vars(self.rfile))
+			    #pprint(vars(self.server))
+			    #print self.dump()
+			    #pprint(self.parsed_path)
+			    
+			    #print k,v
+			    POS = [len(v)]
+			    for key in resp.cookies.keys():
+				POS.append(string.find(v, key+'='))
+				
+			    POS.sort()
+			    print POS
+			    print v
+			    for i in range(0, len(POS)-1):
+				#print i,POS[i],i+1,POS[i+1]
+				print v[POS[i]:POS[i+1]]
+				
+				>>> t = [1, 2, 3, 1, 2, 5, 6, 7, 8]
+				>>> t
+				[1, 2, 3, 1, 2, 5, 6, 7, 8]
+				>>> list(set(t))
+				[1, 2, 3, 5, 6, 7, 8]
+				>>> s = [1, 2, 3]
+				>>> list(set(t) - set(s))
+				[8, 5, 6, 7]				
+			    #print resp.cookies.items()
+			    
+			    #beg=-1
+			    #for cookie in resp.cookies.keys():
+			    #if beg==-1:
+				#    beq=resp.cookies.values()
+				    
+				#print cookie,resp.cookies.get(cookie)
+				
+			    #a = requests.cookies.RequestsCookieJar
+			    #pprint(get_cookie_header(resp.cookies,resp).__expr__)
+			    #pprint(extract_cookies_to_jar(resp.cookies, self.path, resp))
+			    #key=resp.cookies.keys()
+			    #print resp.cookies._find_no_duplicates(key[1])
+			    #print "Set-cookie: %s=%s" % (k1, v1)
+			    '''
+			    for cookie in cookies:
+				print "Set-cookie: %s=%s" % (cookie, str(cookies[cookie]))
+				print "\t>c %s" % v
+				print "\t>s %s" % str(cookie)
+				print "\t>.%s: %s." % (k.capitalize(), cookie )
+			    '''
+
+
+			    pass
+			elif (k == 'transfer-encoding'):
+			    pass
+			elif (k=='content-encoding'):
+			    pass
+			else:
+			    #print "\t.%s: %s." % (k.capitalize(), v)
+			    self.send_header(k.capitalize(),v)
+		    #for h in resp.headers:
+		    #if resp.headers[h].count
+		    #print "\t."+h.capitalize()+':'+resp.headers[h]
+			
+			
+		    '''
 		    for h in resp.headers:
 			if (h=='content-encoding'):	    # Requests hace decodificacion transparente, no añadimos la cabecera
 			    pass
@@ -269,8 +345,8 @@ class Proxy(BaseHTTPRequestHandler):
 			#self.send_header(h.capitalize(),resp.headers[h])
 			
 			self.end_headers()
-			
-			
+		    '''
+		    self.end_headers()
 		    self.wfile.write(resp.content)
 		self.wfile.close()
 		    

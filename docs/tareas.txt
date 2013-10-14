@@ -1,0 +1,54 @@
+PAC1:
++- Q1
+|  +-	14	Conectividad Básica Socket			80%
+|               Recibimos conexion entrante cliente, ejecutamos conexion saliente
+|		para servidor peticiones GET/POST; falta conexión CONNECT, HEAD, OPTIONS
+|               Aquí estoy teniendo problemas con la gestion de algunos headers devueltas
+|               Por el servidor.
+|
+|  +-	15	Gestión multi-hilo				90%
+|		Falta por gestionar los threads que enlazaran los sockets entre el cliente
+|		y el servidor en el CONNECT
+|
+|  +-	16	Gestión de Logs					60%
+|		Realizamos log de todas las conexiones salientes, marcando OK, usuario,
+|		tipo de conexion, negado o permitido; faltaria la hora y todo lo que no esta
+|		implementado todavia: P.ej: log de rule
+|
++- Q2 - Informe Q1
+|  +-	18	Motor de bloqueos				10%
+|		De momento realizo el bloqueo con un unico usuario permitido harcoded en el codigo
+|
+|  +-	19	Implementación expresiones regulares (RegExp)	10%
+|		Para configuracion del proxy, filtramos si la conexion es al propio proxy y contiene
+|		el path /CONFIG o /STOP, y ejecutamos una parada ordenada del proxy en el segundo caso
+|
++- Q3 - Informe Q2
+|  +-	21	Gestión básica resolver DNS
+|  +-	22	Bloqueo por coincidencia URI/URL		 5%
+|		Mirar pto. 19
+|
+|  +-	23	Bloqueo por palabras clave			 
+|  +-	24 OPT:	Implementación de un DNS cache.			 
+|  +-	25 OPT:	Enlace con proveedores externos de bloqueo
+
+PAC2:
++- Q4
+|  +-	29	Gestión validación usuario			40%
+|		Realizamos gestion de la peticion de usuario/contraseña al navegador cliente, enviado un NAK
+|		o permitiendo la conexion saliente
+|
+|  +-	30	Gestión filtrado por usuario			 5%
+|		Usuario hardcoded; hay que enlazar con BBDD pero el código esta en el sitio correspondiente
+|  +-	31	Bloqueo usuario/horario.
+|  +-	32	Bloqueo por mime-type
++- Q5 - Informe Q3
+|  +-	34	Registro de todos intentos de acceso
+|  +-	35	GUI configuración parámetros PROXY		 5%
+|		Mirar pto. 19 - Esto nos servira de base para leer ficheros locales y/o cambiar los param del proxy
+|  +-	36 OPT:	Autoconfiguración basada en WPAD
++- Q6 - Informe Q4
+|  +-	38	Configuración multiplataforma clientes
+|  +-	39 OPT:	Implementación de proxy cache.
+|  +-	40 OPT:	Bloqueo de dominios generadores de anuncios (ADS)
+
