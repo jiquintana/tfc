@@ -5,10 +5,16 @@
 from __future__ import unicode_literals
 import urlparse, base64, binascii, re
 import BaseHTTPServer
+from requests import Timeout, URLRequired, TooManyRedirects, HTTPError, ConnectionError
 import requests
+#import (
+#    RequestException, Timeout, URLRequired,
+#    TooManyRedirects, HTTPError, ConnectionError
+#)
 from BaseHTTPServer import BaseHTTPRequestHandler
 from pprint import pprint
 
+DEBUG = True
 
 class Proxy(BaseHTTPRequestHandler):
     threadServer = None
@@ -77,7 +83,7 @@ class Proxy(BaseHTTPRequestHandler):
         self.send_response(407,"Proxy Authentication Required. "+self.server_version+": Access to the Web Proxy filter is denied.")
         self.send_header('Proxy-Authenticate', 'Negotiate')
         self.send_header('Proxy-Authenticate', self.realm)
-        self.send_header('Via', self.server_version)
+        #self.send_header('Via', self.server_version)
         self.send_header('Proxy-Connection', 'close')
         self.send_header('Connection', 'close')
         self.end_headers()
@@ -165,7 +171,7 @@ class Proxy(BaseHTTPRequestHandler):
 	# Por defecto no nos piden a nosotros
 	selfquery = False
 	
-	print '_ src: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tUSR: '+self.user+',\tPRX: '+self.path
+	
 	
 	
 	if self.parsed_path.netloc =='':
@@ -175,10 +181,14 @@ class Proxy(BaseHTTPRequestHandler):
 	elif self.parsed_path.netloc =='localhost':
 	    selfquery = True;
 	
+	# TODO:: DESCOMENTAR
+	### selfquery = False
+	# TODO:: DESCOMENTAR
+
 	# Si es una dirección local, atendemos la petición HTTP
 	if selfquery:
-	    
-	    pprint(self.parsed_path)
+	    print '_gsrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tUSR: '+self.user+',\tSRV: '+self.path
+	    if DEBUG: pprint(self.parsed_path)
 
 	    service_handle_value="NOOP"
 	    for URL in self.LocalServices:
@@ -211,70 +221,76 @@ class Proxy(BaseHTTPRequestHandler):
 
 	    
             self.wfile.write(content)
-	    print '_ src: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tUSR: '+self.user+',\tSRV: '+self.path
+	   
 	    
 	# Tratamos la peticion como PROXY    
 	else:
 	    # Está autenticado?
-	    self.Allowed = self.handle_PROXY_AUTH()
-	    
+	    # TODO:: DESCOMENTAR
+	    #self.Allowed = self.handle_PROXY_AUTH()
+	    self.Allowed = 1
+	    # TODO:: DESCOMENTAR
 	    # SI
+	    print '_Gsrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tUSR: '+self.user+',\tPRX: '+self.path
 	    if self.Allowed == 1:
-		serverheaders=self.headers.dict.copy()
 		
-		del serverheaders['proxy-authorization']
-		serverheaders['Via'] = str(self.server_version)
+		if DEBUG:
+		    for h in self.headers:
+			print "\t.c >"+h.capitalize()+': '+self.headers.dict[h]+"<"
+		    #self.send_header(h.capitalize(),resp.headers[h])
 		
-		'''
-		del clientheaders['proxy-authorization']
-		clientheaders['Via'] = str(self.server_version)
-		#return r    		
-		
-		#clientheaders = self.remove_header_key(self.headers,'Proxy-Authorization')
-		'''
-		
-		#pprint (self.headers.dict)
-		#pprint (serverheaders)
-		
-		#self.do_HEAD()
-		# TODO:: AQUI TENEMOS QUE GESTIONAR EL USUARIO CONTRA LA BBDD
-		
-		
-		resp = requests.get(self.path, headers=serverheaders)
-		
-		
-		
-		print resp.status_code
-		pprint(resp.headers)
-		print resp.encoding
-		
-		
-		self.send_response(resp.status_code)
-		self.headers.dict=resp.headers.copy()
-		self.end_headers()
-		#self.wfile.encode(resp.encoding)
-		self.wfile.write(unicode.encode(resp.text,resp.encoding) )
-		
-		
-		'''	
-		self.send_response(resp.status_code)
-		pprint(resp.headers)
-		self.end_headers()
-		self.wfile.write(resp.text)
-		'''        
-		
-		
-		
+		try:
+		    if DEBUG: print 'try'
+		    resp = requests.get(self.path, stream=True)
+		except Timeout:
+		    print 'exception Timeout'
+		    self.send_response(504)
+		    self.end_headers()
+		except ConnectionError:
+		    print 'exception Connection'
+		    self.send_response(504)
+		    self.end_headers()		    
+		else:
+		    #if DEBUG: print 'else'
+		    if DEBUG: pprint(vars(resp))
+		    self.send_response(resp.status_code)
+		    for h in resp.headers:
+			if (h=='content-encoding'):	    # Requests hace decodificacion transparente, no añadimos la cabecera
+			    pass
+			elif (h=='transfer-encoding'):	    # Requests hace decodificacion transparente, no añadimos la cabecera
+			    pass
+			elif (h=='server'):		    # cabecera enviada automaticamente por self.send_response del proxy
+			    pass
+			elif (h=='date'):		    # cabecera enviada automaticamente por self.send_response del proxy
+			    pass
+			else:
+			    if DEBUG: print "\t."+h.capitalize()+':'+resp.headers[h]
+			    self.send_header(h.capitalize(),resp.headers[h])
+			#self.send_header(h.capitalize(),resp.headers[h])
+			
+			self.end_headers()
+			
+			
+		    self.wfile.write(resp.content)
+		self.wfile.close()
+		    
+			
 	    # NO, 
 	    else:
 		self.do_HEAD_AUTH()	    
-		
-	    
+	if DEBUG: print "end"
         return
 
-    def do_PUSH(self):
-        ###self.parse()
-        self.do_HEAD()
-        self.wfile.write("<HTML><BODY><CODE>"+self.dump()+"</CODE></BODY></HTML>")
-        return
-
+    def do_POST(self):
+	print '_Osrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tUSR: '+self.user+',\tPRX: '+self.path
+	self.send_response(405)
+	self.send_header('Allow','GET, HEAD, PUT')
+	self.end_headers
+	return
+    
+    def do_CONNECT(self):
+	print '_Csrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tUSR: '+self.user+',\tPRX: '+self.path
+	self.send_response(405)
+	self.send_header('Allow','GET, HEAD, PUT')
+	self.end_headers	
+	return

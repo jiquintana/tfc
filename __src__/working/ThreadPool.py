@@ -22,7 +22,7 @@ class ThreadPoolMixIn(ThreadingMixIn):
     '''
     use a thread pool instead of a new thread on every request
     '''
-    numThreads = 20
+    numThreads = 10
     allow_reuse_address = True  # seems to fix socket.error on server restart
     KEEP_RUNNING = True
     ## Changed: Start
