@@ -3,10 +3,17 @@
 # vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
 
 import threading, socket, os, sys, time
-from Queue import Queue
+try:                    # Python version 2.7
+    from Queue import Queue
+    from SocketServer import TCPServer
+    
+except ImportError:     # Python version 3.x
+    from queue import Queue
+    from socketserver import TCPServer
+
 from Proxy import Proxy
 from ThreadPool import ThreadPoolMixIn
-from SocketServer import TCPServer
+
 
 class ThreadedServer(ThreadPoolMixIn, TCPServer):
     pass
@@ -23,16 +30,16 @@ def run(HandlerClass = Proxy,
     HandlerClass.protocol_version = protocol
     RQServer = ServerClass(server_address, HandlerClass)
     Proxy.threadServer = RQServer
-    
+
     sa = RQServer.socket.getsockname()
-    print "Serving HTTP on", sa[0], "port", sa[1], "..."
+    print ("Serving HTTP on %s, port %s..." % (sa[0], sa[1]))
     try:
         RQServer.serve_forever()
     except KeyboardInterrupt:
-        print time.asctime(), "Catched Ctrl+C, trying to shutdown", "..."
+        print ("%s Catched Ctrl+C, trying to shutdown...", time.asctime())
         RQServer.server_close()
         os._exit(1)
-    
+
     #RQHandler.serve_forever()
 
 

@@ -10,13 +10,15 @@
 #http://stackoverflow.com/questions/7942547/using-or-in-sqlalchemy
 
 
-
-from SocketServer import ThreadingMixIn
-from Queue import Queue
-import threading
+try:                    # Python version 2.7
+    from SocketServer import ThreadingMixIn
+    from Queue import Queue
+except ImportError:     # Python version 3.x
+    from socketserver import ThreadingMixIn
+    from queue import Queue
+    
 import threading, socket, os, sys, time
 
-import socket
 
 class ThreadPoolMixIn(ThreadingMixIn):
     '''
@@ -34,7 +36,7 @@ class ThreadPoolMixIn(ThreadingMixIn):
     
     def force_shutdown(self):
         self.KEEP_RUNNING=False
-        print time.asctime(), "ServerHTTP Forced Shutdown", "..."
+        print ("%s ServerHTTP Forced Shutdown...", time.asctime())
         os._exit(0)
 
       
