@@ -9,22 +9,28 @@
 #http://www.rmunn.com/sqlalchemy-tutorial/tutorial.html
 #http://stackoverflow.com/questions/7942547/using-or-in-sqlalchemy
 
+import sys
+if sys.version_info < (3, 0):
+    python_OldVersion = True
+else:
+    python_OldVersion = False
+    
 
-try:                    # Python version 2.7
+if python_OldVersion:       # Python version 2.7
     from SocketServer import ThreadingMixIn
     from Queue import Queue
-except ImportError:     # Python version 3.x
+else:                       # Python version 3.x
     from socketserver import ThreadingMixIn
     from queue import Queue
     
-import threading, socket, os, sys, time
+import threading, socket, os, time
 
 
 class ThreadPoolMixIn(ThreadingMixIn):
     '''
     use a thread pool instead of a new thread on every request
     '''
-    numThreads = 10
+    numThreads = 100
     allow_reuse_address = True  # seems to fix socket.error on server restart
     KEEP_RUNNING = True
     ## Changed: Start
@@ -66,7 +72,7 @@ class ThreadPoolMixIn(ThreadingMixIn):
         while True:
             ThreadingMixIn.process_request_thread(self, *self.requests.get())
 
-    
+
     def handle_request(self):
         '''
         simply collect requests and put them on the queue for the workers.
@@ -77,5 +83,3 @@ class ThreadPoolMixIn(ThreadingMixIn):
             return
         if self.verify_request(request, client_address):
             self.requests.put((request, client_address))
-
-

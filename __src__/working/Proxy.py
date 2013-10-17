@@ -2,17 +2,26 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
 
-from __future__ import unicode_literals
-try:                    # Python version 2.7
+#from __future__ import unicode_literals
+import sys
+if sys.version_info < (3, 0):
+    python_OldVersion = True
+else:
+    python_OldVersion = False
+
+
+
+if python_OldVersion:       # Python version 2.7
     import urlparse, BaseHTTPServer
     from BaseHTTPServer import BaseHTTPRequestHandler
-except ImportError:     # Python version 3.x
+else:                       # Python version 3.x
     import http.server
     from http.server import HTTPServer, BaseHTTPRequestHandler
     import urllib
 
-import base64, binascii, re, string, sys
+import base64, binascii, re, string
 import socket
+from SocketServer import BaseRequestHandler
 ## pip install requests
 
 from requests import *
@@ -20,6 +29,7 @@ import requests
 from pprint import pprint
 
 DEBUG = False
+    
 
 class Proxy(BaseHTTPRequestHandler):
     threadServer = None
@@ -32,18 +42,33 @@ class Proxy(BaseHTTPRequestHandler):
     Allowed = 0
     parsed_path =''
 
+        
+        # http://bugs.python.org/issue14574
+        # Versions:	Python 3.4, Python 3.3, Python 3.2, Python 2.7
+        # Title:	SocketServer doesn't handle client disconnects properly
+    
 
     def send_html_message(self, what):
         content = "<HTML><BODY><H1>"+what+"</H1></BODY></HTML>\n"
         self.bodySize = len(content)
         self.do_HEAD()
-        self.wfile.write(bytes(content, 'UTF-8'))
+        try:
+            #print ('tamagno %s - %s ' % (self.client_address[1],len(resp.content)))
+            self.wfile.write(bytes(content, 'UTF-8'))
+        except ConnectionAbortedError:
+            pass        
+        
         return
     
     def send_post(self,content):
         self.bodySize = len(content)
         self.do_HEAD()
-        self.wfile.write(bytes(content, 'UTF-8'))        
+        try:
+            #print ('tamagno %s - %s ' % (self.client_address[1],len(resp.content)))
+            self.wfile.write(bytes(content, 'UTF-8'))        
+        except ConnectionAbortedError:
+            pass        
+        
         return
 
     def svc_hndl_STOP(self,parms):
@@ -114,8 +139,7 @@ class Proxy(BaseHTTPRequestHandler):
                           self.client_address[1],
                           self.log_date_time_string(),
                           format%args))
-
-
+        
     def do_HEAD(self):
         self.send_response(200)
         if self.bodySize != None:
@@ -156,8 +180,11 @@ class Proxy(BaseHTTPRequestHandler):
         # TODO python 2.7 self.parsed_path = par (urllibn(self.path))
         
         
-        #self.path = urllib.parse.unquote(self.path)
-        self.parsed_path = urllib.parse.urlparse(self.path)
+        if python_OldVersion:
+            self.parsed_path = urlparse.urlparse(self.path)
+        else:
+            #self.path = urllib.parse.unquote(self.path)
+            self.parsed_path = urllib.parse.urlparse(self.path)
 
         
 
@@ -223,6 +250,7 @@ class Proxy(BaseHTTPRequestHandler):
         # Por defecto no nos piden a nosotros
         selfquery = False
 
+
         if self.parsed_path.netloc =='':
             selfquery = True;
         elif self.parsed_path.netloc =='127.0.0.1':
@@ -267,7 +295,15 @@ class Proxy(BaseHTTPRequestHandler):
             self.parse_query()
             content = '<HTML><H1>test</H1></HTML>'
             self.bodySize = len(content)
-            self.wfile.write(bytes(content, 'UTF-8'))
+            try:
+                #print ('tamagno %s - %s ' % (self.client_address[1],len(resp.content)))
+                self.wfile.write(bytes(content, 'UTF-8'))
+                self.wfile.flush()
+                self.wfile.close()
+                self.rfile.close()
+
+            except ConnectionAbortedError:
+                pass            
 
 
         # Tratamos la peticion como PROXY    
@@ -287,6 +323,7 @@ class Proxy(BaseHTTPRequestHandler):
                     #self.send_header(h.capitalize(),resp.headers[h])
 
                 try:
+                    if DEBUG: print('URL: %s: %s' % (self.client_address[1],self.path))
                     if DEBUG: print ('try')
                     if ( self.what == 'GET' ):
                         resp = requests.get(self.path, stream=True, allow_redirects=True)
@@ -308,16 +345,38 @@ class Proxy(BaseHTTPRequestHandler):
                     if DEBUG: pprint(vars(resp))
                     if  (resp.status_code == requests.codes.ok):
                         self.send_response(resp.status_code)
-
+                    
+                    # Control de la cabecera via
+                    via_header_seen = False
+                    
                     for k, v in resp.headers.items():
+                        if DEBUG: print('IN header: %s - %s: %s' % (self.client_address[1],k.capitalize(),v))
                         if (k == 'date'):
                             pass
-                        elif (k== 'Content-Length'):
-                            self.send_header(k.capitalize(),v)
+                        elif (k== 'content-length'):
+                            # Debido a que la librería request hace descompresion automatica, no nos podemos
+                            # fiar del valor 'content-length' en caso de codificacion deflate/gzip, asi que
+                            # reescribimos la cabecera incondicionalmente
+                            self.send_header(k.capitalize(), len(resp.content))
+                            if DEBUG:
+                                print('OU header CL: %s - %s: %s' % (self.client_address[1],k.capitalize(),v))
+                                print('OU header SZ: %s -   : %s' % (self.client_address[1], len(resp.content)))
+                            pass
+                        elif (k == 'transfer-encoding'):
+                            # Eliminamos transfer-encoding por la misma razon anterior 
+                            pass
+                        elif (k=='content-encoding'):
+                            # Eliminamos transfer-encoding por la misma razon anterior
+                            pass                        
                         elif (k== 'via'):
+                            via_header_seen = True
+                            # Agnadimos a cabecera via
                             v+=', http/1.0 '+self.server_version
                             self.send_header(k.capitalize(),v)
+                            #print('OU header: %s - %s: %s' % (self.client_address[1],k.capitalize(),v))                            
+                            
                         elif (k == 'server'):
+                            # la escribe directamente el servidor BaseHTTPServer
                             pass
                         elif (k == 'set-cookie'):
 
@@ -343,24 +402,35 @@ class Proxy(BaseHTTPRequestHandler):
                             while (POS != []):
                                 parsed_cookie=v[POS[0]:POS[1]]
                                 self.send_header('Set-Cookie',parsed_cookie)
-                                if DEBUG: print ("\t... cookie: Set-cookie=%s" % (v[POS[0]:POS[1]]))
+                                if DEBUG: 
+                                    print ("\t... cookie: Set-cookie=%s" % (v[POS[0]:POS[1]]))
                                 #eliminamos las posisiones 0 y 1; como eliminamos primero el valor [0], el valor [1] se vuelve [0] en el siguiente desapilado
                                 POS.remove(POS[0])
                                 POS.remove(POS[0])
                             pass
-                            '''
-                            elif (k == 'transfer-encoding'):
-                                pass
-                            elif (k=='content-encoding'):
-                                pass
-                            '''
+                           
+                        
+                    
                         else:
-                            if DEBUG: print ("\t... header: %s=%s" % (k.capitalize(),v))
+                            if DEBUG: print('OU header: %s - %s: %s' % (self.client_address[1],k.capitalize(),v))                            
                             self.send_header(k.capitalize(),v)
-                    #print(resp.content)
+                            #print(resp.content)
+                            
+                    if (not via_header_seen):
+                        # Agnadimos a cabecera via
+                        k='Via'
+                        v='http/1.0 '+self.server_version
+                        self.send_header(k.capitalize(),v)
+                        if DEBUG: print('OU header: %s - %s: %s' % (self.client_address[1],k.capitalize(),v))                            
+                    
                     self.end_headers()
+
                     try:
+                        #print ('tamagno %s - %s ' % (self.client_address[1],len(resp.content)))
                         self.wfile.write(resp.content)
+                        self.wfile.flush()
+                        self.wfile.close()
+                        self.rfile.close()                        
                     except ConnectionAbortedError:
                         pass
             # NO, 

@@ -2,14 +2,24 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
 
-import threading, socket, os, sys, time
-try:                    # Python version 2.7
+
+
+import sys
+
+if sys.version_info < (3, 0):
+    python_OldVersion = True
+else:
+    python_OldVersion = False
+    
+if python_OldVersion:       # Python version 2.7
     from Queue import Queue
     from SocketServer import TCPServer
     
-except ImportError:     # Python version 3.x
+else:                       # Python version 3.x
     from queue import Queue
     from socketserver import TCPServer
+
+import threading, socket, os, time
 
 from Proxy import Proxy
 from ThreadPool import ThreadPoolMixIn
