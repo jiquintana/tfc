@@ -14,22 +14,24 @@ else:
 if python_OldVersion:       # Python version 2.7
     import urlparse, BaseHTTPServer
     from BaseHTTPServer import BaseHTTPRequestHandler
+    from SocketServer import BaseRequestHandler
 else:                       # Python version 3.x
-    import http.server
+    import urllib, http.server
     from http.server import HTTPServer, BaseHTTPRequestHandler
-    import urllib
+    from socketserver import BaseRequestHandler 
 
 import base64, binascii, re, string
 import socket
-from SocketServer import BaseRequestHandler
-## pip install requests
+
+# tenemos que instalar la libreria 'requests' procedente de pip: 
+# pip install requests
 
 from requests import *
 import requests
 from pprint import pprint
 
 DEBUG = False
-    
+
 
 class Proxy(BaseHTTPRequestHandler):
     threadServer = None
@@ -298,9 +300,6 @@ class Proxy(BaseHTTPRequestHandler):
             try:
                 #print ('tamagno %s - %s ' % (self.client_address[1],len(resp.content)))
                 self.wfile.write(bytes(content, 'UTF-8'))
-                self.wfile.flush()
-                self.wfile.close()
-                self.rfile.close()
 
             except ConnectionAbortedError:
                 pass            
@@ -427,10 +426,7 @@ class Proxy(BaseHTTPRequestHandler):
 
                     try:
                         #print ('tamagno %s - %s ' % (self.client_address[1],len(resp.content)))
-                        self.wfile.write(resp.content)
-                        self.wfile.flush()
-                        self.wfile.close()
-                        self.rfile.close()                        
+                        self.wfile.write(resp.content)                     
                     except ConnectionAbortedError:
                         pass
             # NO, 
