@@ -21,7 +21,7 @@ else:                       # Python version 3.x
     from socketserver import BaseRequestHandler 
 
 import base64, binascii, re, string
-import socket
+import socket, select, time
 
 # tenemos que instalar la libreria 'requests' procedente de pip: 
 # pip install requests
@@ -29,6 +29,7 @@ import socket
 from requests import *
 import requests
 from pprint import pprint
+from Headers import Headers
 
 DEBUG = False
 
@@ -345,83 +346,18 @@ class Proxy(BaseHTTPRequestHandler):
                     if  (resp.status_code == requests.codes.ok):
                         self.send_response(resp.status_code)
                     
-                    # Control de la cabecera via
-                    via_header_seen = False
+
                     
-                    for k, v in resp.headers.items():
-                        if DEBUG: print('IN header: %s - %s: %s' % (self.client_address[1],k.capitalize(),v))
-                        if (k == 'date'):
-                            pass
-                        elif (k== 'content-length'):
-                            # Debido a que la librería request hace descompresion automatica, no nos podemos
-                            # fiar del valor 'content-length' en caso de codificacion deflate/gzip, asi que
-                            # reescribimos la cabecera incondicionalmente
-                            self.send_header(k.capitalize(), len(resp.content))
-                            if DEBUG:
-                                print('OU header CL: %s - %s: %s' % (self.client_address[1],k.capitalize(),v))
-                                print('OU header SZ: %s -   : %s' % (self.client_address[1], len(resp.content)))
-                            pass
-                        elif (k == 'transfer-encoding'):
-                            # Eliminamos transfer-encoding por la misma razon anterior 
-                            pass
-                        elif (k=='content-encoding'):
-                            # Eliminamos transfer-encoding por la misma razon anterior
-                            pass                        
-                        elif (k== 'via'):
-                            via_header_seen = True
-                            # Agnadimos a cabecera via
-                            v+=', http/1.0 '+self.server_version
-                            self.send_header(k.capitalize(),v)
-                            #print('OU header: %s - %s: %s' % (self.client_address[1],k.capitalize(),v))                            
-                            
-                        elif (k == 'server'):
-                            # la escribe directamente el servidor BaseHTTPServer
-                            pass
-                        elif (k == 'set-cookie'):
-
-                            from requests.cookies import get_cookie_header			    
-                            # Este bloque gestiona las cookies; Requests devuelve todas las cookies en un array 'set-cookie', pero indistinguible si hay varias.
-                            # para obtener todos los parámetros y reenviarlos, parseamos la cadena.		
-                            def allindices(string, sub, listindex=[], offset=0):
-                                i = string.find(sub, offset)
-                                while i >= 0:
-                                    listindex.append(i)
-                                    i = string.find(sub, i + 1)
-                                return listindex				    
-
-                            POS = [0,len(v)]
-                            for key in resp.cookies.keys():
-                                for i in allindices(v, ', '+key+'='): POS.append(i)
-                                for i in allindices(v, key+'='): POS.append(i)
-
-                            POS=list(set(POS))
-                            POS.sort()
-                            # ahora tenemos un array con las posiciones de las cookies a cortar				
-
-                            while (POS != []):
-                                parsed_cookie=v[POS[0]:POS[1]]
-                                self.send_header('Set-Cookie',parsed_cookie)
-                                if DEBUG: 
-                                    print ("\t... cookie: Set-cookie=%s" % (v[POS[0]:POS[1]]))
-                                #eliminamos las posisiones 0 y 1; como eliminamos primero el valor [0], el valor [1] se vuelve [0] en el siguiente desapilado
-                                POS.remove(POS[0])
-                                POS.remove(POS[0])
-                            pass
-                           
+                    parsed_headers = Headers(response=resp, debug=False, 
+                                                          ip=self.client_address[0],
+                                                          port = self.client_address[1])
+                    returned_headers = parsed_headers.parsed_headers()
+                    #returned_headers.sort()
+                    
+                    
+                    for header in returned_headers:
+                        self.send_header(header[0], header[1])
                         
-                    
-                        else:
-                            if DEBUG: print('OU header: %s - %s: %s' % (self.client_address[1],k.capitalize(),v))                            
-                            self.send_header(k.capitalize(),v)
-                            #print(resp.content)
-                            
-                    if (not via_header_seen):
-                        # Agnadimos a cabecera via
-                        k='Via'
-                        v='http/1.0 '+self.server_version
-                        self.send_header(k.capitalize(),v)
-                        if DEBUG: print('OU header: %s - %s: %s' % (self.client_address[1],k.capitalize(),v))                            
-                    
                     self.end_headers()
 
                     try:
@@ -450,8 +386,83 @@ class Proxy(BaseHTTPRequestHandler):
         return
 
     def do_CONNECT(self):
+        o_port_default = None
+        o_port = 80
+        
+        self.parse_query()
+        
+        pprint (self.parsed_path)
+
+        
+        # Tenemos schema? => eso nos fija el puerto por defecto en caso de no
+        # venir definido en la cadena CONNECT...
+        if self.parsed_path.scheme != '':
+            o_port_default = socket.getservbyname(self.parsed_path.scheme)
+        
+        destination = self.parsed_path.netloc if (self.parsed_path.netloc!='') else self.parsed_path.path
+                    
+        
+        try:
+            o_dest,o_port = destination.split(':', 1)
+        except:
+            o_dest = destination
+            if (o_port_default!=None): o_port=o_port_default
+    
+        
+        try:
+            print ('Outbound conection to %s:%s' % (o_dest, o_port))
+            server_socket = socket.create_connection((o_dest, o_port),timeout=5)
+        
+        except socket.error as e:
+            print ("Error %s" % e)
+            self.send_response(404,'CONNECT error ['+str(e)+'] to '+o_dest+':'+str(o_port))
+            self.end_headers()              
+            
+        except socket.herror as e:
+            print ("Error %s" % e)
+            self.send_response(404,'CONNECT error ['+str(e)+'] to '+o_dest+':'+str(o_port))
+            self.end_headers()              
+            
+        except socket.gaierror as e:
+            print ("Error %s" % e)
+            self.send_response(404,'CONNECT error ['+str(e)+'] to '+o_dest+':'+str(o_port))
+            self.end_headers()              
+            
+        except socket.timeout as e:
+            print ("Error %s" % e)
+            self.send_response(504,'CONNECT Timeout ['+str(e)+'] to '+o_dest+':'+str(o_port))
+            self.send_header('Content-Length', '0')
+            self.end_headers()            
+            
+        else: 
+            self.send_response(200,'CONNECT OK -> '+o_dest+':'+str(o_port))
+            self.send_header('Content-Length', '0')
+            self.end_headers()
+            
+            
+            inputs = [self.connection, server_socket]
+            
+            while inputs:
+                # Wait for at least one of the sockets to be ready for processing
+                print >>sys.stderr, '\nwaiting for the next event'
+                readable, writable, exceptional = select.select(inputs, [], inputs)
+                
+                print('select (i:%s, o:%s, e:%s'%(len(readable),len(writable),len(exceptional)))
+                pprint(readable)
+                pprint(writable)
+                pprint(exceptional)
+                '''
+                pprint(server_socket)
+                time.sleep(100)
+                '''            
+                server_socket.close()
         #print '_Csrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tUSR: '+self.user+',\tPRX: '+self.path
+        
+        '''
         self.send_response(405)
         self.send_header('Allow','GET, HEAD, PUT')
-        self.end_headers	
+        self.end_headers
+        '''        
+        #while (True):
+            #if self.rfile.
         return
