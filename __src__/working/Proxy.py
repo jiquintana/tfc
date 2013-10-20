@@ -411,7 +411,7 @@ class Proxy(BaseHTTPRequestHandler):
         
         try:
             print ('Outbound conection to %s:%s' % (o_dest, o_port))
-            server_socket = socket.create_connection((o_dest, o_port),timeout=5)
+            self.server_socket = socket.create_connection((o_dest, o_port),timeout=5)
         
         except socket.error as e:
             print ("Error %s" % e)
@@ -434,29 +434,102 @@ class Proxy(BaseHTTPRequestHandler):
             self.send_header('Content-Length', '0')
             self.end_headers()            
             
-        else: 
+        else:      
             self.send_response(200,'CONNECT OK -> '+o_dest+':'+str(o_port))
             self.send_header('Content-Length', '0')
-            self.end_headers()
+            self.end_headers() 
             
+            self.server_wfile = self.server_socket.makefile('wb', self.wbufsize)            
             
-            inputs = [self.connection, server_socket]
-            
-            while inputs:
+            salir_bucle = False
+            inputs = [self.connection, self.server_socket]            
+            while (inputs and not salir_bucle):
                 # Wait for at least one of the sockets to be ready for processing
-                print >>sys.stderr, '\nwaiting for the next event'
-                readable, writable, exceptional = select.select(inputs, [], inputs)
-                
-                print('select (i:%s, o:%s, e:%s'%(len(readable),len(writable),len(exceptional)))
-                pprint(readable)
-                pprint(writable)
-                pprint(exceptional)
+                if DEBUG: print("waiting for the next event", file=sys.stderr)
+                #readable, writable, exceptional = select.select(inputs, [], inputs)
+                r, w, e = select.select(inputs, [], inputs, 1)
+                if DEBUG: print('select (i:%s, o:%s, e:%s'%(len(r),len(w),len(e)), file=sys.stderr)
+
+                #pprint(e)
+                if e != [] and not salir_bucle:
+                    # cualquiera que sea el error en los sockets de cliente o servidor, tenemos que salir..
+                    
+                    if self.connection in e:
+                        print ("error socket cliente: cerrandolo")
+                    if server_socket in e:
+                        print ("error socket servidor: cerrandolo")
+                    pprint(e)
+                    salir_bucle=True
+ 
+ 
+ 
+                if r != [] and not salir_bucle:
+                    if DEBUG: pprint(r)
+                    if (self.connection in r) and not salir_bucle:
+                        if DEBUG: print('cliente tiene datos: leyendo cliente')  
+                        try:
+                            sockdata = self.connection.recv(4096)
+                        except (socket.timeout, socket.error) as e:
+                            print("error socket timeout cliente: %s" % (e))
+                            salir_bucle=True
+                        else:
+                            if len(sockdata) == 0:
+                                # Ordered shutdown...
+                                print("Cierre de socket cliente ordenado")
+                                salir_bucle=True   
+                            else:
+                                # Tenemos datos...
+                                if self.server_wfile.writable:
+                                    # Podemos escribir en servidor?
+                                    try:
+                                        self.server_wfile.write(sockdata)
+                                    except (socket.timeout, socket.error) as e:
+                                        print("error socket writing server: %s" % (e))
+                                        salir_bucle=True   
+                                else:
+                                    # No podemos escribir en socket server
+                                    print("Socket servido no escribible...")
+                                    salir_bucle=True
+
+
+                    if (self.server_socket in r) and not salir_bucle:
+                        if DEBUG: print('servidor tiene datos: leyendo servidor')               
+                        try:
+                            sockdata = self.server_socket.recv(4096)
+                        except (socket.timeout, socket.error) as e:
+                            print("error socket timeout servidor: %s" % (e))
+                            salir_bucle=True
+                        else:
+                            if len(sockdata) == 0:
+                                # Ordered shutdown...
+                                print("Cierre de socket servidor ordenado")
+                                salir_bucle=True   
+                            else:
+                                # Tenemos datos...
+                                if self.wfile.writable:
+                                    # Podemos escribir en cliente?
+                                    try:
+                                        self.wfile.write(sockdata)
+                                    except (socket.timeout, socket.error) as e:
+                                        print("error socket writing cliente: %s" % (e))
+                                        salir_bucle=True   
+                                else:
+                                    # No podemos escribir en socket cliente
+                                    print("Socket cliente no escribible...")
+                                    salir_bucle=True
+
+                if w != [] and not salir_bucle:
+                    if DEBUG: pprint(w)
+                    
                 '''
                 pprint(server_socket)
                 time.sleep(100)
                 '''            
-                server_socket.close()
         #print '_Csrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tUSR: '+self.user+',\tPRX: '+self.path
+        print ("saliendo del bucle del socket...")
+        self.server_wfile.close()
+        self.server_socket.close()
+        #self.connection.close()                        
         
         '''
         self.send_response(405)
