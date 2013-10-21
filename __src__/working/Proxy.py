@@ -9,8 +9,6 @@ if sys.version_info < (3, 0):
 else:
     python_OldVersion = False
 
-
-
 if python_OldVersion:       # Python version 2.7
     import urlparse, BaseHTTPServer
     from BaseHTTPServer import BaseHTTPRequestHandler
@@ -39,11 +37,17 @@ class Proxy(BaseHTTPRequestHandler):
     __version__ = '0.1'
     server_version = "HTTP_Proxy/" + __version__
     realm = 'Basic realm="'+server_version+' Authentication required"'
-    user = 'none'
+    proxy_user = 'none'
+    proxy_password = ''
+    http_user = 'none'
+    http_password = ''
     bodySize = None
-    password= ''
     Allowed = 0
     parsed_path =''
+    
+    __verbs_supported ='GET, HEAD, POST, PUT, TRACE, OPTIONS, CONNECT'
+    __verbs_unsupported = 'PATCH, DELETE'
+    __verbs_safe = 'GET, HEAD, OPTIONS, TRACE'
 
         
         # http://bugs.python.org/issue14574
@@ -142,7 +146,23 @@ class Proxy(BaseHTTPRequestHandler):
                           self.client_address[1],
                           self.log_date_time_string(),
                           format%args))
+        return
+    '''    
+    def send_response(self, code, message=None):
+        super(BaseHTTPRequestHandler, self)
         
+        #######################################################
+        ## 200 - OK
+        ## 404 - Not found
+        ## 405 - Method Not Allowed
+        ## 407 - Proxy Authentication Required
+        ## 504 - Gateway Timeout
+        #######################################################
+        return
+    '''
+    
+        
+    
     def do_HEAD(self):
         self.send_response(200)
         if self.bodySize != None:
@@ -152,7 +172,7 @@ class Proxy(BaseHTTPRequestHandler):
 
         return
 
-    def do_HEAD_AUTH(self):
+    def do_HEAD_PROXY_AUTH(self):
         self.send_response(407,"Proxy Authentication Required. "+self.server_version+": Access to the Web Proxy filter is denied.")
         self.send_header('Proxy-Authenticate', 'Negotiate')
         self.send_header('Proxy-Authenticate', self.realm)
@@ -162,8 +182,17 @@ class Proxy(BaseHTTPRequestHandler):
         self.end_headers()
         return
 
-    def dump(self):
+    def do_HEAD_HTTP_AUTH(self):
+        self.send_response(401,"Authentication Required. "+self.server_version+": Access to the Web Server is denied.")
+        #self.send_header('WWW-Authenticate', 'Negotiate')
+        self.send_header('WWW-Authenticate', self.realm)
+        #self.send_header('Via', self.server_version)
+        self.send_header('Connection', 'close')
+        self.end_headers()
+        return
 
+    '''
+    def dump(self):
         message = '\n'.join([
             'CLIENT VALUES:',
             'client_address=%s (%s)' % (self.client_address,
@@ -176,30 +205,13 @@ class Proxy(BaseHTTPRequestHandler):
             'protocol_version=%s' % self.protocol_version,
             '',
         ])
-
         return message
-
+    '''
     def parse_query(self):
-        # TODO python 2.7 self.parsed_path = par (urllibn(self.path))
-        
-        
         if python_OldVersion:
             self.parsed_path = urlparse.urlparse(self.path)
         else:
-            #self.path = urllib.parse.unquote(self.path)
             self.parsed_path = urllib.parse.urlparse(self.path)
-
-        
-
-        #print self.log_request.code
-
-
-        #      'method: '+self.headers.get('path')
-
-        #pprint((vars(self)),indent=8,depth=2)
-        #pprint(object, stream=None, indent=1, width=80, depth=None)
-
-
         return
 
 
@@ -211,14 +223,14 @@ class Proxy(BaseHTTPRequestHandler):
 
         # Tenemos una cabecera con autenticacion Proxy?
         if self.headers.has_key('Proxy-Authorization'):
-            self.authorization = self.headers.get('Proxy-Authorization')
-            self.authorization = self.authorization.split()
+            authorization = self.headers.get('Proxy-Authorization')
+            authorization = authorization.split()
 
             # Han usado una autenticación básica?
-            if self.authorization[0].lower() == "basic":
+            if authorization[0].lower() == "basic":
                 try:
                     # Sí, intentamos obtener el usuario y passwd
-                    self.authorization = base64.decodestring(self.authorization[1])
+                    authorization = base64.decodestring(authorization[1])
 
                 except binascii.Error:
                     # Error, entonces KO
@@ -226,10 +238,43 @@ class Proxy(BaseHTTPRequestHandler):
 
                 else:
                     # Tenemos usuario & paswd y lo hemos podido decodificar
-                    self.authorization = self.authorization.split(':')
-                    self.user=self.authorization[0]
-                    self.password=self.authorization[1]
-                    if self.user == 'proxyUser' and self.password == 'proxyPass':
+                    authorization = authorization.split(':')
+                    self.proxy_user=authorization[0]
+                    self.proxy_password=authorization[1]
+                    if self.proxy_user == 'proxyUser' and self.proxy_password == 'proxyPass':
+                        #Autenticacion = OK
+                        return 1
+                    else:
+                        #Autenticacion = KO
+                        return 0	    
+
+        # No está autenticado
+        else:
+            return 0
+        
+    def handle_HTTP_AUTH(self):
+
+        # Tenemos una cabecera con autenticacion Proxy?
+        if self.headers.has_key('Authorization'):
+            authorization = self.headers.get('Authorization')
+            authorization = authorization.split()
+
+            # Han usado una autenticación básica?
+            if authorization[0].lower() == "basic":
+                try:
+                    # Sí, intentamos obtener el usuario y passwd
+                    authorization = base64.decodestring(authorization[1])
+
+                except binascii.Error:
+                    # Error, entonces KO
+                    return 0 
+
+                else:
+                    # Tenemos usuario & paswd y lo hemos podido decodificar
+                    authorization = authorization.split(':')
+                    self.http_user=authorization[0]
+                    self.http_password=authorization[1]
+                    if self.http_user == 'User' and self.http_password == 'Pass':
                         #Autenticacion = OK
                         return 1
                     else:
@@ -240,10 +285,11 @@ class Proxy(BaseHTTPRequestHandler):
         else:
             return 0
 
-
     def BASIC(self,what):
+        
+        
         if (what==None):
-            self.what='GET'     
+            self.what='GET'
         else:
             self.what=what
        
@@ -254,135 +300,140 @@ class Proxy(BaseHTTPRequestHandler):
         selfquery = False
 
 
-        if self.parsed_path.netloc =='':
+        if self.parsed_path.netloc in [ '127.0.0.1' , 'localhost', '' ]:
+            # or '' ]
             selfquery = True;
-        elif self.parsed_path.netloc =='127.0.0.1':
-            selfquery = True;
-        elif self.parsed_path.netloc =='localhost':
-            selfquery = True;
-
+        print("Local, %s %s" % (selfquery, self.what))
+        pprint(self.parsed_path)
         # TODO:: DESCOMENTAR
-        selfquery = False
+        ## La siguiente linea fuerza el uso de modo proxy
+        ## selfquery = False
         # TODO:: DESCOMENTAR
 
+        
         # Si es una dirección local, atendemos la petición HTTP
+        #######################################################
         if selfquery:
-            #print '_gsrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tUSR: '+self.user+',\tSRV: '+self.path
             if DEBUG: pprint(self.parsed_path)
+            
+            self.Allowed = self.handle_HTTP_AUTH()
 
-            service_handle_value="NOOP"
-            for URL in self.LocalServices:
+            if self.Allowed==1:
+                # handler por defecto... 
+                service_handle_value="NOOP"
+                service_handle_parms=""
+                
+                
+                if self.what in ['GET', 'POST', 'HEAD']:
+                    # Para cada uno de los servicios que atenderemos... (LocalServices es una lista de servicios vs handlers)
+                    for URL in self.LocalServices:
+                        if DEBUG: print ("\tm%s" % URL.pattern)
+                        if URL.match(self.parsed_path.path):
+                            #print re.sub(URL.pattern.upper())
+                            # Sustituimos el patron entre "/" y hacemos strip de los caracteres adicionales
+        
+                            service_handle_value=re.sub(r"/[.]*$","",re.sub(r"^/+", "", URL.pattern.upper()))
+                            service_handle_parms=re.sub(r'(?i)'+URL.pattern, "", self.parsed_path.path)
+                            if DEBUG:
+                                print ("\t!%s" % service_handle_value)
+                                print ("\t+%s" % service_handle_parms)
+                            break
+                    
+                    # Llamamos a la funcion que se llame svc_hndl_$(PATRON)
+                    # Por defecto, se llama a la funcion NOOP
+                    
+                    print (service_handle_value)
+                    self.ServiceHandle[service_handle_value](self,service_handle_parms)
+                    
+                    '''
+                    self.parse_query()              
+                    content = '<HTML><H1>test</H1></HTML>'
+                    self.bodySize = len(content)
+                    '''
+                
+                    if self.what != 'HEAD':
+                        try:
+                        #print ('tamagno %s - %s ' % (self.client_address[1],len(resp.content)))
+                            if python_OldVersion:
+                                self.wfile.write(content)
+                            else:
+                                self.wfile.write(bytes(content, 'UTF-8'))
+                        except ConnectionError:
+                            pass
+                    else:
+                        self.send_response(200)
+                        self.end_headers()
+                        
+                else:
+                    self.do_OTHER()
+            else:
+                self.do_HEAD_HTTP_AUTH()
+                          
 
-                print ("\tm%s" % URL.pattern)
-                if URL.match(self.parsed_path.path):
-                    #print re.sub(URL.pattern.upper())
-                    # Sustituimos el patron entre "/" y hacemos strip de los caracteres adicionales
 
-                    service_handle_value=re.sub(r"/[.]*$","",re.sub(r"^/+", "", URL.pattern.upper()))
-                    service_handle_parms=re.sub(r'(?i)'+URL.pattern, "", self.parsed_path.path)
-                    print ("\t!%s" % service_handle_value)
-                    print ("\t+%s" % service_handle_parms)
-                    break
-            # Llamamos a la funcion que se llame svc_hndl_$(PATRON)
-            #service_handle(service_handle_value)
-
-            if service_handle_value != "NOOP":
-                self.ServiceHandle[service_handle_value](self,service_handle_parms)
-            #self.service_selector(service_handle_value)
-                #self.LocalServices.index(URL.pattern)
-
-                #for URL in self.LocalServices:	    
-                #    print URL.pattern,'->',URL.match(self.parsed_path.path)
-                #if (self.parsed_path.path)
-
-            self.parse_query()
-            content = '<HTML><H1>test</H1></HTML>'
-            self.bodySize = len(content)
-            try:
-                #print ('tamagno %s - %s ' % (self.client_address[1],len(resp.content)))
-                self.wfile.write(bytes(content, 'UTF-8'))
-
-            except ConnectionAbortedError:
-                pass            
-
-
-        # Tratamos la peticion como PROXY    
+        # Tratamos la peticion como PROXY
+        # ######################################################
         else:
+            pprint(self.parsed_path)
+            
             # Está autenticado?
+            # Habilitamos la autenticacion o forzamos autenticado..
             # TODO:: DESCOMENTAR
-            #self.Allowed = self.handle_PROXY_AUTH()
-            self.Allowed = 1
+            self.Allowed = self.handle_PROXY_AUTH()
+            #self.Allowed = 1
             # TODO:: DESCOMENTAR
-            # SI
-            #print '_Gsrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tUSR: '+self.user+',\tPRX: '+self.path
+            
             if self.Allowed == 1:
-
                 if DEBUG:
                     for h in self.headers:
                         print ("\t.c >%s: %s<" % (h.capitalize(),self.headers[h]))
-                    #self.send_header(h.capitalize(),resp.headers[h])
-
                 try:
                     if DEBUG: print('URL: %s: %s' % (self.client_address[1],self.path))
                     if DEBUG: print ('try')
+                    
+                    # Filtramos el tipo de servicio y llamamos a un bloque o a otro...
                     if ( self.what == 'GET' ):
                         resp = requests.get(self.path, stream=True, allow_redirects=True)
                     elif ( self.what == 'POST' ):
                         resp = requests.post(self.path, stream=True, allow_redirects=True)
-                    #print (resp.history)
-                    #print (len(resp.content))
-
-                except Timeout:
-                    print ('exception Timeout')
+                    elif ( self.what == 'HEAD' ):
+                        resp = requests.head(self.path, stream=True, allow_redirects=True)                        
+                
+                except (Timeout, ConnectionError):
+                    print ('exception Conexion o Timeout')
                     self.send_response(504)
                     self.end_headers()
-                except ConnectionError:
-                    print ('exception Connection')
-                    self.send_response(504)
-                    self.end_headers()		    
                 else:
                     if DEBUG: print('else')
                     if DEBUG: pprint(vars(resp))
+                    
+                    # Es un código http valido?
                     if  (resp.status_code == requests.codes.ok):
+                         # enviamos el codigo
                         self.send_response(resp.status_code)
                     
-
-                    
+                    # Procesamos las cabeceras para reescribirlas
                     parsed_headers = Headers(response=resp, debug=False, 
                                                           ip=self.client_address[0],
                                                           port = self.client_address[1])
                     returned_headers = parsed_headers.parsed_headers()
-                    #returned_headers.sort()
                     
-                    
+                    # Enviamos todas las cabeceras reescritas
                     for header in returned_headers:
                         self.send_header(header[0], header[1])
-                        
+                    
+                    # Fin de cabeceras
                     self.end_headers()
 
-                    try:
-                        #print ('tamagno %s - %s ' % (self.client_address[1],len(resp.content)))
-                        self.wfile.write(resp.content)                     
-                    except ConnectionAbortedError:
-                        pass
+                    if self.what != 'HEAD':
+                        try:
+                            self.wfile.write(resp.content)
+                        except ConnectionError:
+                            pass
             # NO, 
             else:
-                self.do_HEAD_AUTH()	    
+                self.do_HEAD_PROXY_AUTH()
         if DEBUG: print ("end")
-        return
-
-    def do_GET(self):
-        self.BASIC(what='GET')
-        return
-    
-    def do_POST(self):
-        #print '_Osrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tUSR: '+self.user+',\tPRX: '+self.path
-        self.BASIC(what='POST')
-        '''
-        self.send_response(405)
-        self.send_header('Allow','GET, HEAD, PUT')
-        self.end_headers
-        '''
         return
 
     def do_CONNECT(self):
@@ -413,25 +464,15 @@ class Proxy(BaseHTTPRequestHandler):
             print ('Outbound conection to %s:%s' % (o_dest, o_port))
             self.server_socket = socket.create_connection((o_dest, o_port),timeout=5)
         
-        except socket.error as e:
+        except (socket.error, socket.herror, socket.gaierror) as e:
             print ("Error %s" % e)
             self.send_response(404,'CONNECT error ['+str(e)+'] to '+o_dest+':'+str(o_port))
             self.end_headers()              
-            
-        except socket.herror as e:
-            print ("Error %s" % e)
-            self.send_response(404,'CONNECT error ['+str(e)+'] to '+o_dest+':'+str(o_port))
-            self.end_headers()              
-            
-        except socket.gaierror as e:
-            print ("Error %s" % e)
-            self.send_response(404,'CONNECT error ['+str(e)+'] to '+o_dest+':'+str(o_port))
-            self.end_headers()              
-            
+                       
         except socket.timeout as e:
             print ("Error %s" % e)
             self.send_response(504,'CONNECT Timeout ['+str(e)+'] to '+o_dest+':'+str(o_port))
-            self.send_header('Content-Length', '0')
+            #self.send_header('Content-Length', '0')
             self.end_headers()            
             
         else:      
@@ -445,11 +486,15 @@ class Proxy(BaseHTTPRequestHandler):
             inputs = [self.connection, self.server_socket]            
             while (inputs and not salir_bucle):
                 # Wait for at least one of the sockets to be ready for processing
-                if DEBUG: print("waiting for the next event", file=sys.stderr)
+                
+                if DEBUG:
+                    sys.stderr.write("waiting for the next event")
+                    
                 #readable, writable, exceptional = select.select(inputs, [], inputs)
-                r, w, e = select.select(inputs, [], inputs, 1)
-                if DEBUG: print('select (i:%s, o:%s, e:%s'%(len(r),len(w),len(e)), file=sys.stderr)
-
+                r, w, e = select.select(inputs, [], inputs)
+                if DEBUG:
+                    sys.stderr.write("select (i:%s, o:%s, e:%s'%(len(r),len(w),len(e))")
+                    
                 #pprint(e)
                 if e != [] and not salir_bucle:
                     # cualquiera que sea el error en los sockets de cliente o servidor, tenemos que salir..
@@ -469,73 +514,78 @@ class Proxy(BaseHTTPRequestHandler):
                         if DEBUG: print('cliente tiene datos: leyendo cliente')  
                         try:
                             sockdata = self.connection.recv(4096)
-                        except (socket.timeout, socket.error) as e:
-                            print("error socket timeout cliente: %s" % (e))
-                            salir_bucle=True
-                        else:
-                            if len(sockdata) == 0:
-                                # Ordered shutdown...
+                            if (sockdata):
+                                self.server_wfile.write(sockdata)
+                            else:
                                 print("Cierre de socket cliente ordenado")
                                 salir_bucle=True   
-                            else:
-                                # Tenemos datos...
-                                if self.server_wfile.writable:
-                                    # Podemos escribir en servidor?
-                                    try:
-                                        self.server_wfile.write(sockdata)
-                                    except (socket.timeout, socket.error) as e:
-                                        print("error socket writing server: %s" % (e))
-                                        salir_bucle=True   
-                                else:
-                                    # No podemos escribir en socket server
-                                    print("Socket servido no escribible...")
-                                    salir_bucle=True
-
+                        except (socket.timeout, socket.error) as e:
+                            print("error socket: %s" % (e))
+                            salir_bucle=True   
 
                     if (self.server_socket in r) and not salir_bucle:
                         if DEBUG: print('servidor tiene datos: leyendo servidor')               
                         try:
                             sockdata = self.server_socket.recv(4096)
-                        except (socket.timeout, socket.error) as e:
-                            print("error socket timeout servidor: %s" % (e))
-                            salir_bucle=True
-                        else:
-                            if len(sockdata) == 0:
-                                # Ordered shutdown...
-                                print("Cierre de socket servidor ordenado")
-                                salir_bucle=True   
+                            if (sockdata):
+                                self.wfile.write(sockdata)
                             else:
-                                # Tenemos datos...
-                                if self.wfile.writable:
-                                    # Podemos escribir en cliente?
-                                    try:
-                                        self.wfile.write(sockdata)
-                                    except (socket.timeout, socket.error) as e:
-                                        print("error socket writing cliente: %s" % (e))
-                                        salir_bucle=True   
-                                else:
-                                    # No podemos escribir en socket cliente
-                                    print("Socket cliente no escribible...")
-                                    salir_bucle=True
-
+                                print("Cierre de socket servidor ordenado")
+                                salir_bucle=True
+                        except (socket.timeout, socket.error) as e:
+                            print("error socket: %s" % (e))
+                            salir_bucle=True   
+                        
                 if w != [] and not salir_bucle:
                     if DEBUG: pprint(w)
-                    
-                '''
-                pprint(server_socket)
-                time.sleep(100)
-                '''            
-        #print '_Csrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tUSR: '+self.user+',\tPRX: '+self.path
-        print ("saliendo del bucle del socket...")
+     
+        if DEBUG: print ("saliendo del bucle del socket...")
         self.server_wfile.close()
         self.server_socket.close()
-        #self.connection.close()                        
-        
-        '''
-        self.send_response(405)
-        self.send_header('Allow','GET, HEAD, PUT')
-        self.end_headers
-        '''        
-        #while (True):
-            #if self.rfile.
+
         return
+
+##     __verbs_supported ='GET, HEAD, POST, PUT, TRACE, OPTIONS, CONNECT'
+##                         xxx  xxxx  xxxx              xxxxxxx  xxxxxxx
+
+    def do_OPTIONS(self):
+        #print '_Osrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path
+        if (self.path == '*'):
+            self.send_response(200)
+            self.send_header('Allow',self.__verbs_supported)
+            self.send_header('Content-Length', '0')	
+            self.end_headers            
+        else:
+            self.BASIC(what='OPTIONS')
+            # TODO:: OPTIONS de url requiere auth... gesionado en BASIC      
+        return    
+
+    def do_HEAD(self):
+        print '_Hsrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path
+        self.BASIC(what='HEAD')        
+        return
+    
+    def do_TRACE(self):
+        print '_Tsrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path
+        #if self.parsed_path.netloc=='' and self.parsed_path.path=='*':
+            
+        #else:
+        self.BASIC(what='TRACE')
+        return
+        
+    def do_GET(self):
+        #print '_Gsrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path
+        self.BASIC(what='GET')
+        return
+
+    def do_POST(self):
+        #print '_Osrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path
+        self.BASIC(what='POST')
+        return
+
+    def do_OTHER(self):     
+        self.send_response(405)
+        self.send_header('Allow',self.__verbs_supported)
+        self.end_headers
+        return
+    
