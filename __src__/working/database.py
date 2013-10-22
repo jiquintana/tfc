@@ -7,7 +7,7 @@ import sys, os
 from config import dbFiles
 
 
-'''
+
 class database:
     
     APPID = 0xDECA
@@ -17,21 +17,18 @@ class database:
     #PRAGMA journal_mode=MEMORY;
     #PRAGMA auto_vacuum = FULL;
     
-    def __init__(self):
-        
+    def __init__(self):    
         for dbname in dbFiles.keys():
             filename = dbFiles[dbname]
             pathname = os.path.dirname(filename)
             
-            print 'Checking '+dbname+':\t'+filename
+            sys.stdout.write('Checking '+dbname+':\t'+filename)
             
             try:
                 os.stat(pathname)
             except:
-                print 'Path of '+filename+' doesn\'t exists. Trying to create..'
+                sys.stdout.write('Path of '+filename+' doesn\'t exists. Trying to create..')
                 os.mkdir(pathname)
-            
-            
         return
     
     
@@ -53,14 +50,13 @@ class database:
             self.rol = rol
             self.user = user
             self.password = password
-        
-        def 
+
         
     
 
 mydatabase = database()
 
-'''
+
 '''
 try:
     os.stat(dir)

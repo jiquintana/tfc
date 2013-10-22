@@ -58,7 +58,7 @@ class Proxy(BaseHTTPRequestHandler):
     def send_html_message(self, what):
         content = "<HTML><BODY><H1>"+what+"</H1></BODY></HTML>\n"
         self.bodySize = len(content)
-        self.do_HEAD()
+        self.do_HEADERS()
         try:
             #print ('tamagno %s - %s ' % (self.client_address[1],len(resp.content)))
             self.wfile.write(bytes(content, 'UTF-8'))
@@ -163,7 +163,7 @@ class Proxy(BaseHTTPRequestHandler):
     
         
     
-    def do_HEAD(self):
+    def do_HEADERS(self):
         self.send_response(200)
         if self.bodySize != None:
             self.send_header('Content-Type', 'text/html;charset=UTF-8')
@@ -222,7 +222,10 @@ class Proxy(BaseHTTPRequestHandler):
     def handle_PROXY_AUTH(self):
 
         # Tenemos una cabecera con autenticacion Proxy?
-        if self.headers.has_key('Proxy-Authorization'):
+        
+        ## Python 3 => removed self.headers.>has_key<('Proxy-Authorization'):
+        ## cambiado por 'in'
+        if 'Proxy-Authorization' in self.headers:
             authorization = self.headers.get('Proxy-Authorization')
             authorization = authorization.split()
 
@@ -230,7 +233,11 @@ class Proxy(BaseHTTPRequestHandler):
             if authorization[0].lower() == "basic":
                 try:
                     # Sí, intentamos obtener el usuario y passwd
-                    authorization = base64.decodestring(authorization[1])
+                    if python_OldVersion:
+                        authorization = base64.decodestring(authorization[1])
+                    else:
+                        authorization = base64.decodestring(bytes(authorization[1],'UTF-8')).decode()
+                    # bytes(content, 'UTF-8')
 
                 except binascii.Error:
                     # Error, entonces KO
@@ -255,7 +262,11 @@ class Proxy(BaseHTTPRequestHandler):
     def handle_HTTP_AUTH(self):
 
         # Tenemos una cabecera con autenticacion Proxy?
-        if self.headers.has_key('Authorization'):
+        
+        ## Python 3 => removed self.headers.>has_key<('Authorization'):
+        ## cambiado por 'in'
+
+        if 'Authorization' in self.headers:
             authorization = self.headers.get('Authorization')
             authorization = authorization.split()
 
@@ -263,7 +274,13 @@ class Proxy(BaseHTTPRequestHandler):
             if authorization[0].lower() == "basic":
                 try:
                     # Sí, intentamos obtener el usuario y passwd
-                    authorization = base64.decodestring(authorization[1])
+                    #authorization = base64.decodestring(authorization[1])
+                    
+                    if python_OldVersion:
+                        authorization = base64.decodestring(authorization[1])
+                    else:
+                        authorization = base64.decodestring(bytes(authorization[1],'UTF-8')).decode()
+                    # bytes(content, 'UTF-8')                    
 
                 except binascii.Error:
                     # Error, entonces KO
@@ -314,16 +331,17 @@ class Proxy(BaseHTTPRequestHandler):
         # Si es una dirección local, atendemos la petición HTTP
         #######################################################
         if selfquery:
+            DEBUG=True
             if DEBUG: pprint(self.parsed_path)
             
             self.Allowed = self.handle_HTTP_AUTH()
-
+            print("autorizado: %s " % self.Allowed)
             if self.Allowed==1:
                 # handler por defecto... 
                 service_handle_value="NOOP"
                 service_handle_parms=""
                 
-                
+                print("self.waht: %s " % self.what)
                 if self.what in ['GET', 'POST', 'HEAD']:
                     # Para cada uno de los servicios que atenderemos... (LocalServices es una lista de servicios vs handlers)
                     for URL in self.LocalServices:
@@ -334,6 +352,7 @@ class Proxy(BaseHTTPRequestHandler):
         
                             service_handle_value=re.sub(r"/[.]*$","",re.sub(r"^/+", "", URL.pattern.upper()))
                             service_handle_parms=re.sub(r'(?i)'+URL.pattern, "", self.parsed_path.path)
+                            
                             if DEBUG:
                                 print ("\t!%s" % service_handle_value)
                                 print ("\t+%s" % service_handle_parms)
@@ -342,8 +361,11 @@ class Proxy(BaseHTTPRequestHandler):
                     # Llamamos a la funcion que se llame svc_hndl_$(PATRON)
                     # Por defecto, se llama a la funcion NOOP
                     
-                    print (service_handle_value)
+                    print (">>> %s " % service_handle_value)
                     self.ServiceHandle[service_handle_value](self,service_handle_parms)
+                    service_handle_value = 'NOOP'
+                    print ("<<< %s " % service_handle_value)
+                    
                     
                     '''
                     self.parse_query()              
@@ -561,12 +583,12 @@ class Proxy(BaseHTTPRequestHandler):
         return    
 
     def do_HEAD(self):
-        print '_Hsrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path
+        sys.stdout.write('_Hsrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path)
         self.BASIC(what='HEAD')        
         return
     
     def do_TRACE(self):
-        print '_Tsrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path
+        sys.stdout.write('_Tsrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path)
         #if self.parsed_path.netloc=='' and self.parsed_path.path=='*':
             
         #else:
@@ -583,9 +605,10 @@ class Proxy(BaseHTTPRequestHandler):
         self.BASIC(what='POST')
         return
 
-    def do_OTHER(self):     
+    def do_OTHER(self):
+        
         self.send_response(405)
         self.send_header('Allow',self.__verbs_supported)
         self.end_headers
-        return
-    
+        sys.exit(1)
+        

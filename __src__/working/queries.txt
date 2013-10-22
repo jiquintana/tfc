@@ -1,0 +1,17 @@
+GET http://127.0.0.1/images/loading.gif HTTP/1.0
+
+GET http://clients1.google.es/generate_204 HTTP/1.0
+
+GET http://l.yimg.com/zz/combo?nn/lib/metro/g/uicontrib/yui/yui_3.4.6.js HTTP/1.0
+
+
+GET http://www.google.com HTTP/1.0
+
+CONNECT www.google.com:444
+
+
+HEAD http://www.google.com HTTP/1.0
+
+HEAD http://127.0.0.1 HTTP/1.0
+HEAD /CONFIG HTTP/1.0
+HEAD http://www.google.com HTTP/1.0
