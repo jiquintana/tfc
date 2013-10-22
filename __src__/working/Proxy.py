@@ -19,7 +19,7 @@ else:                       # Python version 3.x
     from socketserver import BaseRequestHandler 
 
 import base64, binascii, re, string
-import socket, select, time
+import socket, select, time, os
 
 # tenemos que instalar la libreria 'requests' procedente de pip: 
 # pip install requests
@@ -50,59 +50,99 @@ class Proxy(BaseHTTPRequestHandler):
     __verbs_safe = 'GET, HEAD, OPTIONS, TRACE'
 
         
-        # http://bugs.python.org/issue14574
-        # Versions:	Python 3.4, Python 3.3, Python 3.2, Python 2.7
-        # Title:	SocketServer doesn't handle client disconnects properly
-    
+    # http://bugs.python.org/issue14574
+    # Versions:	Python 3.4, Python 3.3, Python 3.2, Python 2.7
+    # Title:	SocketServer doesn't handle client disconnects properly
 
-    def send_html_message(self, what):
-        content = "<HTML><BODY><H1>"+what+"</H1></BODY></HTML>\n"
-        self.bodySize = len(content)
-        self.do_HEADERS()
-        try:
-            #print ('tamagno %s - %s ' % (self.client_address[1],len(resp.content)))
-            self.wfile.write(bytes(content, 'UTF-8'))
-        except ConnectionAbortedError:
-            pass        
+
+    def svc_hndl_FILE(self,parms,query, Verb=''):
+        print ("svc_hndl_FILE called with parms: >%s, %s<" % (Verb, parms))
+        
+        if Verb=='HEAD':
+            mensaje=''
+        else:    
+            print("url parms = %s, %s" % (parms,query))
+            filename=re.sub(r'[^a-zA-Z0-9]', "", parms).lower()
+    
+            if os.path.exists('./static/'+filename+'.static'):
+                source = open('./static/'+filename+'.static', 'r')
+                mensaje = source.read()
+                self.int_send_HEADERS(200,mensaje)
+                
+            else:
+                mensaje=self.int_get_html_message('File "<font color="red">'+filename+'</font>" not found')
+                self.int_send_HEADERS(404,mensaje)
+                #self.int_send_BODY(mensaje)
+                
+        if Verb!='HEAD':
+            self.int_send_BODY(mensaje)
+                        
         
         return
+
+    def svc_hndl_STOP(self,parms,query, Verb=''):
+        print ("svc_hndl_STOP called with parms: >%s, %s<" % (Verb, parms))
+        if Verb=='HEAD':
+            mensaje=''
+        else:
+            mensaje=self.int_get_html_message('STOP hndl')
+            
+        self.int_send_HEADERS(200,mensaje)
+                
+        if Verb!='HEAD':
+            self.int_send_BODY(mensaje)
+            Proxy.threadServer.force_shutdown()
+                        
+        #self.send_html_message("FORCED SHUTDOWN")
+        return
+
+    def svc_hndl_CONFIG(self,parms,query, Verb=''):
+        print ("svc_hndl_CONFIG called with parms: >%s, %s<" % (Verb, parms))
+        if Verb=='HEAD':
+            mensaje=''
+        else:
+            mensaje=self.int_get_html_message('CONFIG hndl')
+        self.int_send_HEADERS(200,mensaje)
+                
+        if Verb!='HEAD':
+            self.int_send_BODY(mensaje)
+                
+                
+        #self.send_html_message("CONFIG")
+        return
     
-    def send_post(self,content):
-        self.bodySize = len(content)
-        self.do_HEAD()
-        try:
-            #print ('tamagno %s - %s ' % (self.client_address[1],len(resp.content)))
-            self.wfile.write(bytes(content, 'UTF-8'))        
-        except ConnectionAbortedError:
-            pass        
+    def svc_hndl_POST(self,parms,query, Verb=''):
+        print ("svc_hndl_POST called with parms: >%s, %s<" % (Verb, parms))
+        if Verb=='HEAD':
+            mensaje=''
+        else:
+            mensaje='<html><head><title>My Page</title></head><body><form name="myform" action="http://localhost/dump.php" method="POST"><div align="center"><br><br><input type="text" size="25" value="Enter your name here!"><br><input type="submit" value="Send me your name!"><br></div></form></body></html>'
+            self.int_send_HEADERS(200,mensaje)
+        
+        if Verb!='HEAD':
+            self.int_send_BODY(mensaje)
+            
+        return
+
+    def svc_hndl_NOOP(self,parms,query, Verb=''):
+        print ("svc_hndl_NOOP called with parms: >%s, %s<" % (Verb, parms))
+        if Verb=='HEAD':
+            mensaje=''
+        else:
+            mensaje=self.int_get_html_message('NOOP hndl')
+        self.int_send_HEADERS(200,mensaje)
+        
+        if Verb!='HEAD':
+            self.int_send_BODY(mensaje)
         
         return
-
-    def svc_hndl_STOP(self,parms):
-        print ("svc_hndl_STOP called with parms: %s" % parms)
-        self.send_html_message("FORCED SHUTDOWN")
-        Proxy.threadServer.force_shutdown()
-        return
-
-    def svc_hndl_CONFIG(self,parms):
-        print ("svc_hndl_CONFIG called with parms: %s" % parms)
-        self.send_html_message("CONFIG")
-        return
-    
-    def svc_hndl_POST(self,parms):
-        print ("svc_hndl_POST called with parms: %s" % parms)
-        self.send_post('<html><head><title>My Page</title></head><body><form name="myform" action="/test.php" method="POST"><div align="center"><br><br><input type="text" size="25" value="Enter your name here!"><br><input type="submit" value="Send me your name!"><br></div></form></body></html>')
-        return
-
-    def svc_hndl_NOOP(self,parms):
-        print ("svc_hndl_NOOP called with parms: %s" % parms)
-        self.send_html_message("NOOP")
-        return
+        
 
     LocalServices = {
         re.compile(r"/STOP/",   re.IGNORECASE),
         re.compile(r"/CONFIG/", re.IGNORECASE),
         re.compile(r"/POST/",   re.IGNORECASE),
+        re.compile(r"/FILE/",   re.IGNORECASE),
         re.compile(r"/NOOP/",   re.IGNORECASE)
     }
 
@@ -110,6 +150,7 @@ class Proxy(BaseHTTPRequestHandler):
         "STOP": svc_hndl_STOP,
         "CONFIG": svc_hndl_CONFIG,
         "POST": svc_hndl_POST,
+        "FILE": svc_hndl_FILE,
         "NOOP": svc_hndl_NOOP
     }    
 
@@ -161,18 +202,33 @@ class Proxy(BaseHTTPRequestHandler):
         return
     '''
     
+    def int_get_html_message(self, what):
+        content = "<HTML><BODY><H1>"+what+"</H1></BODY></HTML>\n"
+        return content
         
     
-    def do_HEADERS(self):
-        self.send_response(200)
-        if self.bodySize != None:
-            self.send_header('Content-Type', 'text/html;charset=UTF-8')
-            self.send_header('Content-Length', self.bodySize)	
+    def int_send_HEADERS(self, code=200, message=''):
+        self.send_response(code)
+        self.send_header('Content-Type', 'text/html;charset=UTF-8')
+        self.send_header('Content-Length', self.bodySize)	
         self.end_headers()
-
         return
+    
+    def int_send_BODY(self, message=''):
+        try:
+            if python_OldVersion:
+                self.wfile.write(message)
+            else:
+                self.wfile.write(bytes(message, 'UTF-8'))        
+            
+        except:
+            pass
+        
+        return
+    
+    
 
-    def do_HEAD_PROXY_AUTH(self):
+    def int_HEAD_PROXY_AUTH(self):
         self.send_response(407,"Proxy Authentication Required. "+self.server_version+": Access to the Web Proxy filter is denied.")
         self.send_header('Proxy-Authenticate', 'Negotiate')
         self.send_header('Proxy-Authenticate', self.realm)
@@ -182,9 +238,9 @@ class Proxy(BaseHTTPRequestHandler):
         self.end_headers()
         return
 
-    def do_HEAD_HTTP_AUTH(self):
-        self.send_response(401,"Authentication Required. "+self.server_version+": Access to the Web Server is denied.")
-        #self.send_header('WWW-Authenticate', 'Negotiate')
+    def int_HEAD_HTTP_AUTH(self):
+        self.send_response(401,"HTTP authentication Required. "+self.server_version+": Access to the Web Server is denied.")
+        self.send_header('WWW-Authenticate', 'Negotiate')
         self.send_header('WWW-Authenticate', self.realm)
         #self.send_header('Via', self.server_version)
         self.send_header('Connection', 'close')
@@ -226,9 +282,12 @@ class Proxy(BaseHTTPRequestHandler):
         ## Python 3 => removed self.headers.>has_key<('Proxy-Authorization'):
         ## cambiado por 'in'
         if 'Proxy-Authorization' in self.headers:
+            
             authorization = self.headers.get('Proxy-Authorization')
-            authorization = authorization.split()
 
+            print ('Proxy auth string [Proxy-Authorization]: %s ' % authorization)
+
+            authorization = authorization.split()
             # Han usado una autenticación básica?
             if authorization[0].lower() == "basic":
                 try:
@@ -268,6 +327,9 @@ class Proxy(BaseHTTPRequestHandler):
 
         if 'Authorization' in self.headers:
             authorization = self.headers.get('Authorization')
+            
+            print ('HTTP auth string [Authorization]: %s ' % authorization)
+                        
             authorization = authorization.split()
 
             # Han usado una autenticación básica?
@@ -320,8 +382,7 @@ class Proxy(BaseHTTPRequestHandler):
         if self.parsed_path.netloc in [ '127.0.0.1' , 'localhost', '' ]:
             # or '' ]
             selfquery = True;
-        print("Local, %s %s" % (selfquery, self.what))
-        pprint(self.parsed_path)
+
         # TODO:: DESCOMENTAR
         ## La siguiente linea fuerza el uso de modo proxy
         ## selfquery = False
@@ -331,8 +392,10 @@ class Proxy(BaseHTTPRequestHandler):
         # Si es una dirección local, atendemos la petición HTTP
         #######################################################
         if selfquery:
-            DEBUG=True
-            if DEBUG: pprint(self.parsed_path)
+            if DEBUG:
+                pprint(self.parsed_path)
+                print("Local, %s %s" % (selfquery, self.what))
+                
             
             self.Allowed = self.handle_HTTP_AUTH()
             print("autorizado: %s " % self.Allowed)
@@ -341,7 +404,7 @@ class Proxy(BaseHTTPRequestHandler):
                 service_handle_value="NOOP"
                 service_handle_parms=""
                 
-                print("self.waht: %s " % self.what)
+                print("self.what: %s " % self.what)
                 if self.what in ['GET', 'POST', 'HEAD']:
                     # Para cada uno de los servicios que atenderemos... (LocalServices es una lista de servicios vs handlers)
                     for URL in self.LocalServices:
@@ -353,18 +416,15 @@ class Proxy(BaseHTTPRequestHandler):
                             service_handle_value=re.sub(r"/[.]*$","",re.sub(r"^/+", "", URL.pattern.upper()))
                             service_handle_parms=re.sub(r'(?i)'+URL.pattern, "", self.parsed_path.path)
                             
-                            if DEBUG:
-                                print ("\t!%s" % service_handle_value)
-                                print ("\t+%s" % service_handle_parms)
-                            break
+                            
+                            
+                            #break
                     
                     # Llamamos a la funcion que se llame svc_hndl_$(PATRON)
                     # Por defecto, se llama a la funcion NOOP
-                    
-                    print (">>> %s " % service_handle_value)
-                    self.ServiceHandle[service_handle_value](self,service_handle_parms)
+                    pprint(self.parsed_path)
+                    self.ServiceHandle[service_handle_value](self,service_handle_parms,self.parsed_path.query,Verb=self.what)
                     service_handle_value = 'NOOP'
-                    print ("<<< %s " % service_handle_value)
                     
                     
                     '''
@@ -373,6 +433,7 @@ class Proxy(BaseHTTPRequestHandler):
                     self.bodySize = len(content)
                     '''
                 
+                    '''
                     if self.what != 'HEAD':
                         try:
                         #print ('tamagno %s - %s ' % (self.client_address[1],len(resp.content)))
@@ -385,11 +446,11 @@ class Proxy(BaseHTTPRequestHandler):
                     else:
                         self.send_response(200)
                         self.end_headers()
-                        
+                    '''    
                 else:
                     self.do_OTHER()
             else:
-                self.do_HEAD_HTTP_AUTH()
+                self.int_HEAD_HTTP_AUTH()
                           
 
 
@@ -454,7 +515,7 @@ class Proxy(BaseHTTPRequestHandler):
                             pass
             # NO, 
             else:
-                self.do_HEAD_PROXY_AUTH()
+                self.int_HEAD_PROXY_AUTH()
         if DEBUG: print ("end")
         return
 
@@ -583,12 +644,12 @@ class Proxy(BaseHTTPRequestHandler):
         return    
 
     def do_HEAD(self):
-        sys.stdout.write('_Hsrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path)
+        sys.stdout.write('_Hsrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path+'\n')
         self.BASIC(what='HEAD')        
         return
     
     def do_TRACE(self):
-        sys.stdout.write('_Tsrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path)
+        sys.stdout.write('_Tsrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path+'\n')
         #if self.parsed_path.netloc=='' and self.parsed_path.path=='*':
             
         #else:

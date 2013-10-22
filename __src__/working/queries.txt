@@ -1,17 +1,22 @@
 GET http://127.0.0.1/images/loading.gif HTTP/1.0
-
 GET http://clients1.google.es/generate_204 HTTP/1.0
-
 GET http://l.yimg.com/zz/combo?nn/lib/metro/g/uicontrib/yui/yui_3.4.6.js HTTP/1.0
-
-
 GET http://www.google.com HTTP/1.0
 
 CONNECT www.google.com:444
-
+CONNECT https://www.google.com HTTP/1.0
+CONNECT www.google.com:80 HTTP/1.0
+CONNECT http://www.google.com HTTP/1.0
+CONNECT ftp://www.google.com HTTP/1.0
+CONNECT ftp://www.google.com:1021 HTTP/1.0
+CONNECT http://www.agoogle.com HTTP/1.0
 
 HEAD http://www.google.com HTTP/1.0
-
 HEAD http://127.0.0.1 HTTP/1.0
 HEAD /CONFIG HTTP/1.0
 HEAD http://www.google.com HTTP/1.0
+echo -e "HEAD http://127.0.0.1/NOOP/ HTTP/1.0\nAuthorization:Basic VXNlcjpQYXNz\n" | nc 127.0.0.1 8002
+
+http://127.0.0.1:8002/POST
+http://127.0.0.1:8002/FILE/post
+redirige los resultados del post a http://localhost/dump.php
