@@ -230,7 +230,7 @@ class Proxy(BaseHTTPRequestHandler):
 
     def int_HEAD_PROXY_AUTH(self):
         self.send_response(407,"Proxy Authentication Required. "+self.server_version+": Access to the Web Proxy filter is denied.")
-        self.send_header('Proxy-Authenticate', 'Negotiate')
+        #self.send_header('Proxy-Authenticate', 'Negotiate')
         self.send_header('Proxy-Authenticate', self.realm)
         #self.send_header('Via', self.server_version)
         self.send_header('Proxy-Connection', 'close')
@@ -240,7 +240,7 @@ class Proxy(BaseHTTPRequestHandler):
 
     def int_HEAD_HTTP_AUTH(self):
         self.send_response(401,"HTTP authentication Required. "+self.server_version+": Access to the Web Server is denied.")
-        self.send_header('WWW-Authenticate', 'Negotiate')
+        #self.send_header('WWW-Authenticate', 'Negotiate')
         self.send_header('WWW-Authenticate', self.realm)
         #self.send_header('Via', self.server_version)
         self.send_header('Connection', 'close')
@@ -285,7 +285,7 @@ class Proxy(BaseHTTPRequestHandler):
             
             authorization = self.headers.get('Proxy-Authorization')
 
-            print ('Proxy auth string [Proxy-Authorization]: %s ' % authorization)
+            if DEBUG: print ('Proxy auth string [Proxy-Authorization]: %s ' % authorization)
 
             authorization = authorization.split()
             # Han usado una autenticación básica?
@@ -328,7 +328,7 @@ class Proxy(BaseHTTPRequestHandler):
         if 'Authorization' in self.headers:
             authorization = self.headers.get('Authorization')
             
-            print ('HTTP auth string [Authorization]: %s ' % authorization)
+            if DEBUG: print ('HTTP auth string [Authorization]: %s ' % authorization)
                         
             authorization = authorization.split()
 
@@ -364,8 +364,8 @@ class Proxy(BaseHTTPRequestHandler):
         else:
             return 0
 
+
     def BASIC(self,what):
-        
         
         if (what==None):
             self.what='GET'
@@ -378,7 +378,9 @@ class Proxy(BaseHTTPRequestHandler):
         # Por defecto no nos piden a nosotros
         selfquery = False
 
-
+        ## TODO: aqui hay que cambiar que empiece por la cadena en vez de que sea la cadena
+        ## TODO: cuando atacamos localhost:PUERTO (modo proxy), devuelve OK, pero cuando se ataca el servicio
+        ## TODO: sin puerto, se devuelve como contenido las cabeceras
         if self.parsed_path.netloc in [ '127.0.0.1' , 'localhost', '' ]:
             # or '' ]
             selfquery = True;
@@ -398,7 +400,7 @@ class Proxy(BaseHTTPRequestHandler):
                 
             
             self.Allowed = self.handle_HTTP_AUTH()
-            print("autorizado: %s " % self.Allowed)
+            if DEBUG: print("autorizado by HTTP_AUTH: %s " % self.Allowed)
             if self.Allowed==1:
                 # handler por defecto... 
                 service_handle_value="NOOP"
@@ -422,7 +424,8 @@ class Proxy(BaseHTTPRequestHandler):
                     
                     # Llamamos a la funcion que se llame svc_hndl_$(PATRON)
                     # Por defecto, se llama a la funcion NOOP
-                    pprint(self.parsed_path)
+                    pprint(self.parsed_path, indent=1, depth=80)
+                    pprint(object)
                     self.ServiceHandle[service_handle_value](self,service_handle_parms,self.parsed_path.query,Verb=self.what)
                     service_handle_value = 'NOOP'
                     
@@ -463,6 +466,9 @@ class Proxy(BaseHTTPRequestHandler):
             # Habilitamos la autenticacion o forzamos autenticado..
             # TODO:: DESCOMENTAR
             self.Allowed = self.handle_PROXY_AUTH()
+            
+            if DEBUG: print("autorizado by PROXY_AUTH: %s " % self.Allowed)
+            
             #self.Allowed = 1
             # TODO:: DESCOMENTAR
             
@@ -544,16 +550,16 @@ class Proxy(BaseHTTPRequestHandler):
     
         
         try:
-            print ('Outbound conection to %s:%s' % (o_dest, o_port))
+            if DEBUG: print ('Outbound conection to %s:%s' % (o_dest, o_port))
             self.server_socket = socket.create_connection((o_dest, o_port),timeout=5)
         
         except (socket.error, socket.herror, socket.gaierror) as e:
-            print ("Error %s" % e)
+            if DEBUG: print ("Error %s" % e)
             self.send_response(404,'CONNECT error ['+str(e)+'] to '+o_dest+':'+str(o_port))
             self.end_headers()              
                        
         except socket.timeout as e:
-            print ("Error %s" % e)
+            if DEBUG: print ("Error %s" % e)
             self.send_response(504,'CONNECT Timeout ['+str(e)+'] to '+o_dest+':'+str(o_port))
             #self.send_header('Content-Length', '0')
             self.end_headers()            
@@ -583,9 +589,9 @@ class Proxy(BaseHTTPRequestHandler):
                     # cualquiera que sea el error en los sockets de cliente o servidor, tenemos que salir..
                     
                     if self.connection in e:
-                        print ("error socket cliente: cerrandolo")
+                        if DEBUG: print ("error socket cliente: cerrandolo")
                     if server_socket in e:
-                        print ("error socket servidor: cerrandolo")
+                        if DEBUG: print ("error socket servidor: cerrandolo")
                     pprint(e)
                     salir_bucle=True
  
@@ -600,10 +606,10 @@ class Proxy(BaseHTTPRequestHandler):
                             if (sockdata):
                                 self.server_wfile.write(sockdata)
                             else:
-                                print("Cierre de socket cliente ordenado")
+                                if DEBUG: print("Cierre de socket cliente ordenado")
                                 salir_bucle=True   
                         except (socket.timeout, socket.error) as e:
-                            print("error socket: %s" % (e))
+                            if DEBUG: print("error socket: %s" % (e))
                             salir_bucle=True   
 
                     if (self.server_socket in r) and not salir_bucle:
@@ -613,10 +619,10 @@ class Proxy(BaseHTTPRequestHandler):
                             if (sockdata):
                                 self.wfile.write(sockdata)
                             else:
-                                print("Cierre de socket servidor ordenado")
+                                if DEBUG: print("Cierre de socket servidor ordenado")
                                 salir_bucle=True
                         except (socket.timeout, socket.error) as e:
-                            print("error socket: %s" % (e))
+                            if DEBUG: print("error socket: %s" % (e))
                             salir_bucle=True   
                         
                 if w != [] and not salir_bucle:

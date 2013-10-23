@@ -20,3 +20,7 @@ echo -e "HEAD http://127.0.0.1/NOOP/ HTTP/1.0\nAuthorization:Basic VXNlcjpQYXNz\
 http://127.0.0.1:8002/POST
 http://127.0.0.1:8002/FILE/post
 redirige los resultados del post a http://localhost/dump.php
+
+http://localhost:8002/POST/
+gnuecho -e "GET http://localhost:8002/POST/ HTTP/1.0\n" | nc 127.0.0.1 8002
+gnuecho -e "GET http://localhost/POST/ HTTP/1.0\n" | nc 127.0.0.1 8002
