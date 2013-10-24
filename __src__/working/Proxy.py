@@ -20,6 +20,7 @@ else:                       # Python version 3.x
 
 import base64, binascii, re, string
 import socket, select, time, os
+import cgi
 
 # tenemos que instalar la libreria 'requests' procedente de pip: 
 # pip install requests
@@ -44,6 +45,7 @@ class Proxy(BaseHTTPRequestHandler):
     bodySize = None
     Allowed = 0
     parsed_path =''
+    postvars = {}        
     
     __verbs_supported ='GET, HEAD, POST, PUT, TRACE, OPTIONS, CONNECT'
     __verbs_unsupported = 'PATCH, DELETE'
@@ -484,6 +486,9 @@ class Proxy(BaseHTTPRequestHandler):
                     if ( self.what == 'GET' ):
                         resp = requests.get(self.path, stream=True, allow_redirects=True)
                     elif ( self.what == 'POST' ):
+                        pprint(self.headers.dict)
+                        pprint(self.path)
+                        pprint(self.parsed_path)
                         resp = requests.post(self.path, stream=True, allow_redirects=True)
                     elif ( self.what == 'HEAD' ):
                         resp = requests.head(self.path, stream=True, allow_redirects=True)                        
@@ -668,6 +673,19 @@ class Proxy(BaseHTTPRequestHandler):
         return
 
     def do_POST(self):
+        ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+        if ctype == 'multipart/form-data':
+            postvars = cgi.parse_multipart(self.rfile, pdict)
+        elif ctype == 'application/x-www-form-urlencoded':
+            length = int(self.headers.getheader('content-length'))
+            postvars = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
+        else:
+            postvars = {}        
+        
+        self.postvars = postvars
+        #if DEBUG:
+        for postvar in postvars: print('Post Variable %s = %s' % (postvar,postvars[postvar]))
+        pprint(postvars)
         #print '_Osrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path
         self.BASIC(what='POST')
         return
