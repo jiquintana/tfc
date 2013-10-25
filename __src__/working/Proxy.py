@@ -45,8 +45,8 @@ class Proxy(BaseHTTPRequestHandler):
     bodySize = None
     Allowed = 0
     parsed_path =''
-    postvars = {}        
-    
+    content = ''
+        
     __verbs_supported ='GET, HEAD, POST, PUT, TRACE, OPTIONS, CONNECT'
     __verbs_unsupported = 'PATCH, DELETE'
     __verbs_safe = 'GET, HEAD, OPTIONS, TRACE'
@@ -224,6 +224,7 @@ class Proxy(BaseHTTPRequestHandler):
                 self.wfile.write(bytes(message, 'UTF-8'))        
             
         except:
+            sys.stderr.write("excepcion e")
             pass
         
         return
@@ -462,7 +463,7 @@ class Proxy(BaseHTTPRequestHandler):
         # Tratamos la peticion como PROXY
         # ######################################################
         else:
-            pprint(self.parsed_path)
+            if DEBUG: pprint(self.parsed_path)
             
             # Está autenticado?
             # Habilitamos la autenticacion o forzamos autenticado..
@@ -480,21 +481,25 @@ class Proxy(BaseHTTPRequestHandler):
                         print ("\t.c >%s: %s<" % (h.capitalize(),self.headers[h]))
                 try:
                     if DEBUG: print('URL: %s: %s' % (self.client_address[1],self.path))
-                    if DEBUG: print ('try')
+                    if DEBUG: print ('try request')
                     
+                    # Si la petición contiene datos...
+                    if self.headers.has_key('content-length'):
+                        self.content = self.rfile.read(int(self.headers.getheader('content-length')))
+                        if DEBUG: sys.stderr.write('\ncontent'); pprint(self.content)
+                        
                     # Filtramos el tipo de servicio y llamamos a un bloque o a otro...
                     if ( self.what == 'GET' ):
-                        resp = requests.get(self.path, stream=True, allow_redirects=True)
+                        resp = requests.get(self.path, headers=self.headers,
+                                            data=self.content, stream=True, allow_redirects=True)
                     elif ( self.what == 'POST' ):
-                        pprint(self.headers.dict)
-                        pprint(self.path)
-                        pprint(self.parsed_path)
-                        resp = requests.post(self.path, stream=True, allow_redirects=True)
+                        resp = requests.post(self.path, headers=self.headers,
+                                            data=self.content, stream=True, allow_redirects=True)                        
                     elif ( self.what == 'HEAD' ):
                         resp = requests.head(self.path, stream=True, allow_redirects=True)                        
                 
-                except (Timeout, ConnectionError):
-                    print ('exception Conexion o Timeout')
+                except:
+                    print ('excepcion en el request')
                     self.send_response(504)
                     self.end_headers()
                 else:
@@ -504,27 +509,34 @@ class Proxy(BaseHTTPRequestHandler):
                     # Es un código http valido?
                     if  (resp.status_code == requests.codes.ok):
                          # enviamos el codigo
-                        self.send_response(resp.status_code)
-                    
-                    # Procesamos las cabeceras para reescribirlas
-                    parsed_headers = Headers(response=resp, debug=False, 
-                                                          ip=self.client_address[0],
-                                                          port = self.client_address[1])
-                    returned_headers = parsed_headers.parsed_headers()
-                    
-                    # Enviamos todas las cabeceras reescritas
-                    for header in returned_headers:
-                        self.send_header(header[0], header[1])
-                    
-                    # Fin de cabeceras
-                    self.end_headers()
-
-                    if self.what != 'HEAD':
                         try:
-                            self.wfile.write(resp.content)
-                        except ConnectionError:
+                            self.send_response(resp.status_code)
+                            # Procesamos las cabeceras para reescribirlas
+                            parsed_headers = Headers(response=resp, debug=False, 
+                                                                  ip=self.client_address[0],
+                                                                  port = self.client_address[1])
+                            returned_headers = parsed_headers.parsed_headers()
+                            
+                            # Enviamos todas las cabeceras reescritas
+                            for header in returned_headers:
+                                self.send_header(header[0], header[1])
+
+                            # Fin de cabeceras
+
+                            self.end_headers()
+
+        
+                            if self.what != 'HEAD':
+                                self.wfile.write(resp.content)
+
+                                                     
+                        except: # si encontramos una excepcion...
+                            sys.stderr.write("excepcion a")
+                            pass 
+                        # NO es codigo ok
+                        else:
                             pass
-            # NO, 
+
             else:
                 self.int_HEAD_PROXY_AUTH()
         if DEBUG: print ("end")
@@ -536,7 +548,8 @@ class Proxy(BaseHTTPRequestHandler):
         
         self.parse_query()
         
-        pprint (self.parsed_path)
+        if DEBUG:
+            pprint (self.parsed_path)
 
         
         # Tenemos schema? => eso nos fija el puerto por defecto en caso de no
@@ -596,8 +609,8 @@ class Proxy(BaseHTTPRequestHandler):
                     if self.connection in e:
                         if DEBUG: print ("error socket cliente: cerrandolo")
                     if server_socket in e:
-                        if DEBUG: print ("error socket servidor: cerrandolo")
-                    pprint(e)
+                        if DEBUG:print ("error socket servidor: cerrandolo")
+                    if DEBUG: pprint(e)
                     salir_bucle=True
  
  
@@ -672,24 +685,43 @@ class Proxy(BaseHTTPRequestHandler):
         self.BASIC(what='GET')
         return
 
+    
     def do_POST(self):
-        ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
-        if ctype == 'multipart/form-data':
-            postvars = cgi.parse_multipart(self.rfile, pdict)
-        elif ctype == 'application/x-www-form-urlencoded':
-            length = int(self.headers.getheader('content-length'))
-            postvars = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
-        else:
-            postvars = {}        
+        sys.stderr.write('enter do_POST')
+        #self.post_data=self.rfile.read()
+        postvars = {}
         
-        self.postvars = postvars
+        
+        '''
+        ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+        sys.stderr.write('enter ctype\n')
+        if ctype == 'multipart/form-data':
+            try:
+                postvars = cgi.parse_multipart(self.rfile, pdict)
+            except:
+                sys.stderr.write("excepcion c\n")
+                pass
+        elif ctype == 'application/x-www-form-urlencoded':
+            try:
+                length = int(self.headers.getheader('content-length'))
+                postvars = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
+            except:
+                sys.stderr.write("excepcion d\n")
+                pass
+                  
+        sys.stderr.write('leave ctype\n')
+        self.post_vars = postvars
         #if DEBUG:
         for postvar in postvars: print('Post Variable %s = %s' % (postvar,postvars[postvar]))
-        pprint(postvars)
+        if DEBUG: pprint(postvars)
         #print '_Osrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path
+        '''
+        sys.stderr.write('calling BASIC\n')
         self.BASIC(what='POST')
+        
         return
 
+    
     def do_OTHER(self):
         
         self.send_response(405)
