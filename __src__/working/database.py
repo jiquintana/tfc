@@ -4,7 +4,7 @@
 
 import sqlite3 as lite
 import sys, os
-from config import dbFiles
+import config
 from sqlalchemy import *
 from pprint import pprint
 

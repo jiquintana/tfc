@@ -1,11 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
-
-
-
 import sys
-
 if sys.version_info < (3, 0):
     python_OldVersion = True
 else:
@@ -40,7 +36,7 @@ def run(HandlerClass = Proxy,
     HandlerClass.protocol_version = protocol
     RQServer = ServerClass(server_address, HandlerClass)
     Proxy.threadServer = RQServer
-
+    
     sa = RQServer.socket.getsockname()
     print ("Serving HTTP on %s, port %s..." % (sa[0], sa[1]))
     try:

@@ -25,12 +25,13 @@ else:                       # Python version 3.x
     
 import threading, socket, os, time
 
+from Log import Log
 
 class ThreadPoolMixIn(ThreadingMixIn):
     '''
     use a thread pool instead of a new thread on every request
     '''
-    numThreads = 15
+    numThreads = 10
     allow_reuse_address = True  # seems to fix socket.error on server restart
     KEEP_RUNNING = True
     ## Changed: Start
@@ -42,7 +43,7 @@ class ThreadPoolMixIn(ThreadingMixIn):
     
     def force_shutdown(self):
         self.KEEP_RUNNING=False
-        print ("%s ServerHTTP Forced Shutdown...", time.asctime())
+        Log.pdebug("%s ServerHTTP Forced Shutdown...", time.asctime())
         os._exit(0)
 
       
@@ -52,7 +53,7 @@ class ThreadPoolMixIn(ThreadingMixIn):
         '''
         # set up the threadpool
         self.requests = Queue(self.numThreads)
-
+        
         for x in range(self.numThreads):
             t = threading.Thread(target = self.process_request_thread)
             t.setDaemon(1)
