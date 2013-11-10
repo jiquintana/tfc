@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number:syntax=on:set filetype indent plugin on
 
-configPath = "./db"
-cachePath = "./cache"
+config_Path = "./db"
+cache_Path = "./cache"
+log_Path = "./cache"
 
 dbFiles = {
-    'config': configPath+'/config.db',
-    'rules': configPath+'/rules.db',
-    'log': configPath+'/log.db'
+    'config': config_Path+'/config.db',
+    'rules': config_Path+'/rules.db',
+    'log': config_Path+'/log.db'
 }
 

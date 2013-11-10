@@ -14,7 +14,7 @@ class ClientHeaders:
     
     def __init__(self,  headers, debug =False,
                      ip='', port=''):
-        self.__orig_headers = ''
+        self.__orig_headers = {}
         self.__headers = {}
         self.__cookies = {}
         self.DEBUG = debug
@@ -35,7 +35,10 @@ class ClientHeaders:
            
             if self.DEBUG: Log.pdebug('%s:%s: * IH %s -> %s' % (self.ip, self.port, header_key, header_value))
             # Evitamos copiar la autorizacion del proxy y el host
-            if header_key not in ['Proxy-authorization','Host']:
+            if header_key not in ['Proxy-authorization','Host', 'Accept-encoding']:
+                # Eliminamos la cabecera de autenticacion proxy,
+                # Eliminamos la traza del Host y
+                # Eliminamos las cabeceras que no sean texto plano p.ej: "Accept-encoding -> gzip, deflate"
                 # Si tenemos la cabecera
                 if (header_key== 'Content-length') and self.DEBUG:
                     Log.pdebug("::: HDR - %s:%s Content-length => hdr %s\n" % (self.ip,self.port,header_value))
@@ -68,12 +71,14 @@ class ServerHeaders:
     def __init__(self,  response, debug =False,
                  ip='', port='', server_version='HTTP_Proxy/0.1'):
         self.__headers = []
+        self.__headers.clear()
         self.ip = ''
         self.port = ''  
         self.DEBUG = debug
         self.ip = ip
         self.port = port
         self.server_version = server_version
+        self.headers_have_been_parsed = False
         
         if self.DEBUG: Log.pdebug ('ServerHeaders.__init__')        
         if response != []:
@@ -84,7 +89,7 @@ class ServerHeaders:
     def parsed_headers(self):
         if self.DEBUG: Log.pdebug ('Headers.parsed_headers')
         if not self.headers_have_been_parsed:
-            self.parse()
+            self.__parse()
        
         return self.__headers
 
@@ -97,7 +102,7 @@ class ServerHeaders:
             for i in self.__headers:
                 Log.pdebug(' < %s %s:' % (self.port, i))
 
-    def parse(self):
+    def __parse(self):
         if self.DEBUG: Log.pdebug ('Headers.parse')
         for header_name, header_value in self.__response.headers.items():
             
@@ -152,11 +157,13 @@ class ServerHeaders:
                 POS = [0,len(header_value)]
 
                 # Para cada una de las cookies encontradas en los headers...
+                # Caso excepcional cuando la cookie está en la primera posición de la cadena: no la buscamos porque hemos añadido la posición 0,
+                # así que buscaremos la cadena ' ,<COOKIE>=' y ' <COOKIE>='
                 for cookie in self.__response.cookies.keys():
                     # buscamos la cookie en formato ", cookie=" y agnadimos todas las posiciones al vector POS
                     for i in allindices(header_value, ', '+cookie+'='): POS.append(i)
-                    # buscamos la cookie en formato "cookie=" y agnadimos todas las posiciones al vector POS
-                    for i in allindices(header_value, cookie+'='): POS.append(i)
+                    # buscamos la cookie en formato " cookie=" y agnadimos todas las posiciones al vector POS
+                    for i in allindices(header_value, ' '+cookie+'='): POS.append(i)
 
 
                 #for header_nameey in resp.cooheader_nameies.header_nameeys():
