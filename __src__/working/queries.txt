@@ -1,0 +1,33 @@
+GET http://127.0.0.1/images/loading.gif HTTP/1.0
+GET http://clients1.google.es/generate_204 HTTP/1.0
+GET http://l.yimg.com/zz/combo?nn/lib/metro/g/uicontrib/yui/yui_3.4.6.js HTTP/1.0
+GET http://www.google.com HTTP/1.0
+
+CONNECT www.google.com:444
+CONNECT https://www.google.com HTTP/1.0
+CONNECT www.google.com:80 HTTP/1.0
+CONNECT http://www.google.com HTTP/1.0
+CONNECT ftp://www.google.com HTTP/1.0
+CONNECT ftp://www.google.com:1021 HTTP/1.0
+CONNECT http://www.agoogle.com HTTP/1.0
+
+HEAD http://www.google.com HTTP/1.0
+HEAD http://127.0.0.1 HTTP/1.0
+HEAD /CONFIG HTTP/1.0
+HEAD http://www.google.com HTTP/1.0
+echo -e "HEAD http://127.0.0.1/NOOP/ HTTP/1.0\nAuthorization:Basic VXNlcjpQYXNz\n" | nc 127.0.0.1 8002
+
+http://127.0.0.1:8002/POST
+http://127.0.0.1:8002/FILE/post
+redirige los resultados del post a http://localhost/dump.php
+
+http://localhost:8002/POST/
+gnuecho -e "GET http://localhost:8002/POST/ HTTP/1.0\n" | nc 127.0.0.1 8002
+gnuecho -e "GET http://localhost/POST/ HTTP/1.0\n" | nc 127.0.0.1 8002
+
+
+gnuecho -e "http://bs.serving-sys.com/BurstingPipe/adServer.bs?cn=int&iv=2&int=17497216~~0~~3269890~~3821247373382165474^ebUniqueVideoStarted~0~0~01010^VsR~0~0~01020^VsRAg~0~0~01020^VsRAd~0~0~01020^expandedPanel1_autoshow~0~0~01001^ebVideoUnmuted~0~58852777~01010&usercookie=u2=f0f117a9-9537-48cd-9f77-bced24d27628&OptOut=0&ebRandom=0.25316873653566774&flv=11.99&wmpv=0&res=0HTTP/1.0\nAuthorization:Basic VXNlcjpQYXNz\n" | nc 127.0.0.1 8002
+
+gnuecho -e "GET http://google.com/ HTTP/1.0\nProxy-Authorization:Basic cHJveHlVc2VyOnByb3h5UGFzcw==\n" | nc 127.0.0.1 8002
+gnuecho -e "GET http://www.google.com/search?output=search&sclient=psy-ab&q=&btnK=Submit HTTP/1.0\nProxy-Authorization:Basic cHJveHlVc2VyOnByb3h5UGFzcw==\n" | nc 127.0.0.1 8002
+gnuecho -e "GET http://google.com/ HTTP/1.0\nProxy-Authorization:Basic cHJveHlVc2VyOnByb3h5UGFzcw==\n" | nc 127.0.0.1 8002
