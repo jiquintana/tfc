@@ -449,9 +449,10 @@ class Proxy(BaseHTTPRequestHandler):
                 if DEBUG: Log.pdebug('URL: %s: %s' % (self.client_address[1],self.path))
                 if DEBUG: Log.pdebug ('try request')
                 
+                fc = Cache.FileCache()
                 # Filtramos el tipo de servicio y llamamos a un bloque o a otro...
                 if ( self.what == 'GET' ):
-                    fc = Cache.FileCache()
+                    
                     cache_content = b''
                     cache_headers = []
                     cache_headers.clear()
