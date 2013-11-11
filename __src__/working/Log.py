@@ -2,26 +2,21 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
 
-import select, time, sys
+import select, time, sys, datetime
 import Config
 
 TRACE = True
 MAX_CON_MSG = 180
 
 class Log:
-    def get_timestamp(timestamp=None):
-        if timestamp is None:
-            timestamp = time.time()
-        year, month, day, hh, mm, ss, wd, y, z = time.gmtime(timestamp)
-        s = "%04d.%02d.%02d %02d:%02d:%02d" % (
-            year, month, day, 
-            hh, mm, ss)
-        return s
+    def get_timestamp(self):
+        return str(datetime.datetime.now())
+   
 
-    def pdebug(*args):
+    def pdebug(self,*args):
         if TRACE:
-            if len(args[0]) > MAX_CON_MSG:
-                sys.stderr.write('%s, %s\n' % (Log.get_timestamp(), args[0][0:MAX_CON_MSG-3]+'..'))
+            if (args[0].__len__()) > MAX_CON_MSG:
+                sys.stdout.write('%s, %s\n' % (self.get_timestamp(), args[0][0:MAX_CON_MSG-3]+'..'))
             else:
-                sys.stderr.write('%s, %s\n' % (Log.get_timestamp(), args[0]))
+                sys.stdout.write('%s, %s\n' % (self.get_timestamp(), args[0]))
         return    

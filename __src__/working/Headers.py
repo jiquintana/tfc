@@ -71,7 +71,7 @@ class ServerHeaders:
     def __init__(self,  response, debug =False,
                  ip='', port='', server_version='HTTP_Proxy/0.1'):
         self.__headers = []
-        self.__headers.clear()
+        self.__headers [:] = []
         self.ip = ''
         self.port = ''  
         self.DEBUG = debug

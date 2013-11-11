@@ -35,6 +35,7 @@ import requests
 import Headers
 import Cache
 from Log import Log
+#import Log
 
 DEBUG_LEVELS = ['CONNECTIONS','HEADERS', 'AUTH']
 DEBUG = False
@@ -55,6 +56,7 @@ class Proxy(BaseHTTPRequestHandler):
     processed_headers = []
     code = 0
     content_cached=False
+    logger = Log()
 
     #http.client.HTTPConnection.debuglevel = 1
 
@@ -84,11 +86,15 @@ class Proxy(BaseHTTPRequestHandler):
             return s	
     '''
     def __init__(self, request, client_address, server):
-        super().__init__(request, client_address, server)
+        if not python_OldVersion:
+            super().__init__(request, client_address, server)   
+        else:
+            BaseHTTPRequestHandler.__init__(self, request, client_address, server)
+            
         self.content = b''
         self.content_lenght = 0
         self.code = 0
-        self.processed_headers = []
+        self.processed_headers [:] = []
         self.content_cached=False 
         self.Allowed = 0
         
@@ -105,12 +111,12 @@ class Proxy(BaseHTTPRequestHandler):
     '''
 
     def svc_hndl_FILE(self,parms,query, Verb=''):
-        Log.pdebug("svc_hndl_FILE called with parms: >%s, %s<" % (Verb, parms))
+        self.logger.pdebug("svc_hndl_FILE called with parms: >%s, %s<" % (Verb, parms))
 
         if Verb=='HEAD':
             mensaje=''
         else:    
-            if DEBUG: Log.pdebug("url parms = %s, %s" % (parms,query))
+            if DEBUG: self.logger.pdebug("url parms = %s, %s" % (parms,query))
             filename=re.sub(r'[^a-zA-Z0-9]', "", parms).lower()
 
             if os.path.exists('./static/'+filename+'.static'):
@@ -130,7 +136,7 @@ class Proxy(BaseHTTPRequestHandler):
         return
 
     def svc_hndl_STOP(self,parms,query, Verb=''):
-        Log.pdebug("svc_hndl_STOP called with parms: >%s, %s<" % (Verb, parms))
+        self.logger.pdebug("svc_hndl_STOP called with parms: >%s, %s<" % (Verb, parms))
         if Verb=='HEAD':
             mensaje=''
         else:
@@ -146,7 +152,7 @@ class Proxy(BaseHTTPRequestHandler):
         return
 
     def svc_hndl_CONFIG(self,parms,query, Verb=''):
-        Log.pdebug("svc_hndl_CONFIG called with parms: >%s, %s<" % (Verb, parms))
+        self.logger.pdebug("svc_hndl_CONFIG called with parms: >%s, %s<" % (Verb, parms))
         if Verb=='HEAD':
             mensaje=''
         else:
@@ -161,7 +167,7 @@ class Proxy(BaseHTTPRequestHandler):
         return
 
     def svc_hndl_POST(self,parms,query, Verb=''):
-        Log.pdebug("svc_hndl_POST called with parms: >%s, %s<" % (Verb, parms))
+        self.logger.pdebug("svc_hndl_POST called with parms: >%s, %s<" % (Verb, parms))
         if Verb=='HEAD':
             mensaje=''
         else:
@@ -174,7 +180,7 @@ class Proxy(BaseHTTPRequestHandler):
         return
 
     def svc_hndl_NOOP(self,parms,query, Verb=''):
-        Log.pdebug("svc_hndl_NOOP called with parms: >%s, %s<" % (Verb, parms))
+        self.logger.pdebug("svc_hndl_NOOP called with parms: >%s, %s<" % (Verb, parms))
         if Verb=='HEAD':
             mensaje=''
         else:
@@ -225,7 +231,7 @@ class Proxy(BaseHTTPRequestHandler):
                 self.wfile.write(bytes(message, 'UTF-8'))        
 
         except:
-            Log.pdebug('excepcion en send_body :%s, %s' % (self.what, self.path))
+            self.logger.pdebug('excepcion en send_body :%s, %s' % (self.what, self.path))
 
             pass
 
@@ -270,7 +276,7 @@ class Proxy(BaseHTTPRequestHandler):
 
             authorization = self.headers.get('Proxy-Authorization')
 
-            if DEBUG: Log.pdebug ('Proxy auth string [Proxy-Authorization]: %s ' % authorization)
+            if DEBUG: self.logger.pdebug ('Proxy auth string [Proxy-Authorization]: %s ' % authorization)
 
             authorization = authorization.split()
             # Han usado una autenticación básica?
@@ -313,7 +319,7 @@ class Proxy(BaseHTTPRequestHandler):
         if 'Authorization' in self.headers:
             authorization = self.headers.get('Authorization')
 
-            if DEBUG: Log.pdebug ('HTTP auth string [Authorization]: %s ' % authorization)
+            if DEBUG: self.logger.pdebug ('HTTP auth string [Authorization]: %s ' % authorization)
 
             authorization = authorization.split()
 
@@ -354,8 +360,8 @@ class Proxy(BaseHTTPRequestHandler):
         self.content = b''
         self.content_lenght = 0
         self.code = 0
-        self.processed_headers = []
-        self.processed_headers.clear()
+        self.processed_headers [:] = []
+        #self.processed_headers.clear()
         self.content_cached=False 
         self.Allowed = 0
         
@@ -387,22 +393,22 @@ class Proxy(BaseHTTPRequestHandler):
         #######################################################
         if selfquery:
             if DEBUG:
-                Log.pdebug(self.parsed_path)
-                Log.pdebug("Local, %s %s" % (selfquery, self.what))
+                self.logger.pdebug(self.parsed_path)
+                self.logger.pdebug("Local, %s %s" % (selfquery, self.what))
 
 
             self.Allowed = self.handle_HTTP_AUTH()
-            if DEBUG: Log.pdebug("autorizado by HTTP_AUTH: %s " % self.Allowed)
+            if DEBUG: self.logger.pdebug("autorizado by HTTP_AUTH: %s " % self.Allowed)
             if self.Allowed==1:
                 # handler por defecto... 
                 service_handle_value="NOOP"
                 service_handle_parms=""
 
-                Log.pdebug("self.what: %s " % self.what)
+                self.logger.pdebug("self.what: %s " % self.what)
                 if self.what in ['GET', 'POST', 'HEAD']:
                     # Para cada uno de los servicios que atenderemos... (LocalServices es una lista de servicios vs handlers)
                     for URL in self.LocalServices:
-                        if DEBUG: Log.pdebug ("\tm%s" % URL.pattern)
+                        if DEBUG: self.logger.pdebug ("\tm%s" % URL.pattern)
                         if URL.match(self.parsed_path.path):
 
                             # Sustituimos el patron entre "/" y hacemos strip de los caracteres adicionales
@@ -425,14 +431,14 @@ class Proxy(BaseHTTPRequestHandler):
         # Tratamos la peticion como PROXY
         # ######################################################
         else:
-            if DEBUG: Log.pdebug(self.parsed_path)
+            if DEBUG: self.logger.pdebug(self.parsed_path)
 
             # Está autenticado?
             # Habilitamos la autenticacion o forzamos autenticado..
             # TODO:: DESCOMENTAR
             self.Allowed = self.handle_PROXY_AUTH()
 
-            if DEBUG: Log.pdebug("autorizado by PROXY_AUTH: %s " % self.Allowed)
+            if DEBUG: self.logger.pdebug("autorizado by PROXY_AUTH: %s " % self.Allowed)
 
             #self.Allowed = 1
             # TODO:: DESCOMENTAR
@@ -446,8 +452,8 @@ class Proxy(BaseHTTPRequestHandler):
                                                                       port = self.client_address[1])                
                 new_client_headers,client_cookies = client_headers.parse()
 
-                if DEBUG: Log.pdebug('URL: %s: %s' % (self.client_address[1],self.path))
-                if DEBUG: Log.pdebug ('try request')
+                if DEBUG: self.logger.pdebug('URL: %s: %s' % (self.client_address[1],self.path))
+                if DEBUG: self.logger.pdebug ('try request')
                 
                 fc = Cache.FileCache()
                 # Filtramos el tipo de servicio y llamamos a un bloque o a otro...
@@ -455,7 +461,8 @@ class Proxy(BaseHTTPRequestHandler):
                     
                     cache_content = b''
                     cache_headers = []
-                    cache_headers.clear()
+                    cache_headers[:] = []
+                    #cache_headers.clear()
                     self.content_cached = fc.is_cached(path=self.path, debug=False, ip=self.client_address[0], port=self.client_address[1])
                     if self.content_cached:
                         cache_content, cache_headers = fc.get(path=self.path, debug=True, ip=self.client_address[0], port=self.client_address[1])
@@ -482,9 +489,10 @@ class Proxy(BaseHTTPRequestHandler):
                 if  (self.code == requests.codes.ok):
                     # enviamos el codigo
                     self.send_response(self.code)
-                    self.processed_headers = []
-                    self.processed_headers.clear()
+                    self.processed_headers [:] = []
+                    #self.processed_headers.clear()
                     parsed_headers = []
+                    parsed_headers [:] = []
                     could_cache=True
                     if not self.content_cached:                        
                         # Procesamos las cabeceras para reescribirlas
@@ -524,7 +532,7 @@ class Proxy(BaseHTTPRequestHandler):
                         
             else:
                 self.int_HEAD_PROXY_AUTH()
-        if DEBUG: Log.pdebug ("end")
+        if DEBUG: self.logger.pdebug ("end")
         return
 
     def do_CONNECT(self):
@@ -533,8 +541,8 @@ class Proxy(BaseHTTPRequestHandler):
 
         self.parse_query()
         if DEBUG:
-            Log.pdebug (self.parsed_path)
-        Log.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+            self.logger.pdebug (self.parsed_path)
+        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                     'Allow: %s, ' % self.Allowed +
                     'prxUSR: %10s, ' % self.proxy_user[0:9] +
                     'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
@@ -553,16 +561,16 @@ class Proxy(BaseHTTPRequestHandler):
             if (o_port_default!=None): o_port=o_port_default
 
         try:
-            if DEBUG: Log.pdebug ('Outbound conection to %s:%s' % (o_dest, o_port))
+            if DEBUG: self.logger.pdebug ('Outbound conection to %s:%s' % (o_dest, o_port))
             self.server_socket = socket.create_connection((o_dest, o_port),timeout=3)
 
         except (socket.error, socket.herror, socket.gaierror) as e:
-            if DEBUG: Log.pdebug ("Error %s" % e)
+            if DEBUG: self.logger.pdebug ("Error %s" % e)
             self.send_response(404,'CONNECT error ['+str(e)+'] to '+o_dest+':'+str(o_port))
             self.end_headers()              
 
         except socket.timeout as e:
-            if DEBUG: Log.pdebug ("Error %s" % e)
+            if DEBUG: self.logger.pdebug ("Error %s" % e)
             self.send_response(504,'CONNECT Timeout ['+str(e)+'] to '+o_dest+':'+str(o_port))
             #self.send_header('Content-Length', '0')
             self.end_headers()            
@@ -574,8 +582,8 @@ class Proxy(BaseHTTPRequestHandler):
 
             self.server_wfile = self.server_socket.makefile('wb', self.wbufsize)            
 
-            #Log.pdebug('_Csrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path)		
-            Log.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+            #self.logger.pdebug('_Csrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path)		
+            self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                         'Allow: %s, ' % self.Allowed +
                         'prxUSR: %10s, ' % self.proxy_user[0:9] +
                         'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
@@ -597,44 +605,44 @@ class Proxy(BaseHTTPRequestHandler):
                     # cualquiera que sea el error en los sockets de cliente o servidor, tenemos que salir..
 
                     if self.connection in e:
-                        if DEBUG: Log.pdebug("error socket cliente: cerrandolo")
+                        if DEBUG: self.logger.pdebug("error socket cliente: cerrandolo")
                     if server_socket in e:
-                        if DEBUG: Log.pdebug("error socket servidor: cerrandolo")
-                    if DEBUG: Log.pdebug(e)
+                        if DEBUG: self.logger.pdebug("error socket servidor: cerrandolo")
+                    if DEBUG: self.logger.pdebug(e)
                     salir_bucle=True
 
                 if r != [] and not salir_bucle:
-                    if DEBUG: Log.pdebug(r)
+                    if DEBUG: self.logger.pdebug(r)
                     if (self.connection in r) and not salir_bucle:
-                        if DEBUG: Log.pdebug('cliente tiene datos: leyendo cliente')  
+                        if DEBUG: self.logger.pdebug('cliente tiene datos: leyendo cliente')  
                         try:
                             sockdata = self.connection.recv(4096)
                             if (sockdata):
                                 self.server_wfile.write(sockdata)
                             else:
-                                if DEBUG: Log.pdebug("Cierre de socket cliente ordenado")
+                                if DEBUG: self.logger.pdebug("Cierre de socket cliente ordenado")
                                 salir_bucle=True   
                         except (socket.timeout, socket.error) as e:
-                            if DEBUG: Log.pdebug("error socket: %s" % (e))
+                            if DEBUG: self.logger.pdebug("error socket: %s" % (e))
                             salir_bucle=True   
 
                     if (self.server_socket in r) and not salir_bucle:
-                        if DEBUG: Log.pdebug('servidor tiene datos: leyendo servidor')               
+                        if DEBUG: self.logger.pdebug('servidor tiene datos: leyendo servidor')               
                         try:
                             sockdata = self.server_socket.recv(4096)
                             if (sockdata):
                                 self.wfile.write(sockdata)
                             else:
-                                if DEBUG: Log.pdebug("Cierre de socket servidor ordenado")
+                                if DEBUG: self.logger.pdebug("Cierre de socket servidor ordenado")
                                 salir_bucle=True
                         except (socket.timeout, socket.error) as e:
-                            if DEBUG: Log.pdebug("error socket: %s" % (e))
+                            if DEBUG: self.logger.pdebug("error socket: %s" % (e))
                             salir_bucle=True   
 
                 if w != [] and not salir_bucle:
-                    if DEBUG: Log.pdebug(w)
+                    if DEBUG: self.logger.pdebug(w)
 
-        if DEBUG: Log.pdebug ("saliendo del bucle del socket...")
+        if DEBUG: self.logger.pdebug ("saliendo del bucle del socket...")
         self.server_wfile.close()
         self.server_socket.close()
         return
@@ -644,7 +652,7 @@ class Proxy(BaseHTTPRequestHandler):
 
     def do_OPTIONS(self):
         self.content = ''
-        Log.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                     'Allow: %s, ' % self.Allowed +
                     'prxUSR: %10s, ' % self.proxy_user[0:9] +
                     'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
@@ -657,7 +665,7 @@ class Proxy(BaseHTTPRequestHandler):
         else:
             self.BASIC(what='OPTIONS')
             # TODO:: OPTIONS de url requiere auth... gesionado en BASIC      
-            Log.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+            self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                         'Allow: %s, ' % self.Allowed +
                         'prxUSR: %10s, ' % self.proxy_user[0:9] +
                         'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
@@ -665,14 +673,14 @@ class Proxy(BaseHTTPRequestHandler):
         return    
 
     def do_HEAD(self):
-        Log.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                     'Allow: %s, ' % self.Allowed +
                     'prxUSR: %10s, ' % self.proxy_user[0:9] +
                     'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
                     '??? HEA '+ self.path)        
         self.content = ''
         self.BASIC(what='HEAD')
-        Log.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                     'Allow: %s, ' % self.Allowed +
                     'prxUSR: %10s, ' % self.proxy_user[0:9] +
                     'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
@@ -682,7 +690,7 @@ class Proxy(BaseHTTPRequestHandler):
     def do_TRACE(self):
         self.content = ''
         self.BASIC(what='TRACE')
-        Log.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+        self.logger.pdebug( '%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                     'Allow: %s, ' % self.Allowed +
                     'prxUSR: %10s, ' % self.proxy_user[0:9] +
                     'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
@@ -696,12 +704,13 @@ class Proxy(BaseHTTPRequestHandler):
                                 port = self.client_address[1])
         returned_headers = parsed_headers.input_parsed_headers()
         '''
-        Log.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+        
+        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                     'Allow: %s, ' % self.Allowed +
                     'prxUSR: %10s, ' % self.proxy_user[0:9] +
                     'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
                     '??? GET %s' % (self.path)
-                    )            
+                     )            
         
         if 'Content-Length' in self.headers:
             self.content = self.rfile.read(int(self.headers['Content-Length']))
@@ -716,14 +725,14 @@ class Proxy(BaseHTTPRequestHandler):
                    'PRX GET ' + self.path
         '''
         if self.content_cached:
-            Log.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+            self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                         'Allow: %s, ' % self.Allowed +
                         'prxUSR: %10s, ' % self.proxy_user[0:9] +
                         'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
                         'CAC GET %s' % (self.path)
                         )            
         else:
-            Log.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+            self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                         'Allow: %s, ' % self.Allowed +
                         'prxUSR: %10s, ' % self.proxy_user[0:9] +
                         'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
@@ -734,7 +743,7 @@ class Proxy(BaseHTTPRequestHandler):
 
 
     def do_POST(self):
-        Log.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                     'Allow: %s, ' % self.Allowed +
                     'prxUSR: %10s, ' % self.proxy_user[0:9] +
                     'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
@@ -748,7 +757,7 @@ class Proxy(BaseHTTPRequestHandler):
 
         if DEBUG: sys.stderr.write('calling BASIC\n')
         self.BASIC(what='POST')
-        Log.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                     'Allow: %s, ' % self.Allowed +
                     'prxUSR: %10s, ' % self.proxy_user[0:9] +
                     'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
@@ -761,7 +770,7 @@ class Proxy(BaseHTTPRequestHandler):
         self.send_response(405)
         self.send_header('Allow',self.__verbs_supported)
         self.end_headers
-        Log.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                     'Allow: %s, ' % self.Allowed +
                     'prxUSR: %10s, ' % self.proxy_user[0:9] +
                     'Cod: %3d, Size: %8d,' % (self.code, self.content_lenght) +
