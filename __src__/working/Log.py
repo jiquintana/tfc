@@ -6,7 +6,7 @@ import select, time, sys, datetime
 import Config
 
 TRACE = True
-MAX_CON_MSG = 180
+
 
 class Log:
     def get_timestamp(self):
@@ -15,8 +15,8 @@ class Log:
 
     def pdebug(self,*args):
         if TRACE:
-            if (args[0].__len__()) > MAX_CON_MSG:
-                sys.stdout.write('%s, %s\n' % (self.get_timestamp(), args[0][0:MAX_CON_MSG-3]+'..'))
+            if (args[0].__len__()) > Config.MAX_LEN_MSG:
+                sys.stdout.write('%s, %s\n' % (self.get_timestamp(), args[0][0:Config.MAX_LEN_MSG-3]+'..'))
             else:
                 sys.stdout.write('%s, %s\n' % (self.get_timestamp(), args[0]))
         return    

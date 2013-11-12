@@ -4,7 +4,7 @@
 
 import sqlite3 as lite
 import sys, os
-import config
+import Config
 from sqlalchemy import *
 from pprint import pprint
 
@@ -20,8 +20,8 @@ class database:
     #PRAGMA auto_vacuum = FULL;
     
     def __init__(self):    
-        for dbname in dbFiles.keys():
-            filename = dbFiles[dbname]
+        for dbname in Config.dbFiles.keys():
+            filename = Config.dbFiles[dbname]
             pathname = os.path.dirname(filename)
             
             sys.stdout.write('Checking if database "'+dbname+'" stored in '+filename+' exists\n')
@@ -64,7 +64,7 @@ logdb = mydatabases.connections['log']
 
 with logdb:
     cur=logdb.cursor()
-    # cur.execute("CREATE TABLE Cars(Id INT, Name TEXT, Price INT)")
+    cur.execute("CREATE TABLE Cars(Id INT, Name TEXT, Price INT)")
     cur.execute("INSERT INTO Cars VALUES(1,'Audi',52642)")
     cur.execute("INSERT INTO Cars VALUES(2,'Mercedes',57127)")
     cur.execute("INSERT INTO Cars VALUES(3,'Skoda',9000)")

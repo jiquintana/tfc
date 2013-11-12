@@ -24,14 +24,14 @@ else:                       # Python version 3.x
     from queue import Queue
     
 import threading, socket, os, time
-
+import Config
 from Log import Log
 
 class ThreadPoolMixIn(ThreadingMixIn):
     '''
     use a thread pool instead of a new thread on every request
     '''
-    numThreads = 80
+    numThreads = Config.NUM_THREADS
     allow_reuse_address = True  # seems to fix socket.error on server restart
     KEEP_RUNNING = True
     ## Changed: Start
