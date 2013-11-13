@@ -3,7 +3,7 @@
 # vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
 
 import select, time, sys, datetime
-import Config
+from Config import Config
 
 TRACE = True
 

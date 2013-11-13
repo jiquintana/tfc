@@ -8,7 +8,7 @@ else:
     python_OldVersion = False
 
 import hashlib
-import Config
+from Config import Config
 from Log import Log
 
 import os

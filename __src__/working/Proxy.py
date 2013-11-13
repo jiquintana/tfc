@@ -87,7 +87,8 @@ class Proxy(BaseHTTPRequestHandler):
     '''
     def __init__(self, request, client_address, server):
         if not python_OldVersion:
-            super().__init__(request, client_address, server)   
+            super().__init__(request, client_address, server)
+            #BaseHTTPRequestHandler.__init__(self, request, client_address, server)
         else:
             BaseHTTPRequestHandler.__init__(self, request, client_address, server)
             
@@ -141,9 +142,9 @@ class Proxy(BaseHTTPRequestHandler):
             mensaje=''
         else:
             mensaje=self.int_get_html_message('STOP hndl')
-
+        
         self.int_send_HEADERS(200,mensaje)
-
+        
         if Verb!='HEAD':
             self.int_send_BODY(mensaje)
             Proxy.threadServer.force_shutdown()

@@ -19,9 +19,14 @@ import threading, socket, os, time
 
 from Proxy import Proxy
 from ThreadPool import ThreadPoolMixIn
+from Log import Log
+import requests
 
 
+logger = Log()  
+    
 class ThreadedServer(ThreadPoolMixIn, TCPServer):
+    
     pass
 
 def run(HandlerClass = Proxy,
@@ -30,6 +35,7 @@ def run(HandlerClass = Proxy,
     '''
     Run an HTTP server on port 8002
     '''
+    
     port = 8002
     server_address = ('', port)
 
@@ -38,13 +44,15 @@ def run(HandlerClass = Proxy,
     Proxy.threadServer = RQServer
     
     sa = RQServer.socket.getsockname()
-    print ("Serving HTTP on %s, port %s..." % (sa[0], sa[1]))
+    
     try:
         RQServer.serve_forever()
+
     except KeyboardInterrupt:
-        print ("%s Catched Ctrl+C, trying to shutdown...", time.asctime())
-        RQServer.server_close()
-        os._exit(1)
+        logger.pdebug("Catched Ctrl+C, trying to shutdown...")
+        #RQServer.server_close()
+        RQServer.force_shutdown()
+        #os._exit(1)
 
     #RQHandler.serve_forever()
 
