@@ -5,5 +5,13 @@ easy_install requests
 easy_install sqlalchemy
 
 
-
-
+http://www.linas.org/linux/db-rad.html
+ERD tool
+http://stackoverflow.com/questions/14032/whats-a-good-database-erd-tool-for-linux
+http://en.wikipedia.org/wiki/Comparison_of_data_modeling_tools
+http://pythonhosted.org/Flask-SQLAlchemy/quickstart.html#quickstart
+#### libgda en linux
+gda-browser-5.0 
+i
+GooCanvas
+gsql	/usr/local/bin/gsql
