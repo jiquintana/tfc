@@ -1,5 +1,7 @@
+
+CREATE SEQUENCE seq_pk_uid;
 CREATE TABLE USERS (
-  uid INTEGER AUTO_INCREMENT,
+  uid INTEGER NOT NULL DEFAULT nextval('seq_pk_uid'),
   name VARCHAR(20) NOT NULL,
   password_hash VARCHAR(80),
   description VARCHAR(80),
@@ -7,28 +9,32 @@ CREATE TABLE USERS (
   CONSTRAINT uid UNIQUE (uid)
 );
 
+CREATE SEQUENCE seq_pk_gid;
 CREATE TABLE GROUPS (
-  gid INTEGER AUTO_INCREMENT,
+  gid INTEGER NOT NULL DEFAULT nextval('seq_pk_gid'),
   description VARCHAR(80),
   CONSTRAINT pk_gid PRIMARY KEY (gid),
   CONSTRAINT gid UNIQUE (gid)
 );
 
+CREATE SEQUENCE seq_pk_rtid;
 CREATE TABLE RULES_TIME (
-  rtid INTEGER AUTO_INCREMENT,
+  rtid INTEGER NOT NULL DEFAULT nextval('seq_pk_rtid'),
   CONSTRAINT pk_rtid PRIMARY KEY (rtid),
   CONSTRAINT rtid UNIQUE (rtid)
 );
 
+CREATE SEQUENCE seq_pk_ruid;
 CREATE TABLE RULES_URIS (
-  ruid INTEGER AUTO_INCREMENT,
+  ruid INTEGER NOT NULL DEFAULT nextval('seq_pk_ruid'),
   rule_uri VARCHAR(256),
   CONSTRAINT pk_ruid PRIMARY KEY (ruid),
   CONSTRAINT ruid UNIQUE (ruid)
 );
 
+CREATE SEQUENCE seq_pk_rwid;
 CREATE TABLE RULES_WORDS (
-  rwid INTEGER AUTO_INCREMENT,
+  rwid INTEGER NOT NULL DEFAULT nextval('seq_pk_rwid'),
   words VARCHAR(256),
   CONSTRAINT pk_rwid PRIMARY KEY (rwid),
   CONSTRAINT rwid UNIQUE (rwid)
@@ -78,18 +84,11 @@ CREATE UNIQUE INDEX idx_rwid  ON RULES_WORDS (rwid);
 CREATE UNIQUE INDEX idx_uri   ON RULES_URIS (rule_uri);
 CREATE UNIQUE INDEX idx_words ON RULES_WORDS (words);
 
-CREATE INDEX idx_g2ti_rtid    ON _M_G2T (rtid);
-CREATE INDEX idx_g2ti_gid     ON _M_G2T (gid);
+CREATE INDEX idx_g2ti_rtid    ON _m_G2T (rtid);
+CREATE INDEX idx_g2ti_gid     ON _m_G2T (gid);
 CREATE INDEX idx_g2ur_ruid    ON _M_G2U (ruid);
 CREATE INDEX idx_g2ur_gid     ON _M_G2U (gid);
 CREATE INDEX idx_g2wo_rwid    ON _M_G2W (rwid);
 CREATE INDEX idx_g2wo_gid     ON _M_G2W (gid);
 CREATE INDEX idx_u2g_uid      ON _M_U2G (uid);
 CREATE INDEX idx_u2g_gid      ON _M_U2G (gid);
-
-
-
-
-
-
-

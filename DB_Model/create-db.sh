@@ -20,21 +20,35 @@ fi
 DATABASE=`echo $1 | tr '[:upper:]' '[:lower:]'`
 case $DATABASE in
     mysql)
-        
+        MYDATABASE=`cat SQL.DB`
+        MYUSER=`cat SQL.USER`
+        MYPASS=`cat SQL.PASSWD`
+        export MYDATABASE MYUSER
+        cat drop.mysql.template | sed "s/@USER/$MYUSER/g;s/@DATABASE/$MYDATABASE/g" > drop.mysql.sql
+        mysql -t -vvv -e "source drop.mysql.sql"
+        cat create.mysql.template | sed "s/@USER/$MYUSER/g;s/@DATABASE/$MYDATABASE/gi;s/@PASSWD/`cat SQL.PASSWD`/g;" > create.mysql.sql
+        mysql -t -vvv -e "source create.mysql.sql"
+        #cat mysql -u proxy --password=proxypass proxy
+        mysql -t -vvv -u proxy --password=proxypass proxy -e "source DDL.sql"
         ;;
     sqlite3)
+        SQLITEDATABASE=`cat SQL.DB`.db
+        rm -rf $SQLITEDATABASE
+        sqlite3 $SQLITEDATABASE -init DDL.sql
         ;;
     postgres)
-        cat drop.postgres.template | sed "s/@USER/`cat SQL.USER`/g;s/@DATABASE/`cat SQL.DB`/g" > drop.postgres.sql
-        su - postgres -c "psql -f `pwd`/drop.postgres.sql"
-        cat create.postgres.template | sed "s/@USER/`cat SQL.USER`/g;s/@DATABASE/`cat SQL.DB`/g;s/@PASSWD/`cat SQL.PASSWD`/g;" > create.postgres.sql
-        su - postgres -c "psql -f `pwd`/create.postgres.sql"
-        echo "*:*:`cat SQL.DB`:`cat SQL.USER`:`cat SQL.PASSWD`" > ./.pgpass
-        chmod 600 ./.pgpass
         PGDATABASE=`cat SQL.DB`
         PGUSER=`cat SQL.USER`
-        export PGDATABASE PGUSER
-        psql -f DDL.sql
+        PGPASSFILE=`pwd`/.pgpass
+        export PGDATABASE PGUSER PGPASSFILE
+        #su - postgres -c "dropdb $PGDATABASE; dropuser $PGUSER ; createuser $PGUSER ; createdb -O $PGUSER $PGDATABASE"
+        cat drop.postgres.template | sed "s/@USER/$PGUSER/g;s/@DATABASE/$PGDATABASE/g" > drop.postgres.sql
+        su - postgres -c "psql -f `pwd`/drop.postgres.sql"
+        cat create.postgres.template | sed "s/@USER/$PGUSER/g;s/@DATABASE/$PGDATABASE/g;s/@PASSWD/`cat SQL.PASSWD`/g;" > create.postgres.sql
+        su - postgres -c "psql -f `pwd`/create.postgres.sql"
+        echo "*:*:$PGDATABASE:$PGUSER:`cat SQL.PASSWD`" > ./.pgpass
+        chmod 600 ./.pgpass
+        psql -f DDL.postgres.sql
 
         ;;
     *)
