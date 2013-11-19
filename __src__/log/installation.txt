@@ -15,3 +15,7 @@ gda-browser-5.0
 i
 GooCanvas
 gsql	/usr/local/bin/gsql
+
+http://docs.sqlalchemy.org/en/rel_0_9/core/engines.html
+https://pypi.python.org/pypi/shove
+http://elixir.ematia.de/trac/wiki
