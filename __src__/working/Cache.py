@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# header_valueim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
+# vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
 import sys
 if sys.version_info < (3, 0):
     python_OldVersion = True
