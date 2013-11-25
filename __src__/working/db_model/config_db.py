@@ -65,18 +65,40 @@ class Database(Singleton):
         return users_found
 
     def findUserByUID(self, uid):
-        users_found = self.session.query(User).filter(User.uid==uid)
+        users_found = self.session.query(User).filter(User.uid==uid).first()
         return users_found
-
-    def addUser(self, User):
-        self.findUser
-        return users_found
-
 
     def getAllUser(self):
         users_found = self.session.query(User).all()
         return users_found
-
+    
+    def getLowestUnusedUIDfromUsers(self):
+        result = db.session.execute('SELECT MIN(USER.uid + 1) AS nextID FROM USER LEFT JOIN USER tu1 ON USER.uid + 1 = tu1.uid WHERE tu1.uid IS NULL').first()
+        theUID=int(result[0])
+        if theUID > 32:
+            theUID = None
+        return theUID
+     
+    def addUser(self,newUser):
+        theUID = self.getLowestUnusedUIDfromUsers()
+        if theUID != None:
+            newUser.uid = theUID
+            try:
+                result = self.session.add(newUser)
+                db.session.commit()
+            except:
+                db.session.rollback()
+            storedUser = self.findUserByUID(theUID)
+            if storedUser == newUser:
+                return storedUser
+            else:
+                return None   
+            http://docs.sqlalchemy.org/en/latest/orm/session.html#managing-transactions
+            http://docs.sqlalchemy.org/en/latest/orm/session.html#managing-transactions
+            http://docs.sqlalchemy.org/en/latest/orm/session.html#managing-transactions
+            
+            http://docs.sqlalchemy.org/en/latest/orm/session.html#managing-transactions
+            
     def findGroup(self, str2find):
         groups_found = self.session.query(Group).filter(
             or_( Group.groupname==str2find, Group.description==str2find )
@@ -88,12 +110,12 @@ class Database(Singleton):
         return groups_found
     
     def findGroupByGroupname(self, groupname):
-        groups_found = self.session.query(Group).filter(Group.groupname==str2find).first()
+        groups_found = self.session.query(Group).filter(Group.groupname==groupname).first()
         return groups_found    
 
     def findGroupByGID(self, gid):
-        groups_found = self.session.query(Group).filter(Group.gid==gid)
-        return users_found
+        groups_found = self.session.query(Group).filter(Group.gid==gid).first()
+        return groups_found
 
     def getAllGroups(self):
         groups_found = self.session.query(Group).all()
@@ -112,7 +134,12 @@ class Groups(Base):
         
     def __repr__(self):
         return "Groups(%r,%r)" % (self.uid,self.gid)
-    
+
+    def __eq__(self, other):
+        print(". %r" % self.__repr__())
+        print(". %r" % other.__repr__())
+        return self.__dict__ == other.__dict__    
+
     def pertenece(self, User):
         if User.uid == self.uid:
             return True
@@ -160,7 +187,15 @@ if __name__ == "__main__":
         
     print("-----")
     print(db.findUserByUID(1))
-    print(db.findUserByUsername('ed'))    
+    print(db.findUserByUsername('ed'))
+    print("-----")
+    print(db.findGroupByGID(8))
+    print("-----")
+    print(db.findGroupByGroupname('e'))
+    print(db.getLowestUnusedUIDfromUsers())
+    otherUser = User(username='josi3', password='password', description='Josi User')
+    result=db.addUser(otherUser)
+    print(result)
     '''
     for instance in db.findUser("ep"):
         print("....%r" % instance)
