@@ -52,12 +52,12 @@ class Database(Singleton):
  
     def findUser(self, str2find):
         users_found = self.session.query(User).filter(
-            or_(User.username==str2find,User.description==str2find)
+            or_( User.username==str2find, User.description==str2find )
             ).all()
         print(users_found)
         if users_found == []:
             users_found = self.session.query(User).filter(
-                or_(User.username.like("%"+str2find+"%"),User.description.like("%"+str2find+"%"))
+                or_( User.username.ilike("%"+str2find+"%"), User.description.ilike("%"+str2find+"%") )
                 ).all()
         return users_found
 
@@ -65,10 +65,14 @@ class Database(Singleton):
         users_found = self.session.query(User).all()
         return users_found
 
-    def findGroup(self, groupname):
-        groups_found = self.session.query(Group).filter(Group.groupname==groupname).all()
+    def findGroup(self, str2find):
+        groups_found = self.session.query(Group).filter(
+            or_( Group.groupname==str2find, Group.description==str2find )
+            ).all()
         if groups_found == []:
-            groups_found = self.session.query(Group).filter(Group.groupname.like("%"+groupname+"%")).all()     
+            groups_found = self.session.query(Group).filter(
+                or_( Group.groupname.ilike("%"+str2find+"%"), Group.description.ilike("%"+str2find+"%") )
+                ).all()     
         return groups_found    
 
     def getAllGroups(self):
@@ -128,9 +132,11 @@ if __name__ == "__main__":
     
     db=Database()
     
-    for instance in db.findUser("Jones"):
+    for instance in db.findUser(u"ñ"):
         print("....%r" % instance)
-        
+    
+    for instance in db.findGroup("b"):
+        print("....%r" % instance)        
     '''
     for instance in db.findUser("ep"):
         print("....%r" % instance)
