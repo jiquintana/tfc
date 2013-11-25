@@ -171,16 +171,19 @@ class database():
     def load(self):
         print("load")
         
-        metadata = MetaData()
-        metadata.reflect(bind=engine)
-        for i in metadata.tables:
+        self.metadata = MetaData()
+        self.metadata.reflect(bind=engine)
+        for i in self.metadata.tables:
             print(i)
         #    meta.tables[i]
         
         #print(len(us))
         #pprint(us)#self.gro=meta.tables['GROUP']
         #self.relu2g=meta.tables['_M_U2G']
-        
+    
+    def query(self, thisobject):
+        self.metadata.query(thisobject)
+    
     def p(self):
         print("print")
         
@@ -195,5 +198,5 @@ if __name__ == "__main__":
     db = database()
     db.create()
     db.load()
-    
-    print (User.query.all())
+    db.query(User)
+    print(User.query())
