@@ -2,20 +2,27 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
 import pprint
-from sqlalchemy import Column, ForeignKey, Integer, String, Table, or_
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Table, or_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship,  scoped_session, sessionmaker
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, MetaData, event
 
-
-TraceSQL=True
+TraceSQL = False
+MAXUSERS = 1024
+MAXGROUPS = 65536
 
 DRIVER = 'sqlite:///proxy.db'
+#DRIVER = 'sqlite://'
 engine = create_engine(DRIVER, echo=TraceSQL)
 Base = declarative_base()
 #Base.metadata.bind = engine
-
 #metadata = MetaData()
+
+
+@event.listens_for(engine, "connect")
+def _fk_pragma_on_connect(dbapi_con, con_record):
+    dbapi_con.execute('PRAGMA journal_mode=MEMORY')
+
 
 class Singleton(object):
     __instance = None
@@ -72,33 +79,93 @@ class Database(Singleton):
         users_found = self.session.query(User).all()
         return users_found
     
-    def getLowestUnusedUIDfromUsers(self):
-        result = db.session.execute('SELECT MIN(USER.uid + 1) AS nextID FROM USER LEFT JOIN USER tu1 ON USER.uid + 1 = tu1.uid WHERE tu1.uid IS NULL').first()
-        theUID=int(result[0])
-        if theUID > 32:
-            theUID = None
+    def getLowestUnusedUIDfromUser(self):        
+        theUID=None
+        uids_found = [r for (r, ) in self.session.query(User.uid).all()]
+        for testUID in range(1,MAXUSERS+1):
+            if (theUID == None) and  not (testUID in uids_found):
+                theUID = testUID        
         return theUID
      
     def addUser(self,newUser):
-        theUID = self.getLowestUnusedUIDfromUsers()
-        if theUID != None:
-            newUser.uid = theUID
+        theUID = None
+        theGID = -1
+        transaction_succesful=False            
+        
+        
+        # Obtenemos el UID libre mas bajo; el uid no supera el máximo de MAXUSERS usrs
+        theUID = self.getLowestUnusedUIDfromUser()
+        
+        # Comprobamos que el grupo no exista, y si esta libre, creamos el UID y GID con el mismo valor:
+        # Correspondencia 1:1 entre usuario y grupo cuando el UID<MAXUSERS
+        if (theUID != None) and (self.findGroupByGID(theUID) == None):
+            theGID = theUID
+            
+        testUSR = self.findUserByUsername(newUser.username)
+        testGRP = self.findGroupByGroupname('dfl_grp_'+newUser.username)
+        
+        # Comprobamos si ya existe un usuario o grupo con igual clave primaria
+        if (testUSR != None) or (testGRP != None):
+            # Existe: forzamos NO ejecucion...
+            theGID = -1
+        
+        # Si hemos encontrado un usuario libre y el grupo libre...
+        # y ademas no existen las claves primarias de usuario.username y grupo.groupname...
+        #  => (todo OK hasta el momento...)
+        # en la inicializacion hemos forzado valores diferentes para evitar que esta comparacion sea
+        # cierta por defecto
+        if theUID == theGID:
+            # Todos los valores recibidos en newUser, salvo el UID, son validos. Ahora alocamos el UID
+            newUser.uid = theUID    
+            
+            newGroup = Group()         
+            newGroup.gid=theGID
+            newGroup.description='Grupo de '+newUser.description
+            newGroup.groupname='dfl_grp_'+newUser.username
+            
+            relacionUsrGrp = Groups(newUser, newGroup)
+            
+            # Tenemos todo preparado... intentamos ejecutar la transaccion
             try:
-                result = self.session.add(newUser)
-                db.session.commit()
+                self.session.add(newUser)
+                self.session.add(newGroup)
+                self.session.add(relacionUsrGrp)
+                self.session.commit()
+                transaction_succesful=True
             except:
-                db.session.rollback()
+                self.session.rollback()
+                
+        # Si todo ha ido bien (creacion del usuario, creacion del grupo y creacion de acl), devolvemos
+        # un registro con el usuario creado
+        # si ha ido mal, devolvemos None
+        if transaction_succesful:
             storedUser = self.findUserByUID(theUID)
-            if storedUser == newUser:
-                return storedUser
-            else:
-                return None   
-            http://docs.sqlalchemy.org/en/latest/orm/session.html#managing-transactions
-            http://docs.sqlalchemy.org/en/latest/orm/session.html#managing-transactions
-            http://docs.sqlalchemy.org/en/latest/orm/session.html#managing-transactions
+        else:
+            storedUser = None
             
-            http://docs.sqlalchemy.org/en/latest/orm/session.html#managing-transactions
-            
+        return storedUser
+    
+    def setAdmin(self,requestedUser):
+        if requestedUser != None:
+            storedUser=self.findUserByUsername(requestedUser.username)
+            if storedUser != None:
+                theUser = self.session.query(User).filter(User.uid==storedUser.uid).update({'admin': True})
+                self.session.commit()
+            return self.findUserByUsername(requestedUser.username)
+        else:
+            return None
+        
+        
+    def unsetAdmin(self,requestedUser):
+        if requestedUser != None:
+            storedUser=self.findUserByUsername(requestedUser.username)
+            if storedUser != None:
+                theUser = self.session.query(User).filter(User.uid==storedUser.uid).update({'admin': False})
+                self.session.commit()
+            return self.findUserByUsername(requestedUser.username)
+        else:
+            return None
+        
     def findGroup(self, str2find):
         groups_found = self.session.query(Group).filter(
             or_( Group.groupname==str2find, Group.description==str2find )
@@ -111,7 +178,8 @@ class Database(Singleton):
     
     def findGroupByGroupname(self, groupname):
         groups_found = self.session.query(Group).filter(Group.groupname==groupname).first()
-        return groups_found    
+        return groups_found                    
+
 
     def findGroupByGID(self, gid):
         groups_found = self.session.query(Group).filter(Group.gid==gid).first()
@@ -120,6 +188,50 @@ class Database(Singleton):
     def getAllGroups(self):
         groups_found = self.session.query(Group).all()
         return groups_found
+    
+    def getLowestUnusedGIDfromGroup(self):
+        theGID=None
+        gids_found = [r for (r, ) in self.session.query(Group.gid).all()]
+        for testGID in range(MAXUSERS+1,MAXGROUPS+1):
+            if (theGID == None) and  not (testGID in gids_found):
+                theGID = testGID
+        return theGID
+    
+    def addGroup(self,newGroup):
+       theGID = None
+       transaction_succesful=False
+       
+       # Obtenemos el GID libre mas bajo... 
+       theGID = self.getLowestUnusedGIDfromGroup()
+       # e intentamos localizar un grupo con el mismo nombre
+       testGRP = self.findGroupByGroupname(newGroup.groupname)
+       
+       print("... GID %r" % theGID)
+       print("... testG %r" % testGRP)
+       # si el GID esta libre y no hemos encontrado un grupo con la misma clave primaria..
+       if theGID != None and testGRP == None:
+           # Todos los valores recibidos en newUser, salvo el UID, son validos. Ahora alocamos el UID
+           newGroup.gid = theGID    
+           try:
+               self.session.add(newGroup)
+               self.session.commit()
+               print("created")
+               transaction_succesful=True
+           except:
+               self.session.rollback()
+               print("aborted")
+               
+       # Si todo ha ido bien (creacion del grupo), devolvemos
+       # un registro con el grupo creado
+       # si ha ido mal, devolvemos None
+       if transaction_succesful:
+           storedGroup = self.findGroupByGID(theGID)
+       else:
+           storedGroup = None
+           
+       return storedGroup
+    
+    
 
 class Groups(Base):
     __tablename__ = '_GROUPS'
@@ -128,7 +240,7 @@ class Groups(Base):
     usuario = relationship("User", backref="_GROUPS")
     grupo = relationship("Group", backref="_GROUPS")
     
-    def __init__(self,user, group):
+    def __init__(self, user, group):
         self.uid=user.uid
         self.gid=group.gid
         
@@ -140,17 +252,21 @@ class Groups(Base):
         print(". %r" % other.__repr__())
         return self.__dict__ == other.__dict__    
 
-    def pertenece(self, User):
-        if User.uid == self.uid:
+    def pertenece(self, user):
+        if user.uid == self.uid:
             return True
         else:
             return False
     
-    def contiene(self, Group):
-        if User.gid == self.gid:
+    def contiene(self, group):
+        if group.gid == self.gid:
             return True
         else:
             return False
+        
+    def __repr__(self):
+        return "Groups(%r,%r)" % (self.gid,self.uid)
+
     
 class User(Base):
     __tablename__ = 'USER'
@@ -158,9 +274,10 @@ class User(Base):
     username = Column(String(20), nullable=False, unique=True, index=True)
     password= Column(String(16), nullable=False)
     description = Column(String(80), nullable=False)
+    admin = Column(Boolean, unique=False, default=False)
     usuarios = relationship("Groups", backref="USER")
     def __repr__(self):
-        return "User(%r,%r,%r,%r)" % (self.uid,self.username,self.password,self.description)
+        return "User(%r,%r,%r,%r,%r)" % (self.uid,self.username,self.admin,self.password,self.description)
 
 
 class Group(Base):
@@ -172,14 +289,58 @@ class Group(Base):
     grupos = relationship("Groups", backref="GROUP")
     
     def __repr__(self):
-        return "Group(%r,%r,%r,%r)" % (self.gid, self.groupname, self.groupname, self.description)
+        return "Group(%r,%r,%r)" % (self.gid, self.groupname, self.description)
 
     
 if __name__ == "__main__":
     
     db=Database()
+    ed_user = User(username='ed', password='Ed Jones', description='edspassword')
     
-    for instance in db.findUser(u"ñ"):
+    try:
+        db.session.add(ed_user)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        
+    storedUser=db.findUserByUsername('ed')
+    print(db.setAdmin(storedUser))
+    print(db.unsetAdmin(storedUser))
+    
+    '''
+    mytestGroup=Group(groupname='josi', description='Josi User ')
+    storedGRP=db.addGroup(mytestGroup)
+    print(mytestGroup)
+    print(storedGRP)
+    '''
+    '''
+    for idx in range(4096): # esto va desde 0..MAXUSERS, debiendo fallar en el numero MAXUSERS
+        mytestUsr=User(username='josi'+str(idx), password='password', description='Josi User '+str(idx))
+        result=db.addUser(mytestUsr)
+        print(result)
+        
+        if result != None:
+            print("success idx "+str(idx))
+            print(mytestUsr)
+            print(result)
+    '''    
+    '''
+    for instance in db.findUser("ep"):
+        print("....%r" % inUSERstance)
+    
+    for instance in db.findGroup("%e"):
+        print("....%r" % instance)
+    print("----")
+    for instance in db.getAllUser():
+        print("....%r" % instance)
+    print("----")        USER
+    for instance in db.getAllGroups():
+        print("....%r" % instance)
+    print("----")        
+    '''
+    
+    '''
+        for instance in db.findUser(u"ñ"):
         print("....%r" % instance)
     
     for instance in db.findGroup("b"):
@@ -195,23 +356,9 @@ if __name__ == "__main__":
     print(db.getLowestUnusedUIDfromUsers())
     otherUser = User(username='josi3', password='password', description='Josi User')
     result=db.addUser(otherUser)
-    print(result)
-    '''
-    for instance in db.findUser("ep"):
-        print("....%r" % instance)
-    
-    for instance in db.findGroup("%e"):
-        print("....%r" % instance)
-    print("----")
-    for instance in db.getAllUser():
-        print("....%r" % instance)
-    print("----")        
-    for instance in db.getAllGroups():
-        print("....%r" % instance)
-    print("----")        
     '''
     
-'''    
+    '''    
     db2=Database()
     print (User.__table__)
 
@@ -271,6 +418,6 @@ if __name__ == "__main__":
     for instance in db.session.query(Groups).join(User).outerjoin(Group).add_entity(User).add_entity(Group):
         print(instance)
     #(Groups(1,1), User(1,'ed','Ed Jones','edspassword'), Group(1,'ed','ed','ed group'))
-    #(Groups(1,3), User(1,'ed','Ed Jones','edspassword'), Group(3,'b','b','b'))
+    #(Groups(1,3), INSERT INTO "GROUP" VALUES(33,'e','e');User(1,'ed','Ed Jones','edspassword'), Group(3,'b','b','b'))
     
-'''
+    '''
