@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
 import pprint
-from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Table, or_
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Table, or_, CHAR
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship,  scoped_session, sessionmaker
 from sqlalchemy import create_engine, MetaData, event
@@ -22,6 +22,8 @@ Base = declarative_base()
 @event.listens_for(engine, "connect")
 def _fk_pragma_on_connect(dbapi_con, con_record):
     dbapi_con.execute('PRAGMA journal_mode=MEMORY')
+
+
 
 
 class Singleton(object):
@@ -132,7 +134,8 @@ class Database(Singleton):
                 self.session.add(relacionUsrGrp)
                 self.session.commit()
                 transaction_succesful=True
-            except:
+            except e:
+                print(e)
                 self.session.rollback()
                 
         # Si todo ha ido bien (creacion del usuario, creacion del grupo y creacion de acl), devolvemos
@@ -145,7 +148,7 @@ class Database(Singleton):
             
         return storedUser
     
-    def setAdmin(self,requestedUser):
+    def setUserAdmin(self,requestedUser):
         if requestedUser != None:
             storedUser=self.findUserByUsername(requestedUser.username)
             if storedUser != None:
@@ -156,7 +159,7 @@ class Database(Singleton):
             return None
         
         
-    def unsetAdmin(self,requestedUser):
+    def unsetUserAdmin(self,requestedUser):
         if requestedUser != None:
             storedUser=self.findUserByUsername(requestedUser.username)
             if storedUser != None:
@@ -165,6 +168,27 @@ class Database(Singleton):
             return self.findUserByUsername(requestedUser.username)
         else:
             return None
+    
+    def changeUserPassword(self,requestedUser):
+        if requestedUser != None:
+            storedUser=self.findUserByUsername(requestedUser.username)
+            if storedUser != None:
+                theUser = self.session.query(User).filter(User.uid==storedUser.uid).update({'password': requestedUser.password})
+                self.session.commit()
+            return self.findUserByUsername(requestedUser.username)
+        else:
+            return None 
+        
+    def changeUserDescription(self,requestedUser):
+        if requestedUser != None:
+            storedUser=self.findUserByUsername(requestedUser.username)
+            if storedUser != None:
+                theUser = self.session.query(User).filter(User.uid==storedUser.uid).update({'description': requestedUser.description})
+                self.session.commit()
+            return self.findUserByUsername(requestedUser.username)
+        else:
+            return None 
+        
         
     def findGroup(self, str2find):
         groups_found = self.session.query(Group).filter(
@@ -198,39 +222,44 @@ class Database(Singleton):
         return theGID
     
     def addGroup(self,newGroup):
-       theGID = None
-       transaction_succesful=False
-       
-       # Obtenemos el GID libre mas bajo... 
-       theGID = self.getLowestUnusedGIDfromGroup()
-       # e intentamos localizar un grupo con el mismo nombre
-       testGRP = self.findGroupByGroupname(newGroup.groupname)
-       
-       print("... GID %r" % theGID)
-       print("... testG %r" % testGRP)
-       # si el GID esta libre y no hemos encontrado un grupo con la misma clave primaria..
-       if theGID != None and testGRP == None:
-           # Todos los valores recibidos en newUser, salvo el UID, son validos. Ahora alocamos el UID
-           newGroup.gid = theGID    
-           try:
-               self.session.add(newGroup)
-               self.session.commit()
-               print("created")
-               transaction_succesful=True
-           except:
-               self.session.rollback()
-               print("aborted")
-               
-       # Si todo ha ido bien (creacion del grupo), devolvemos
-       # un registro con el grupo creado
-       # si ha ido mal, devolvemos None
-       if transaction_succesful:
-           storedGroup = self.findGroupByGID(theGID)
-       else:
-           storedGroup = None
-           
-       return storedGroup
-    
+        theGID = None
+        transaction_succesful=False
+        
+        # Obtenemos el GID libre mas bajo... 
+        theGID = self.getLowestUnusedGIDfromGroup()
+        # e intentamos localizar un grupo con el mismo nombre
+        testGRP = self.findGroupByGroupname(newGroup.groupname)
+        
+        # si el GID esta libre y no hemos encontrado un grupo con la misma clave primaria..
+        if theGID != None and testGRP == None:
+            # Todos los valores recibidos en newUser, salvo el UID, son validos. Ahora alocamos el UID
+            newGroup.gid = theGID    
+            try:
+                self.session.add(newGroup)
+                self.session.commit()
+                transaction_succesful=True
+            except:
+                self.session.rollback()
+                
+        # Si todo ha ido bien (creacion del grupo), devolvemos
+        # un registro con el grupo creado, M, X, J, V, S, D 
+        # si ha ido mal, devolvemos None
+        if transaction_succesful:
+            storedGroup = self.findGroupByGID(theGID)
+        else:
+            storedGroup = None
+            
+        return storedGroup
+   
+    def changeGroupDescription(self,requestedGroup):
+        if requestedGroup != None:
+            storedGroup=self.findGroupByGroupname(requestedGroup.groupname)
+            if storedGroup != None:
+                theGroup = self.session.query(Group).filter(Group.gid==storedGroup.gid).update({'description': requestedGroup.description})
+                self.session.commit()
+            return self.findGroupByGroupname(requestedGroup.groupname)
+        else:
+            return None             
     
 
 class Groups(Base):
@@ -267,17 +296,23 @@ class Groups(Base):
     def __repr__(self):
         return "Groups(%r,%r)" % (self.gid,self.uid)
 
+
+
     
 class User(Base):
     __tablename__ = 'USER'
     uid = Column(Integer, primary_key=True, autoincrement=True, unique=True, index=True)
     username = Column(String(20), nullable=False, unique=True, index=True)
+    admin = Column(Boolean, unique=False, default=False)
     password= Column(String(16), nullable=False)
     description = Column(String(80), nullable=False)
-    admin = Column(Boolean, unique=False, default=False)
+    hours = Column(CHAR(24), default=(chr(0x00)*24))
     usuarios = relationship("Groups", backref="USER")
+    
+    
     def __repr__(self):
-        return "User(%r,%r,%r,%r,%r)" % (self.uid,self.username,self.admin,self.password,self.description)
+        return "User(%r,%r,%r,%r,%r, %r)" % (self.uid,self.username,self.admin,self.password,self.description,
+                                             ':'.join(x.encode('hex') for x in self.hours))
 
 
 class Group(Base):
@@ -290,12 +325,11 @@ class Group(Base):
     
     def __repr__(self):
         return "Group(%r,%r,%r)" % (self.gid, self.groupname, self.description)
-
     
 if __name__ == "__main__":
     
     db=Database()
-    ed_user = User(username='ed', password='Ed Jones', description='edspassword')
+    ed_user = User(username='ed', password='Ed Jones', description='ed')
     
     try:
         db.session.add(ed_user)
@@ -304,8 +338,18 @@ if __name__ == "__main__":
         db.session.rollback()
         
     storedUser=db.findUserByUsername('ed')
-    print(db.setAdmin(storedUser))
-    print(db.unsetAdmin(storedUser))
+    print(db.setUserAdmin(storedUser))
+    print(db.unsetUserAdmin(storedUser))
+    storedUser=db.findUserByUsername('ed')
+    storedUser.password='patata'
+    print(db.changeUserPassword(storedUser))
+    storedUser.description='cambio de descripcion'
+    print(db.changeUserDescription(storedUser))
+
+    newGroup = Group(groupname='nuevo_grupo', description='nuevo grupo de prueba')
+    print(db.addGroup(newGroup))
+    newGroup.description='otra descripcion'
+    print(db.changeGroupDescription(newGroup))
     
     '''
     mytestGroup=Group(groupname='josi', description='Josi User ')
@@ -320,7 +364,8 @@ if __name__ == "__main__":
         print(result)
         
         if result != None:
-            print("success idx "+str(idx))
+            print("success idx "+str(idx))                print("aborted")
+
             print(mytestUsr)
             print(result)
     '''    
