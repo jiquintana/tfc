@@ -1,11 +1,19 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
+import sys
+if sys.version_info < (3, 0):
+    python_OldVersion = True
+else:
+    python_OldVersion = False
+    
 import pprint
 from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Table, or_, CHAR
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship,  scoped_session, sessionmaker
 from sqlalchemy import create_engine, MetaData, event
+if not python_OldVersion:
+    import binascii
 
 TraceSQL = False
 MAXUSERS = 1024
@@ -22,9 +30,6 @@ Base = declarative_base()
 @event.listens_for(engine, "connect")
 def _fk_pragma_on_connect(dbapi_con, con_record):
     dbapi_con.execute('PRAGMA journal_mode=MEMORY')
-
-
-
 
 class Singleton(object):
     __instance = None
@@ -129,6 +134,7 @@ class Database(Singleton):
             
             # Tenemos todo preparado... intentamos ejecutar la transaccion
             try:
+                self.session.begin_nested()
                 self.session.add(newUser)
                 self.session.add(newGroup)
                 self.session.add(relacionUsrGrp)
@@ -311,9 +317,13 @@ class User(Base):
     
     
     def __repr__(self):
-        return "User(%r,%r,%r,%r,%r, %r)" % (self.uid,self.username,self.admin,self.password,self.description,
+        if python_OldVersion:
+            return "User(%r,%r,%r,%r,%r, %r)" % (self.uid,self.username,self.admin,self.password,self.description,
                                              ':'.join(x.encode('hex') for x in self.hours))
-
+        else:
+            return "User(%r,%r,%r,%r,%r, %r)" % (self.uid,self.username,self.admin,self.password,self.description,
+                                             binascii.hexlify(self.hours.encode('ascii')))            
+[ bin(ord(ch))[2:].zfill(8) for ch in str2convert ]
 
 class Group(Base):
     __tablename__ = 'GROUP'
