@@ -1,0 +1,30 @@
+# PynSource Version 1.1
+{'type':'meta', 'info1':'Lorem ipsum dolor sit amet, consectetur adipiscing elit is latin.'}
+{'type':'umlshape', 'id':'FileCache', 'x':456, 'y':15, 'width':178, 'height':331, 'attrs':'path|md5hash_str|cache_filename_base|cache_filename_meta|cache_filename_cache|cache_filename_strip|cache_filename_header|logger|is_initialized|DEBUG|was_checked|md5hash', 'meths':'remove_html_markup|__init__|setup|is_cached|put|get'}
+{'type':'umlshape', 'id':'Config', 'x':51, 'y':395, 'width':98, 'height':141, 'attrs':'MAX_LEN_MSG|NUM_THREADS|config_Path|cache_Path|log_Path|dbFiles', 'meths':''}
+{'type':'umlshape', 'id':'ClientHeaders', 'x':244, 'y':30, 'width':153, 'height':181, 'attrs':'DEBUG|__orig_headers|__headers|__cookies|ip|port', 'meths':'__init__|parse'}
+{'type':'umlshape', 'id':'ServerHeaders', 'x':9, 'y':25, 'width':202, 'height':271, 'attrs':'DEBUG|via_header_seen|headers_have_been_parsed|__response|__headers|ip|port|server_version', 'meths':'__init__|parsed_headers|dump|__parse|allindices|headers'}
+{'type':'umlshape', 'id':'Log', 'x':228, 'y':450, 'width':114, 'height':81, 'attrs':'', 'meths':'get_timestamp|pdebug'}
+{'type':'umlshape', 'id':'ThreadedServer', 'x':798, 'y':40, 'width':164, 'height':31, 'attrs':'', 'meths':''}
+{'type':'umlshape', 'id':'ThreadPoolMixIn', 'x':708, 'y':175, 'width':175, 'height':31, 'attrs':'', 'meths':''}
+{'type':'umlshape', 'id':'TCPServer', 'x':941, 'y':170, 'width':109, 'height':31, 'attrs':'', 'meths':''}
+{'type':'umlshape', 'id':'Proxy', 'x':464, 'y':391, 'width':170, 'height':766, 'attrs':'threadServer|__version__|server_version|proxy_user|proxy_password|http_user|http_password|bodySize|Allowed|parsed_path|content|content_lenght|processed_headers|code|content_cached|logger|__verbs_supported|__verbs_unsupported|__verbs_safe|LocalServices|ServiceHandle|what|client_headers|server_socket', 'meths':'__init__|log_message|svc_hndl_FILE|svc_hndl_STOP|svc_hndl_CONFIG|svc_hndl_POST|svc_hndl_NOOP|int_get_html_message|int_send_HEADERS|int_send_BODY|int_HEAD_PROXY_AUTH|int_HEAD_HTTP_AUTH|parse_query|handle_PROXY_AUTH|handle_HTTP_AUTH|BASIC|do_CONNECT|do_OPTIONS|do_HEAD|do_TRACE|do_GET|do_POST|do_OTHER'}
+{'type':'umlshape', 'id':'BaseHTTPRequestHandler', 'x':704, 'y':760, 'width':252, 'height':31, 'attrs':'', 'meths':''}
+{'type':'umlshape', 'id':'urlparse.urlparse', 'x':792, 'y':580, 'width':197, 'height':31, 'attrs':'', 'meths':''}
+{'type':'umlshape', 'id':'socket.create_connection', 'x':684, 'y':464, 'width':274, 'height':31, 'attrs':'', 'meths':''}
+{'type':'umlshape', 'id':'ThreadingMixIn', 'x':803, 'y':280, 'width':164, 'height':31, 'attrs':'', 'meths':''}
+{'type':'umlshape', 'id':'Queue', 'x':708, 'y':280, 'width':65, 'height':31, 'attrs':'', 'meths':''}
+{'type':'edge', 'id':'ThreadedServer_to_ThreadPoolMixIn', 'source':'ThreadedServer', 'target':'ThreadPoolMixIn', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'ThreadedServer_to_TCPServer', 'source':'ThreadedServer', 'target':'TCPServer', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'ThreadedServer_to_ThreadPoolMixIn', 'source':'ThreadedServer', 'target':'ThreadPoolMixIn', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'ThreadedServer_to_TCPServer', 'source':'ThreadedServer', 'target':'TCPServer', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'Proxy_to_BaseHTTPRequestHandler', 'source':'Proxy', 'target':'BaseHTTPRequestHandler', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'urlparse.urlparse_to_Proxy', 'source':'urlparse.urlparse', 'target':'Proxy', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'socket.create_connection_to_Proxy', 'source':'socket.create_connection', 'target':'Proxy', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'ThreadedServer_to_ThreadPoolMixIn', 'source':'ThreadedServer', 'target':'ThreadPoolMixIn', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'ThreadedServer_to_TCPServer', 'source':'ThreadedServer', 'target':'TCPServer', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'Proxy_to_BaseHTTPRequestHandler', 'source':'Proxy', 'target':'BaseHTTPRequestHandler', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'ThreadPoolMixIn_to_ThreadingMixIn', 'source':'ThreadPoolMixIn', 'target':'ThreadingMixIn', 'uml_edge_type':'generalisation'}
+{'type':'edge', 'id':'urlparse.urlparse_to_Proxy', 'source':'urlparse.urlparse', 'target':'Proxy', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'socket.create_connection_to_Proxy', 'source':'socket.create_connection', 'target':'Proxy', 'uml_edge_type':'composition'}
+{'type':'edge', 'id':'Queue_to_ThreadPoolMixIn', 'source':'Queue', 'target':'ThreadPoolMixIn', 'uml_edge_type':'composition'}

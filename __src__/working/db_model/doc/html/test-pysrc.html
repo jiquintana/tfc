@@ -1,0 +1,630 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>test</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Module&nbsp;test
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="test-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="test-module.html">Module test</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-comment">#!/bin/python</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-comment"># -*- coding: utf-8 -*-</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-comment"># vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">pprint</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">sqlalchemy</tt> <tt class="py-keyword">import</tt> <tt class="py-op">*</tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">sqlalchemy</tt><tt class="py-op">.</tt><tt class="py-name">ext</tt><tt class="py-op">.</tt><tt class="py-name">declarative</tt> <tt class="py-keyword">import</tt> <tt class="py-name">declarative_base</tt><tt class="py-op">,</tt> <tt class="py-name">declared_attr</tt><tt class="py-op">,</tt> <tt class="py-name">DeferredReflection</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">sqlalchemy</tt><tt class="py-op">.</tt><tt class="py-name">orm</tt> <tt class="py-keyword">import</tt> <tt class="py-name">relation</tt><tt class="py-op">,</tt> <tt class="py-name">sessionmaker</tt><tt class="py-op">,</tt> <tt class="py-name">relationship</tt><tt class="py-op">,</tt><tt class="py-name">scoped_session</tt><tt class="py-op">,</tt> <tt class="py-name">sessionmaker</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt id="link-0" class="py-name" targets="Variable config_db.engine=config_db-module.html#engine,Variable sql_test.engine=sql_test-module.html#engine,Variable sqlalchemy_declarative.engine=sqlalchemy_declarative-module.html#engine,Variable sqlalchemy_insert.engine=sqlalchemy_insert-module.html#engine,Variable test.engine=test-module.html#engine"><a title="config_db.engine
+sql_test.engine
+sqlalchemy_declarative.engine
+sqlalchemy_insert.engine
+test.engine" class="py-name" href="#" onclick="return doclink('link-0', 'engine', 'link-0');">engine</a></tt> <tt class="py-op">=</tt> <tt class="py-name">create_engine</tt><tt class="py-op">(</tt><tt class="py-string">'sqlite:///pepe.db'</tt><tt class="py-op">,</tt> <tt class="py-name">echo</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt id="link-1" class="py-name" targets="Variable sql_test.DBSession=sql_test-module.html#DBSession,Variable sqlalchemy_insert.DBSession=sqlalchemy_insert-module.html#DBSession,Variable test.DBSession=test-module.html#DBSession"><a title="sql_test.DBSession
+sqlalchemy_insert.DBSession
+test.DBSession" class="py-name" href="#" onclick="return doclink('link-1', 'DBSession', 'link-1');">DBSession</a></tt> <tt class="py-op">=</tt> <tt class="py-name">scoped_session</tt><tt class="py-op">(</tt><tt class="py-name">sessionmaker</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt id="link-2" class="py-name"><a title="sql_test.DBSession
+sqlalchemy_insert.DBSession
+test.DBSession" class="py-name" href="#" onclick="return doclink('link-2', 'DBSession', 'link-1');">DBSession</a></tt><tt class="py-op">.</tt><tt class="py-name">configure</tt><tt class="py-op">(</tt><tt class="py-name">bind</tt><tt class="py-op">=</tt><tt id="link-3" class="py-name"><a title="config_db.engine
+sql_test.engine
+sqlalchemy_declarative.engine
+sqlalchemy_insert.engine
+test.engine" class="py-name" href="#" onclick="return doclink('link-3', 'engine', 'link-0');">engine</a></tt><tt class="py-op">)</tt> </tt>
+<a name="uBase"></a><div id="uBase-def"><a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt> <a class="py-toggle" href="#" id="uBase-toggle" onclick="return toggle('uBase');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="test.uBase-class.html">uBase</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="uBase-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="uBase-expanded"><a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">declared_attr</tt> </tt>
+<a name="uBase.__tablename__"></a><div id="uBase.__tablename__-def"><a name="L20"></a><tt class="py-lineno"> 20</tt> <a class="py-toggle" href="#" id="uBase.__tablename__-toggle" onclick="return toggle('uBase.__tablename__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test.uBase-class.html#__tablename__">__tablename__</a><tt class="py-op">(</tt><tt class="py-param">cls</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="uBase.__tablename__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="uBase.__tablename__-expanded"><a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">cls</tt><tt class="py-op">.</tt><tt class="py-name">__name__</tt><tt class="py-op">.</tt><tt class="py-name">upper</tt><tt class="py-op">(</tt><tt class="py-op">)</tt>     </tt>
+</div></div><a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"><tt class="py-comment">#Base = declarative_base(cls=Base)</tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"><tt id="link-4" class="py-name" targets="Variable acl_database.Base=acl_database-module.html#Base,Variable config_db.Base=config_db-module.html#Base"><a title="acl_database.Base
+config_db.Base" class="py-name" href="#" onclick="return doclink('link-4', 'Base', 'link-4');">Base</a></tt> <tt class="py-op">=</tt> <tt class="py-name">declarative_base</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="Rows"></a><div id="Rows-def"><a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line"> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt> <a class="py-toggle" href="#" id="Rows-toggle" onclick="return toggle('Rows');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="test.Rows-class.html">Rows</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Rows-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Rows-expanded"><a name="Rows.__init__"></a><div id="Rows.__init__-def"><a name="L27"></a><tt class="py-lineno"> 27</tt> <a class="py-toggle" href="#" id="Rows.__init__-toggle" onclick="return toggle('Rows.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test.Rows-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">header</tt><tt class="py-op">,</tt> <tt class="py-param">rows</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Rows.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Rows.__init__-expanded"><a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">header</tt> <tt class="py-op">=</tt> <tt class="py-name">header</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">rows</tt> <tt class="py-op">=</tt> <tt class="py-name">rows</tt> </tt>
+</div><a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line">  </tt>
+<a name="Rows.commit"></a><div id="Rows.commit-def"><a name="L31"></a><tt class="py-lineno"> 31</tt> <a class="py-toggle" href="#" id="Rows.commit-toggle" onclick="return toggle('Rows.commit');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test.Rows-class.html#commit">commit</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">model</tt><tt class="py-op">,</tt> <tt class="py-param">session</tt><tt class="py-op">=</tt><tt id="link-5" class="py-name"><a title="sql_test.DBSession
+sqlalchemy_insert.DBSession
+test.DBSession" class="py-name" href="#" onclick="return doclink('link-5', 'DBSession', 'link-1');">DBSession</a></tt><tt class="py-op">,</tt> <tt class="py-param">commiter</tt><tt class="py-op">=</tt><tt id="link-6" class="py-name"><a title="sql_test.DBSession
+sqlalchemy_insert.DBSession
+test.DBSession" class="py-name" href="#" onclick="return doclink('link-6', 'DBSession', 'link-1');">DBSession</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Rows.commit-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Rows.commit-expanded"><a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line">        <tt class="py-name">header</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">header</tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">row</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">rows</tt><tt class="py-op">:</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line">            <tt class="py-name">o</tt> <tt class="py-op">=</tt> <tt class="py-name">model</tt><tt class="py-op">(</tt><tt class="py-op">**</tt><tt class="py-name">dict</tt><tt class="py-op">(</tt><tt class="py-name">zip</tt><tt class="py-op">(</tt><tt class="py-name">header</tt><tt class="py-op">,</tt><tt class="py-name">row</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line">            <tt id="link-7" class="py-name" targets="Variable acl_database.Database.session=acl_database.Database-class.html#session,Variable config_db.Database.session=config_db.Database-class.html#session,Variable sql_test.session=sql_test-module.html#session,Variable sqlalchemy_insert.session=sqlalchemy_insert-module.html#session"><a title="acl_database.Database.session
+config_db.Database.session
+sql_test.session
+sqlalchemy_insert.session" class="py-name" href="#" onclick="return doclink('link-7', 'session', 'link-7');">session</a></tt><tt class="py-op">.</tt><tt class="py-name">add</tt><tt class="py-op">(</tt><tt class="py-name">o</tt><tt class="py-op">)</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">            <tt class="py-name">commiter</tt><tt class="py-op">.</tt><tt id="link-8" class="py-name" targets="Method test.Rows.commit()=test.Rows-class.html#commit"><a title="test.Rows.commit" class="py-name" href="#" onclick="return doclink('link-8', 'commit', 'link-8');">commit</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line"> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line"> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line"><tt class="py-comment">#DeferredReflection.prepare(engine)</tt> </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line">    </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line">     </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line"><tt id="link-9" class="py-name" targets="Variable sqlalchemy_declarative.groups=sqlalchemy_declarative-module.html#groups,Variable test.groups=test-module.html#groups"><a title="sqlalchemy_declarative.groups
+test.groups" class="py-name" href="#" onclick="return doclink('link-9', 'groups', 'link-9');">groups</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Table</tt><tt class="py-op">(</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line">    <tt class="py-string">'groups'</tt><tt class="py-op">,</tt> <tt id="link-10" class="py-name"><a title="acl_database.Base
+config_db.Base" class="py-name" href="#" onclick="return doclink('link-10', 'Base', 'link-4');">Base</a></tt><tt class="py-op">.</tt><tt class="py-name">metadata</tt><tt class="py-op">,</tt> </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line">    <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-string">'uid'</tt><tt class="py-op">,</tt> <tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">ForeignKey</tt><tt class="py-op">(</tt><tt class="py-string">'USER.uid'</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">nullable</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line">    <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-string">'gid'</tt><tt class="py-op">,</tt> <tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">ForeignKey</tt><tt class="py-op">(</tt><tt class="py-string">'GROUP.gid'</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">nullable</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line"> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">    <tt class="py-comment">#rel_uid = relationship("USER", backref="_map_user2group", primaryjoin="_M_U2G.uid==USER.uid")</tt> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">    <tt class="py-comment">#rel_gid = relationship("GROUPS", backref="_map_user2group",primaryjoin="_M_U2G.gid==GROUPS.gid")</tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line"><tt class="py-op">)</tt> </tt>
+<a name="User"></a><div id="User-def"><a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line"> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt> <a class="py-toggle" href="#" id="User-toggle" onclick="return toggle('User');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="test.User-class.html">User</a><tt class="py-op">(</tt><tt class="py-base-class">Base</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="User-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="User-expanded"><a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line">    <tt id="link-11" class="py-name" targets="Variable acl_database.Users.__tablename__=acl_database.Users-class.html#__tablename__,Variable config_db.Group.__tablename__=config_db.Group-class.html#__tablename__,Variable config_db.Groups.__tablename__=config_db.Groups-class.html#__tablename__,Variable config_db.User.__tablename__=config_db.User-class.html#__tablename__,Variable sqlalchemy_declarative.Group.__tablename__=sqlalchemy_declarative.Group-class.html#__tablename__,Variable sqlalchemy_declarative.User.__tablename__=sqlalchemy_declarative.User-class.html#__tablename__,Variable test.Group.__tablename__=test.Group-class.html#__tablename__,Variable test.User.__tablename__=test.User-class.html#__tablename__,Variable test._m_g2t.__tablename__=test._m_g2t-class.html#__tablename__,Variable test._m_g2u.__tablename__=test._m_g2u-class.html#__tablename__,Variable test._m_g2w.__tablename__=test._m_g2w-class.html#__tablename__,Variable test._m_u2g.__tablename__=test._m_u2g-class.html#__tablename__,Variable test.rules_time.__tablename__=test.rules_time-class.html#__tablename__,Variable test.rules_uris.__tablename__=test.rules_uris-class.html#__tablename__,Variable test.rules_words.__tablename__=test.rules_words-class.html#__tablename__,Variable test.uBase.__tablename__=test.uBase-class.html#__tablename__"><a title="acl_database.Users.__tablename__
+config_db.Group.__tablename__
+config_db.Groups.__tablename__
+config_db.User.__tablename__
+sqlalchemy_declarative.Group.__tablename__
+sqlalchemy_declarative.User.__tablename__
+test.Group.__tablename__
+test.User.__tablename__
+test._m_g2t.__tablename__
+test._m_g2u.__tablename__
+test._m_g2w.__tablename__
+test._m_u2g.__tablename__
+test.rules_time.__tablename__
+test.rules_uris.__tablename__
+test.rules_words.__tablename__
+test.uBase.__tablename__" class="py-name" href="#" onclick="return doclink('link-11', '__tablename__', 'link-11');">__tablename__</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'USER'</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line">     </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">    <tt id="link-12" class="py-name" targets="Variable acl_database.Users.uid=acl_database.Users-class.html#uid,Variable config_db.Groups.uid=config_db.Groups-class.html#uid,Variable config_db.User.uid=config_db.User-class.html#uid,Variable sqlalchemy_declarative.User.uid=sqlalchemy_declarative.User-class.html#uid,Variable test.User.uid=test.User-class.html#uid,Variable test._m_u2g.uid=test._m_u2g-class.html#uid"><a title="acl_database.Users.uid
+config_db.Groups.uid
+config_db.User.uid
+sqlalchemy_declarative.User.uid
+test.User.uid
+test._m_u2g.uid" class="py-name" href="#" onclick="return doclink('link-12', 'uid', 'link-12');">uid</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">autoincrement</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">unique</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line">    <tt id="link-13" class="py-name" targets="Variable acl_database.Users.name=acl_database.Users-class.html#name,Variable test.Group.name=test.Group-class.html#name,Variable test.User.name=test.User-class.html#name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-13', 'name', 'link-13');">name</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">String</tt><tt class="py-op">(</tt><tt class="py-number">20</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">nullable</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">,</tt> <tt class="py-name">unique</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line">    <tt id="link-14" class="py-name" targets="Variable acl_database.Users.password_hash=acl_database.Users-class.html#password_hash,Variable test.User.password_hash=test.User-class.html#password_hash"><a title="acl_database.Users.password_hash
+test.User.password_hash" class="py-name" href="#" onclick="return doclink('link-14', 'password_hash', 'link-14');">password_hash</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">String</tt><tt class="py-op">(</tt><tt class="py-number">16</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">nullable</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">)</tt> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line">    <tt id="link-15" class="py-name" targets="Variable acl_database.Users.description=acl_database.Users-class.html#description,Variable config_db.Group.description=config_db.Group-class.html#description,Variable config_db.User.description=config_db.User-class.html#description,Variable sqlalchemy_declarative.Group.description=sqlalchemy_declarative.Group-class.html#description,Variable sqlalchemy_declarative.User.description=sqlalchemy_declarative.User-class.html#description,Variable test.User.description=test.User-class.html#description"><a title="acl_database.Users.description
+config_db.Group.description
+config_db.User.description
+sqlalchemy_declarative.Group.description
+sqlalchemy_declarative.User.description
+test.User.description" class="py-name" href="#" onclick="return doclink('link-15', 'description', 'link-15');">description</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">String</tt><tt class="py-op">(</tt><tt class="py-number">80</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">nullable</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">)</tt> </tt>
+<a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">    <tt class="py-comment"># many to many User &lt;-&gt; Group</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line">    <tt class="py-comment">#relationship("pertenece", secondary = groups, backref = Base.__tablename__)</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line"> </tt>
+<a name="User.__init__"></a><div id="User.__init__-def"><a name="L61"></a><tt class="py-lineno"> 61</tt> <a class="py-toggle" href="#" id="User.__init__-toggle" onclick="return toggle('User.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test.User-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">name</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="User.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="User.__init__-expanded"><a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-16" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-16', 'name', 'link-13');">name</a></tt> <tt class="py-op">=</tt> <tt id="link-17" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-17', 'name', 'link-13');">name</a></tt> </tt>
+</div><a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line"> </tt>
+<a name="User.__repr__"></a><div id="User.__repr__-def"><a name="L64"></a><tt class="py-lineno"> 64</tt> <a class="py-toggle" href="#" id="User.__repr__-toggle" onclick="return toggle('User.__repr__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test.User-class.html#__repr__">__repr__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="User.__repr__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="User.__repr__-expanded"><a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">"User(%r)"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-18" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-18', 'name', 'link-13');">name</a></tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line"> </tt>
+<a name="Group"></a><div id="Group-def"><a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line"> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt> <a class="py-toggle" href="#" id="Group-toggle" onclick="return toggle('Group');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="test.Group-class.html">Group</a><tt class="py-op">(</tt><tt class="py-base-class">Base</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Group-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Group-expanded"><a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">    <tt class="py-comment">#__table_args__ = ({'autoload': True},)</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line">    <tt id="link-19" class="py-name"><a title="acl_database.Users.__tablename__
+config_db.Group.__tablename__
+config_db.Groups.__tablename__
+config_db.User.__tablename__
+sqlalchemy_declarative.Group.__tablename__
+sqlalchemy_declarative.User.__tablename__
+test.Group.__tablename__
+test.User.__tablename__
+test._m_g2t.__tablename__
+test._m_g2u.__tablename__
+test._m_g2w.__tablename__
+test._m_u2g.__tablename__
+test.rules_time.__tablename__
+test.rules_uris.__tablename__
+test.rules_words.__tablename__
+test.uBase.__tablename__" class="py-name" href="#" onclick="return doclink('link-19', '__tablename__', 'link-11');">__tablename__</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'GROUP'</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">     </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line"> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">    <tt id="link-20" class="py-name" targets="Variable config_db.Group.gid=config_db.Group-class.html#gid,Variable config_db.Groups.gid=config_db.Groups-class.html#gid,Variable sqlalchemy_declarative.Group.gid=sqlalchemy_declarative.Group-class.html#gid,Variable test.Group.gid=test.Group-class.html#gid,Variable test._m_g2t.gid=test._m_g2t-class.html#gid,Variable test._m_g2u.gid=test._m_g2u-class.html#gid,Variable test._m_g2w.gid=test._m_g2w-class.html#gid,Variable test._m_u2g.gid=test._m_u2g-class.html#gid"><a title="config_db.Group.gid
+config_db.Groups.gid
+sqlalchemy_declarative.Group.gid
+test.Group.gid
+test._m_g2t.gid
+test._m_g2u.gid
+test._m_g2w.gid
+test._m_u2g.gid" class="py-name" href="#" onclick="return doclink('link-20', 'gid', 'link-20');">gid</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">autoincrement</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">unique</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line">    <tt id="link-21" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-21', 'name', 'link-13');">name</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">String</tt><tt class="py-op">(</tt><tt class="py-number">80</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">nullable</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">)</tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">    <tt class="py-comment">#teams = relationship('pk_group', backref="_M_G2T")</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">    <tt class="py-comment">#componentes = relationship('componentes', secondary = groups, backref = Base.__tablename__)</tt> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line"> </tt>
+<a name="Group.__init__"></a><div id="Group.__init__-def"><a name="L78"></a><tt class="py-lineno"> 78</tt> <a class="py-toggle" href="#" id="Group.__init__-toggle" onclick="return toggle('Group.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test.Group-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">name</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Group.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Group.__init__-expanded"><a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-22" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-22', 'name', 'link-13');">name</a></tt> <tt class="py-op">=</tt> <tt id="link-23" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-23', 'name', 'link-13');">name</a></tt> </tt>
+</div><a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line"> </tt>
+<a name="Group.__repr__"></a><div id="Group.__repr__-def"><a name="L81"></a><tt class="py-lineno"> 81</tt> <a class="py-toggle" href="#" id="Group.__repr__-toggle" onclick="return toggle('Group.__repr__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test.Group-class.html#__repr__">__repr__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Group.__repr__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Group.__repr__-expanded"><a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">"Groups(%r)"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-24" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-24', 'name', 'link-13');">name</a></tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line"> </tt>
+<a name="rules_time"></a><div id="rules_time-def"><a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line"> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt> <a class="py-toggle" href="#" id="rules_time-toggle" onclick="return toggle('rules_time');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="test.rules_time-class.html">rules_time</a><tt class="py-op">(</tt><tt class="py-base-class">Base</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="rules_time-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="rules_time-expanded"><a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line">    <tt id="link-25" class="py-name"><a title="acl_database.Users.__tablename__
+config_db.Group.__tablename__
+config_db.Groups.__tablename__
+config_db.User.__tablename__
+sqlalchemy_declarative.Group.__tablename__
+sqlalchemy_declarative.User.__tablename__
+test.Group.__tablename__
+test.User.__tablename__
+test._m_g2t.__tablename__
+test._m_g2u.__tablename__
+test._m_g2w.__tablename__
+test._m_u2g.__tablename__
+test.rules_time.__tablename__
+test.rules_uris.__tablename__
+test.rules_words.__tablename__
+test.uBase.__tablename__" class="py-name" href="#" onclick="return doclink('link-25', '__tablename__', 'link-11');">__tablename__</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'RULES_TIME'</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line">    <tt class="py-comment">#__table_args__ = (Index('idx_rtid' , 'rtid'),)</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line"> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line">    <tt id="link-26" class="py-name" targets="Variable test._m_g2t.rtid=test._m_g2t-class.html#rtid,Variable test.rules_time.rtid=test.rules_time-class.html#rtid"><a title="test._m_g2t.rtid
+test.rules_time.rtid" class="py-name" href="#" onclick="return doclink('link-26', 'rtid', 'link-26');">rtid</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">autoincrement</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">unique</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line"> </tt>
+<a name="rules_time.__init__"></a><div id="rules_time.__init__-def"><a name="L91"></a><tt class="py-lineno"> 91</tt> <a class="py-toggle" href="#" id="rules_time.__init__-toggle" onclick="return toggle('rules_time.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test.rules_time-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">name</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="rules_time.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="rules_time.__init__-expanded"><a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-27" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-27', 'name', 'link-13');">name</a></tt> <tt class="py-op">=</tt> <tt id="link-28" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-28', 'name', 'link-13');">name</a></tt> </tt>
+</div><a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line"> </tt>
+<a name="rules_time.__repr__"></a><div id="rules_time.__repr__-def"><a name="L94"></a><tt class="py-lineno"> 94</tt> <a class="py-toggle" href="#" id="rules_time.__repr__-toggle" onclick="return toggle('rules_time.__repr__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test.rules_time-class.html#__repr__">__repr__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="rules_time.__repr__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="rules_time.__repr__-expanded"><a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">"RuleTime(%r)"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-29" class="py-name"><a title="test._m_g2t.rtid
+test.rules_time.rtid" class="py-name" href="#" onclick="return doclink('link-29', 'rtid', 'link-26');">rtid</a></tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line"> </tt>
+<a name="rules_uris"></a><div id="rules_uris-def"><a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line"> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt> <a class="py-toggle" href="#" id="rules_uris-toggle" onclick="return toggle('rules_uris');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="test.rules_uris-class.html">rules_uris</a><tt class="py-op">(</tt><tt class="py-base-class">Base</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="rules_uris-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="rules_uris-expanded"><a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line">    <tt id="link-30" class="py-name"><a title="acl_database.Users.__tablename__
+config_db.Group.__tablename__
+config_db.Groups.__tablename__
+config_db.User.__tablename__
+sqlalchemy_declarative.Group.__tablename__
+sqlalchemy_declarative.User.__tablename__
+test.Group.__tablename__
+test.User.__tablename__
+test._m_g2t.__tablename__
+test._m_g2u.__tablename__
+test._m_g2w.__tablename__
+test._m_u2g.__tablename__
+test.rules_time.__tablename__
+test.rules_uris.__tablename__
+test.rules_words.__tablename__
+test.uBase.__tablename__" class="py-name" href="#" onclick="return doclink('link-30', '__tablename__', 'link-11');">__tablename__</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'RULES_URIS'</tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line">    <tt id="link-31" class="py-name" targets="Variable test._m_g2u.ruid=test._m_g2u-class.html#ruid,Variable test.rules_uris.ruid=test.rules_uris-class.html#ruid"><a title="test._m_g2u.ruid
+test.rules_uris.ruid" class="py-name" href="#" onclick="return doclink('link-31', 'ruid', 'link-31');">ruid</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">autoincrement</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">unique</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt id="link-32" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-32', 'name', 'link-13');">name</a></tt><tt class="py-op">=</tt><tt class="py-string">'ruid'</tt><tt class="py-op">,</tt> <tt class="py-name">index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line">    <tt id="link-33" class="py-name" targets="Variable test.rules_uris.rule_uri=test.rules_uris-class.html#rule_uri"><a title="test.rules_uris.rule_uri" class="py-name" href="#" onclick="return doclink('link-33', 'rule_uri', 'link-33');">rule_uri</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">String</tt><tt class="py-op">(</tt><tt class="py-number">256</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line"> </tt>
+<a name="rules_uris.__init__"></a><div id="rules_uris.__init__-def"><a name="L103"></a><tt class="py-lineno">103</tt> <a class="py-toggle" href="#" id="rules_uris.__init__-toggle" onclick="return toggle('rules_uris.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test.rules_uris-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">name</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="rules_uris.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="rules_uris.__init__-expanded"><a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-34" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-34', 'name', 'link-13');">name</a></tt> <tt class="py-op">=</tt> <tt id="link-35" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-35', 'name', 'link-13');">name</a></tt> </tt>
+</div><a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line"> </tt>
+<a name="rules_uris.__repr__"></a><div id="rules_uris.__repr__-def"><a name="L106"></a><tt class="py-lineno">106</tt> <a class="py-toggle" href="#" id="rules_uris.__repr__-toggle" onclick="return toggle('rules_uris.__repr__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test.rules_uris-class.html#__repr__">__repr__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="rules_uris.__repr__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="rules_uris.__repr__-expanded"><a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">"RuleURI(%r)"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-36" class="py-name"><a title="test._m_g2u.ruid
+test.rules_uris.ruid" class="py-name" href="#" onclick="return doclink('link-36', 'ruid', 'link-31');">ruid</a></tt><tt class="py-op">)</tt>     </tt>
+</div></div><a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line"> </tt>
+<a name="rules_words"></a><div id="rules_words-def"><a name="L109"></a><tt class="py-lineno">109</tt> <a class="py-toggle" href="#" id="rules_words-toggle" onclick="return toggle('rules_words');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="test.rules_words-class.html">rules_words</a><tt class="py-op">(</tt><tt class="py-base-class">Base</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="rules_words-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="rules_words-expanded"><a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line">    <tt id="link-37" class="py-name"><a title="acl_database.Users.__tablename__
+config_db.Group.__tablename__
+config_db.Groups.__tablename__
+config_db.User.__tablename__
+sqlalchemy_declarative.Group.__tablename__
+sqlalchemy_declarative.User.__tablename__
+test.Group.__tablename__
+test.User.__tablename__
+test._m_g2t.__tablename__
+test._m_g2u.__tablename__
+test._m_g2w.__tablename__
+test._m_u2g.__tablename__
+test.rules_time.__tablename__
+test.rules_uris.__tablename__
+test.rules_words.__tablename__
+test.uBase.__tablename__" class="py-name" href="#" onclick="return doclink('link-37', '__tablename__', 'link-11');">__tablename__</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'RULES_WORDS'</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line">    <tt id="link-38" class="py-name" targets="Variable test._m_g2w.rwid=test._m_g2w-class.html#rwid,Variable test.rules_words.rwid=test.rules_words-class.html#rwid"><a title="test._m_g2w.rwid
+test.rules_words.rwid" class="py-name" href="#" onclick="return doclink('link-38', 'rwid', 'link-38');">rwid</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">autoincrement</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">unique</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line">    <tt id="link-39" class="py-name" targets="Variable test.rules_words.words=test.rules_words-class.html#words"><a title="test.rules_words.words" class="py-name" href="#" onclick="return doclink('link-39', 'words', 'link-39');">words</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">String</tt><tt class="py-op">(</tt><tt class="py-number">256</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">nullable</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">)</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line"> </tt>
+<a name="rules_words.__init__"></a><div id="rules_words.__init__-def"><a name="L114"></a><tt class="py-lineno">114</tt> <a class="py-toggle" href="#" id="rules_words.__init__-toggle" onclick="return toggle('rules_words.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test.rules_words-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">name</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="rules_words.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="rules_words.__init__-expanded"><a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-40" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-40', 'name', 'link-13');">name</a></tt> <tt class="py-op">=</tt> <tt id="link-41" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-41', 'name', 'link-13');">name</a></tt> </tt>
+</div><a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line"> </tt>
+<a name="rules_words.__repr__"></a><div id="rules_words.__repr__-def"><a name="L117"></a><tt class="py-lineno">117</tt> <a class="py-toggle" href="#" id="rules_words.__repr__-toggle" onclick="return toggle('rules_words.__repr__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test.rules_words-class.html#__repr__">__repr__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="rules_words.__repr__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="rules_words.__repr__-expanded"><a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">"RuleURI(%r)"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-42" class="py-name"><a title="test._m_g2u.ruid
+test.rules_uris.ruid" class="py-name" href="#" onclick="return doclink('link-42', 'ruid', 'link-31');">ruid</a></tt><tt class="py-op">)</tt>     </tt>
+</div></div><a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line"> </tt>
+<a name="_m_g2t"></a><div id="_m_g2t-def"><a name="L120"></a><tt class="py-lineno">120</tt> <a class="py-toggle" href="#" id="_m_g2t-toggle" onclick="return toggle('_m_g2t');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="test._m_g2t-class.html">_m_g2t</a><tt class="py-op">(</tt><tt class="py-base-class">Base</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="_m_g2t-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="_m_g2t-expanded"><a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line">    <tt id="link-43" class="py-name"><a title="acl_database.Users.__tablename__
+config_db.Group.__tablename__
+config_db.Groups.__tablename__
+config_db.User.__tablename__
+sqlalchemy_declarative.Group.__tablename__
+sqlalchemy_declarative.User.__tablename__
+test.Group.__tablename__
+test.User.__tablename__
+test._m_g2t.__tablename__
+test._m_g2u.__tablename__
+test._m_g2w.__tablename__
+test._m_u2g.__tablename__
+test.rules_time.__tablename__
+test.rules_uris.__tablename__
+test.rules_words.__tablename__
+test.uBase.__tablename__" class="py-name" href="#" onclick="return doclink('link-43', '__tablename__', 'link-11');">__tablename__</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'_M_G2T'</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line">    <tt id="link-44" class="py-name"><a title="config_db.Group.gid
+config_db.Groups.gid
+sqlalchemy_declarative.Group.gid
+test.Group.gid
+test._m_g2t.gid
+test._m_g2u.gid
+test._m_g2w.gid
+test._m_u2g.gid" class="py-name" href="#" onclick="return doclink('link-44', 'gid', 'link-20');">gid</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">ForeignKey</tt><tt class="py-op">(</tt><tt class="py-string">'GROUP.gid'</tt><tt class="py-op">,</tt> <tt id="link-45" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-45', 'name', 'link-13');">name</a></tt><tt class="py-op">=</tt><tt class="py-string">'allowed_time'</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">nullable</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line">    <tt id="link-46" class="py-name"><a title="test._m_g2t.rtid
+test.rules_time.rtid" class="py-name" href="#" onclick="return doclink('link-46', 'rtid', 'link-26');">rtid</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">ForeignKey</tt><tt class="py-op">(</tt><tt class="py-string">'RULES_TIME.rtid'</tt><tt class="py-op">,</tt> <tt id="link-47" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-47', 'name', 'link-13');">name</a></tt><tt class="py-op">=</tt><tt class="py-string">'time_allowed'</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">nullable</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line"> </tt>
+<a name="_m_g2t.__repr__"></a><div id="_m_g2t.__repr__-def"><a name="L125"></a><tt class="py-lineno">125</tt> <a class="py-toggle" href="#" id="_m_g2t.__repr__-toggle" onclick="return toggle('_m_g2t.__repr__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test._m_g2t-class.html#__repr__">__repr__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="_m_g2t.__repr__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="_m_g2t.__repr__-expanded"><a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">"MAP G2T (%r:%r)"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-48" class="py-name"><a title="config_db.Group.gid
+config_db.Groups.gid
+sqlalchemy_declarative.Group.gid
+test.Group.gid
+test._m_g2t.gid
+test._m_g2u.gid
+test._m_g2w.gid
+test._m_u2g.gid" class="py-name" href="#" onclick="return doclink('link-48', 'gid', 'link-20');">gid</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-49" class="py-name"><a title="test._m_g2t.rtid
+test.rules_time.rtid" class="py-name" href="#" onclick="return doclink('link-49', 'rtid', 'link-26');">rtid</a></tt><tt class="py-op">)</tt>     </tt>
+</div></div><a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line"> </tt>
+<a name="_m_g2u"></a><div id="_m_g2u-def"><a name="L128"></a><tt class="py-lineno">128</tt> <a class="py-toggle" href="#" id="_m_g2u-toggle" onclick="return toggle('_m_g2u');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="test._m_g2u-class.html">_m_g2u</a><tt class="py-op">(</tt><tt class="py-base-class">Base</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="_m_g2u-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="_m_g2u-expanded"><a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line">    <tt id="link-50" class="py-name"><a title="acl_database.Users.__tablename__
+config_db.Group.__tablename__
+config_db.Groups.__tablename__
+config_db.User.__tablename__
+sqlalchemy_declarative.Group.__tablename__
+sqlalchemy_declarative.User.__tablename__
+test.Group.__tablename__
+test.User.__tablename__
+test._m_g2t.__tablename__
+test._m_g2u.__tablename__
+test._m_g2w.__tablename__
+test._m_u2g.__tablename__
+test.rules_time.__tablename__
+test.rules_uris.__tablename__
+test.rules_words.__tablename__
+test.uBase.__tablename__" class="py-name" href="#" onclick="return doclink('link-50', '__tablename__', 'link-11');">__tablename__</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'_M_G2U'</tt> </tt>
+<a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line">    <tt id="link-51" class="py-name"><a title="config_db.Group.gid
+config_db.Groups.gid
+sqlalchemy_declarative.Group.gid
+test.Group.gid
+test._m_g2t.gid
+test._m_g2u.gid
+test._m_g2w.gid
+test._m_u2g.gid" class="py-name" href="#" onclick="return doclink('link-51', 'gid', 'link-20');">gid</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">ForeignKey</tt><tt class="py-op">(</tt><tt class="py-string">'GROUP.gid'</tt><tt class="py-op">,</tt> <tt id="link-52" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-52', 'name', 'link-13');">name</a></tt><tt class="py-op">=</tt><tt class="py-string">'allowed_uris'</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">nullable</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line">    <tt id="link-53" class="py-name"><a title="test._m_g2u.ruid
+test.rules_uris.ruid" class="py-name" href="#" onclick="return doclink('link-53', 'ruid', 'link-31');">ruid</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">ForeignKey</tt><tt class="py-op">(</tt><tt class="py-string">'RULES_URIS.ruid'</tt><tt class="py-op">,</tt> <tt id="link-54" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-54', 'name', 'link-13');">name</a></tt><tt class="py-op">=</tt><tt class="py-string">'uris_allowed'</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">nullable</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line">    <tt class="py-comment">#rel_gid = relationship("GROUPS", backref="_m_g2u",primaryjoin="_M_G2U.gid==GROUP.gid")</tt> </tt>
+<a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line">    <tt class="py-comment">#rel_rtid = relationship("RULES_URIS", backref="_m_g2u", primaryjoin="_M_G2U.rtid==RULES_URIS.ruid")</tt> </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line"> </tt>
+<a name="_m_g2u.__repr__"></a><div id="_m_g2u.__repr__-def"><a name="L135"></a><tt class="py-lineno">135</tt> <a class="py-toggle" href="#" id="_m_g2u.__repr__-toggle" onclick="return toggle('_m_g2u.__repr__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test._m_g2u-class.html#__repr__">__repr__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="_m_g2u.__repr__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="_m_g2u.__repr__-expanded"><a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">"MAP G2U (%r:%r)"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-55" class="py-name"><a title="config_db.Group.gid
+config_db.Groups.gid
+sqlalchemy_declarative.Group.gid
+test.Group.gid
+test._m_g2t.gid
+test._m_g2u.gid
+test._m_g2w.gid
+test._m_u2g.gid" class="py-name" href="#" onclick="return doclink('link-55', 'gid', 'link-20');">gid</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-56" class="py-name"><a title="test._m_g2u.ruid
+test.rules_uris.ruid" class="py-name" href="#" onclick="return doclink('link-56', 'ruid', 'link-31');">ruid</a></tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line"> </tt>
+<a name="_m_g2w"></a><div id="_m_g2w-def"><a name="L138"></a><tt class="py-lineno">138</tt> <a class="py-toggle" href="#" id="_m_g2w-toggle" onclick="return toggle('_m_g2w');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="test._m_g2w-class.html">_m_g2w</a><tt class="py-op">(</tt><tt class="py-base-class">Base</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="_m_g2w-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="_m_g2w-expanded"><a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line">    <tt id="link-57" class="py-name"><a title="acl_database.Users.__tablename__
+config_db.Group.__tablename__
+config_db.Groups.__tablename__
+config_db.User.__tablename__
+sqlalchemy_declarative.Group.__tablename__
+sqlalchemy_declarative.User.__tablename__
+test.Group.__tablename__
+test.User.__tablename__
+test._m_g2t.__tablename__
+test._m_g2u.__tablename__
+test._m_g2w.__tablename__
+test._m_u2g.__tablename__
+test.rules_time.__tablename__
+test.rules_uris.__tablename__
+test.rules_words.__tablename__
+test.uBase.__tablename__" class="py-name" href="#" onclick="return doclink('link-57', '__tablename__', 'link-11');">__tablename__</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'_M_G2W'</tt> </tt>
+<a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line">    <tt class="py-comment">#__table_args__ = (Index('idx_g2wo_1rwid' , 'rwid'), Index('idx_g2wo_gid' , 'gid'))</tt> </tt>
+<a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line"> </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line">    <tt id="link-58" class="py-name"><a title="config_db.Group.gid
+config_db.Groups.gid
+sqlalchemy_declarative.Group.gid
+test.Group.gid
+test._m_g2t.gid
+test._m_g2u.gid
+test._m_g2w.gid
+test._m_u2g.gid" class="py-name" href="#" onclick="return doclink('link-58', 'gid', 'link-20');">gid</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">ForeignKey</tt><tt class="py-op">(</tt><tt class="py-string">'GROUP.gid'</tt><tt class="py-op">,</tt> <tt id="link-59" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-59', 'name', 'link-13');">name</a></tt><tt class="py-op">=</tt><tt class="py-string">'allowed_words'</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">nullable</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line">    <tt id="link-60" class="py-name"><a title="test._m_g2w.rwid
+test.rules_words.rwid" class="py-name" href="#" onclick="return doclink('link-60', 'rwid', 'link-38');">rwid</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">ForeignKey</tt><tt class="py-op">(</tt><tt class="py-string">'RULES_WORDS.rwid'</tt><tt class="py-op">,</tt> <tt id="link-61" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-61', 'name', 'link-13');">name</a></tt><tt class="py-op">=</tt><tt class="py-string">'words_allowed'</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">nullable</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line">    <tt class="py-comment">#rel_gid = relationship("GROUPS", backref="_m_g2w",primaryjoin="_M_G2W.gid==GROUPS.gid")</tt> </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line">    <tt class="py-comment">#rel_rwid = relationship("RULES_WORDS", backref="_m_g2w", primaryjoin="_M_G2W.rwid==RULES_WORDS.rwid")</tt> </tt>
+<a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line"> </tt>
+<a name="_m_g2w.__repr__"></a><div id="_m_g2w.__repr__-def"><a name="L147"></a><tt class="py-lineno">147</tt> <a class="py-toggle" href="#" id="_m_g2w.__repr__-toggle" onclick="return toggle('_m_g2w.__repr__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test._m_g2w-class.html#__repr__">__repr__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="_m_g2w.__repr__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="_m_g2w.__repr__-expanded"><a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">"MAP G2W (%r:%r)"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-62" class="py-name"><a title="config_db.Group.gid
+config_db.Groups.gid
+sqlalchemy_declarative.Group.gid
+test.Group.gid
+test._m_g2t.gid
+test._m_g2u.gid
+test._m_g2w.gid
+test._m_u2g.gid" class="py-name" href="#" onclick="return doclink('link-62', 'gid', 'link-20');">gid</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-63" class="py-name"><a title="test._m_g2w.rwid
+test.rules_words.rwid" class="py-name" href="#" onclick="return doclink('link-63', 'rwid', 'link-38');">rwid</a></tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line"> </tt>
+<a name="_m_u2g"></a><div id="_m_u2g-def"><a name="L150"></a><tt class="py-lineno">150</tt> <a class="py-toggle" href="#" id="_m_u2g-toggle" onclick="return toggle('_m_u2g');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="test._m_u2g-class.html">_m_u2g</a><tt class="py-op">(</tt><tt class="py-base-class">Base</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="_m_u2g-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="_m_u2g-expanded"><a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line">    <tt id="link-64" class="py-name"><a title="acl_database.Users.__tablename__
+config_db.Group.__tablename__
+config_db.Groups.__tablename__
+config_db.User.__tablename__
+sqlalchemy_declarative.Group.__tablename__
+sqlalchemy_declarative.User.__tablename__
+test.Group.__tablename__
+test.User.__tablename__
+test._m_g2t.__tablename__
+test._m_g2u.__tablename__
+test._m_g2w.__tablename__
+test._m_u2g.__tablename__
+test.rules_time.__tablename__
+test.rules_uris.__tablename__
+test.rules_words.__tablename__
+test.uBase.__tablename__" class="py-name" href="#" onclick="return doclink('link-64', '__tablename__', 'link-11');">__tablename__</a></tt> <tt class="py-op">=</tt> <tt class="py-string">'_M_U2G'</tt> </tt>
+<a name="L152"></a><tt class="py-lineno">152</tt>  <tt class="py-line">    <tt id="link-65" class="py-name"><a title="acl_database.Users.uid
+config_db.Groups.uid
+config_db.User.uid
+sqlalchemy_declarative.User.uid
+test.User.uid
+test._m_u2g.uid" class="py-name" href="#" onclick="return doclink('link-65', 'uid', 'link-12');">uid</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">ForeignKey</tt><tt class="py-op">(</tt><tt class="py-string">'USER.uid'</tt><tt class="py-op">,</tt> <tt id="link-66" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-66', 'name', 'link-13');">name</a></tt><tt class="py-op">=</tt><tt class="py-string">'pertenece'</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">nullable</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line">    <tt id="link-67" class="py-name"><a title="config_db.Group.gid
+config_db.Groups.gid
+sqlalchemy_declarative.Group.gid
+test.Group.gid
+test._m_g2t.gid
+test._m_g2u.gid
+test._m_g2w.gid
+test._m_u2g.gid" class="py-name" href="#" onclick="return doclink('link-67', 'gid', 'link-20');">gid</a></tt> <tt class="py-op">=</tt> <tt class="py-name">Column</tt><tt class="py-op">(</tt><tt class="py-name">Integer</tt><tt class="py-op">,</tt> <tt class="py-name">ForeignKey</tt><tt class="py-op">(</tt><tt class="py-string">'GROUP.gid'</tt><tt class="py-op">,</tt> <tt id="link-68" class="py-name"><a title="acl_database.Users.name
+test.Group.name
+test.User.name" class="py-name" href="#" onclick="return doclink('link-68', 'name', 'link-13');">name</a></tt><tt class="py-op">=</tt><tt class="py-string">'contiene'</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">nullable</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">,</tt> <tt class="py-name">primary_key</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-name">index</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">)</tt> </tt>
+<a name="L154"></a><tt class="py-lineno">154</tt>  <tt class="py-line">    <tt class="py-comment">#rel_uid = relationship("USER", backref="_m_u2g", primaryjoin="_M_U2G.uid==USER.uid")</tt> </tt>
+<a name="L155"></a><tt class="py-lineno">155</tt>  <tt class="py-line">    <tt class="py-comment">#rel_gid = relationship("GROUPS", backref="_m_u2g",primaryjoin="_M_U2G.gid==GROUPS.gid")</tt> </tt>
+<a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line"> </tt>
+<a name="_m_u2g.__repr__"></a><div id="_m_u2g.__repr__-def"><a name="L157"></a><tt class="py-lineno">157</tt> <a class="py-toggle" href="#" id="_m_u2g.__repr__-toggle" onclick="return toggle('_m_u2g.__repr__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test._m_u2g-class.html#__repr__">__repr__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="_m_u2g.__repr__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="_m_u2g.__repr__-expanded"><a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-string">"MAP U2G (%r:%r)"</tt> <tt class="py-op">%</tt> <tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-69" class="py-name"><a title="acl_database.Users.uid
+config_db.Groups.uid
+config_db.User.uid
+sqlalchemy_declarative.User.uid
+test.User.uid
+test._m_u2g.uid" class="py-name" href="#" onclick="return doclink('link-69', 'uid', 'link-12');">uid</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-70" class="py-name"><a title="config_db.Group.gid
+config_db.Groups.gid
+sqlalchemy_declarative.Group.gid
+test.Group.gid
+test._m_g2t.gid
+test._m_g2u.gid
+test._m_g2w.gid
+test._m_u2g.gid" class="py-name" href="#" onclick="return doclink('link-70', 'gid', 'link-20');">gid</a></tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line"> </tt>
+<a name="database"></a><div id="database-def"><a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line"> </tt>
+<a name="L161"></a><tt class="py-lineno">161</tt> <a class="py-toggle" href="#" id="database-toggle" onclick="return toggle('database');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="test.database-class.html">database</a><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="database-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="database-expanded"><a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line"> </tt>
+<a name="database.create"></a><div id="database.create-def"><a name="L163"></a><tt class="py-lineno">163</tt> <a class="py-toggle" href="#" id="database.create-toggle" onclick="return toggle('database.create');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test.database-class.html#create">create</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="database.create-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="database.create-expanded"><a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line">        <tt class="py-comment">#engine = create_engine('sqlite:///pepe.db', echo=True)</tt> </tt>
+<a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line">        <tt class="py-comment">#DeferredReflection.prepare(engine)</tt> </tt>
+<a name="L166"></a><tt class="py-lineno">166</tt>  <tt class="py-line">        <tt class="py-comment">#Base.metadata.bind=engine</tt> </tt>
+<a name="L167"></a><tt class="py-lineno">167</tt>  <tt class="py-line">        <tt class="py-comment">#Base.metadata.create_all(engine)</tt> </tt>
+<a name="L168"></a><tt class="py-lineno">168</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt><tt class="py-op">(</tt><tt class="py-string">"init"</tt><tt class="py-op">)</tt> </tt>
+<a name="L169"></a><tt class="py-lineno">169</tt>  <tt class="py-line">        <tt id="link-71" class="py-name"><a title="acl_database.Base
+config_db.Base" class="py-name" href="#" onclick="return doclink('link-71', 'Base', 'link-4');">Base</a></tt><tt class="py-op">.</tt><tt class="py-name">metadata</tt><tt class="py-op">.</tt><tt class="py-name">create_all</tt><tt class="py-op">(</tt><tt id="link-72" class="py-name"><a title="config_db.engine
+sql_test.engine
+sqlalchemy_declarative.engine
+sqlalchemy_insert.engine
+test.engine" class="py-name" href="#" onclick="return doclink('link-72', 'engine', 'link-0');">engine</a></tt><tt class="py-op">)</tt> </tt>
+</div><a name="L170"></a><tt class="py-lineno">170</tt>  <tt class="py-line">     </tt>
+<a name="database.load"></a><div id="database.load-def"><a name="L171"></a><tt class="py-lineno">171</tt> <a class="py-toggle" href="#" id="database.load-toggle" onclick="return toggle('database.load');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test.database-class.html#load">load</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="database.load-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="database.load-expanded"><a name="L172"></a><tt class="py-lineno">172</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt><tt class="py-op">(</tt><tt class="py-string">"load"</tt><tt class="py-op">)</tt> </tt>
+<a name="L173"></a><tt class="py-lineno">173</tt>  <tt class="py-line">         </tt>
+<a name="L174"></a><tt class="py-lineno">174</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">metadata</tt> <tt class="py-op">=</tt> <tt class="py-name">MetaData</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L175"></a><tt class="py-lineno">175</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">metadata</tt><tt class="py-op">.</tt><tt class="py-name">reflect</tt><tt class="py-op">(</tt><tt class="py-name">bind</tt><tt class="py-op">=</tt><tt id="link-73" class="py-name"><a title="config_db.engine
+sql_test.engine
+sqlalchemy_declarative.engine
+sqlalchemy_insert.engine
+test.engine" class="py-name" href="#" onclick="return doclink('link-73', 'engine', 'link-0');">engine</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L176"></a><tt class="py-lineno">176</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">i</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">metadata</tt><tt class="py-op">.</tt><tt class="py-name">tables</tt><tt class="py-op">:</tt> </tt>
+<a name="L177"></a><tt class="py-lineno">177</tt>  <tt class="py-line">            <tt class="py-keyword">print</tt><tt class="py-op">(</tt><tt class="py-name">i</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L178"></a><tt class="py-lineno">178</tt>  <tt class="py-line">        <tt class="py-comment">#    meta.tables[i]</tt> </tt>
+<a name="L179"></a><tt class="py-lineno">179</tt>  <tt class="py-line">         </tt>
+<a name="L180"></a><tt class="py-lineno">180</tt>  <tt class="py-line">        <tt class="py-comment">#print(len(us))</tt> </tt>
+<a name="L181"></a><tt class="py-lineno">181</tt>  <tt class="py-line">        <tt class="py-comment">#pprint(us)#self.gro=meta.tables['GROUP']</tt> </tt>
+<a name="L182"></a><tt class="py-lineno">182</tt>  <tt class="py-line">        <tt class="py-comment">#self.relu2g=meta.tables['_M_U2G']</tt> </tt>
+<a name="L183"></a><tt class="py-lineno">183</tt>  <tt class="py-line">     </tt>
+<a name="database.query"></a><div id="database.query-def"><a name="L184"></a><tt class="py-lineno">184</tt> <a class="py-toggle" href="#" id="database.query-toggle" onclick="return toggle('database.query');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test.database-class.html#query">query</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">thisobject</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="database.query-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="database.query-expanded"><a name="L185"></a><tt class="py-lineno">185</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">metadata</tt><tt class="py-op">.</tt><tt id="link-74" class="py-name" targets="Method test.database.query()=test.database-class.html#query"><a title="test.database.query" class="py-name" href="#" onclick="return doclink('link-74', 'query', 'link-74');">query</a></tt><tt class="py-op">(</tt><tt class="py-name">thisobject</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L186"></a><tt class="py-lineno">186</tt>  <tt class="py-line">     </tt>
+<a name="database.p"></a><div id="database.p-def"><a name="L187"></a><tt class="py-lineno">187</tt> <a class="py-toggle" href="#" id="database.p-toggle" onclick="return toggle('database.p');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="test.database-class.html#p">p</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="database.p-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="database.p-expanded"><a name="L188"></a><tt class="py-lineno">188</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt><tt class="py-op">(</tt><tt class="py-string">"print"</tt><tt class="py-op">)</tt> </tt>
+<a name="L189"></a><tt class="py-lineno">189</tt>  <tt class="py-line">         </tt>
+<a name="L190"></a><tt class="py-lineno">190</tt>  <tt class="py-line">        <tt class="py-keyword">print</tt><tt class="py-op">(</tt><tt class="py-name">len</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">user</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L191"></a><tt class="py-lineno">191</tt>  <tt class="py-line">         </tt>
+<a name="L192"></a><tt class="py-lineno">192</tt>  <tt class="py-line"> </tt>
+<a name="L193"></a><tt class="py-lineno">193</tt>  <tt class="py-line"><tt class="py-keyword">if</tt> <tt class="py-name">__name__</tt> <tt class="py-op">==</tt> <tt class="py-string">"__main__"</tt><tt class="py-op">:</tt> </tt>
+<a name="L194"></a><tt class="py-lineno">194</tt>  <tt class="py-line">    <tt id="link-75" class="py-name"><a title="acl_database.Base
+config_db.Base" class="py-name" href="#" onclick="return doclink('link-75', 'Base', 'link-4');">Base</a></tt><tt class="py-op">.</tt><tt class="py-name">metadata</tt><tt class="py-op">.</tt><tt class="py-name">bind</tt> <tt class="py-op">=</tt> <tt id="link-76" class="py-name"><a title="config_db.engine
+sql_test.engine
+sqlalchemy_declarative.engine
+sqlalchemy_insert.engine
+test.engine" class="py-name" href="#" onclick="return doclink('link-76', 'engine', 'link-0');">engine</a></tt> </tt>
+<a name="L195"></a><tt class="py-lineno">195</tt>  <tt class="py-line">    <tt id="link-77" class="py-name"><a title="acl_database.Base
+config_db.Base" class="py-name" href="#" onclick="return doclink('link-77', 'Base', 'link-4');">Base</a></tt><tt class="py-op">.</tt><tt class="py-name">metadata</tt><tt class="py-op">.</tt><tt class="py-name">create_all</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L196"></a><tt class="py-lineno">196</tt>  <tt class="py-line">    <tt id="link-78" class="py-name"><a title="sql_test.DBSession
+sqlalchemy_insert.DBSession
+test.DBSession" class="py-name" href="#" onclick="return doclink('link-78', 'DBSession', 'link-1');">DBSession</a></tt><tt class="py-op">.</tt><tt class="py-name">configure</tt><tt class="py-op">(</tt><tt class="py-name">bind</tt><tt class="py-op">=</tt><tt id="link-79" class="py-name"><a title="config_db.engine
+sql_test.engine
+sqlalchemy_declarative.engine
+sqlalchemy_insert.engine
+test.engine" class="py-name" href="#" onclick="return doclink('link-79', 'engine', 'link-0');">engine</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L197"></a><tt class="py-lineno">197</tt>  <tt class="py-line">     </tt>
+<a name="L198"></a><tt class="py-lineno">198</tt>  <tt class="py-line">    <tt class="py-name">db</tt> <tt class="py-op">=</tt> <tt id="link-80" class="py-name" targets="Class test.database=test.database-class.html"><a title="test.database" class="py-name" href="#" onclick="return doclink('link-80', 'database', 'link-80');">database</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L199"></a><tt class="py-lineno">199</tt>  <tt class="py-line">    <tt class="py-name">db</tt><tt class="py-op">.</tt><tt id="link-81" class="py-name" targets="Method test.database.create()=test.database-class.html#create"><a title="test.database.create" class="py-name" href="#" onclick="return doclink('link-81', 'create', 'link-81');">create</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L200"></a><tt class="py-lineno">200</tt>  <tt class="py-line">    <tt class="py-name">db</tt><tt class="py-op">.</tt><tt id="link-82" class="py-name" targets="Method test.database.load()=test.database-class.html#load"><a title="test.database.load" class="py-name" href="#" onclick="return doclink('link-82', 'load', 'link-82');">load</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L201"></a><tt class="py-lineno">201</tt>  <tt class="py-line">    <tt class="py-name">db</tt><tt class="py-op">.</tt><tt id="link-83" class="py-name"><a title="test.database.query" class="py-name" href="#" onclick="return doclink('link-83', 'query', 'link-74');">query</a></tt><tt class="py-op">(</tt><tt id="link-84" class="py-name" targets="Class config_db.User=config_db.User-class.html,Class sqlalchemy_declarative.User=sqlalchemy_declarative.User-class.html,Class test.User=test.User-class.html"><a title="config_db.User
+sqlalchemy_declarative.User
+test.User" class="py-name" href="#" onclick="return doclink('link-84', 'User', 'link-84');">User</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L202"></a><tt class="py-lineno">202</tt>  <tt class="py-line">    <tt class="py-keyword">print</tt><tt class="py-op">(</tt><tt id="link-85" class="py-name"><a title="config_db.User
+sqlalchemy_declarative.User
+test.User" class="py-name" href="#" onclick="return doclink('link-85', 'User', 'link-84');">User</a></tt><tt class="py-op">.</tt><tt id="link-86" class="py-name"><a title="test.database.query" class="py-name" href="#" onclick="return doclink('link-86', 'query', 'link-74');">query</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L203"></a><tt class="py-lineno">203</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Thu Nov 28 12:20:22 2013
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

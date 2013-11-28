@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>sqlalchemy_insert</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        Module&nbsp;sqlalchemy_insert
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="sqlalchemy_insert-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="sqlalchemy_insert-module.html">Module sqlalchemy_insert</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno"> 1</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">sqlalchemy</tt> <tt class="py-keyword">import</tt> <tt class="py-name">create_engine</tt> </tt>
+<a name="L2"></a><tt class="py-lineno"> 2</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">sqlalchemy</tt><tt class="py-op">.</tt><tt class="py-name">orm</tt> <tt class="py-keyword">import</tt> <tt class="py-name">sessionmaker</tt> </tt>
+<a name="L3"></a><tt class="py-lineno"> 3</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">sqlalchemy</tt><tt class="py-op">.</tt><tt class="py-name">orm</tt> <tt class="py-keyword">import</tt> <tt class="py-name">relationship</tt> </tt>
+<a name="L4"></a><tt class="py-lineno"> 4</tt>  <tt class="py-line"> </tt>
+<a name="L5"></a><tt class="py-lineno"> 5</tt>  <tt class="py-line">  </tt>
+<a name="L6"></a><tt class="py-lineno"> 6</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-0" class="py-name" targets="Module sqlalchemy_declarative=sqlalchemy_declarative-module.html"><a title="sqlalchemy_declarative" class="py-name" href="#" onclick="return doclink('link-0', 'sqlalchemy_declarative', 'link-0');">sqlalchemy_declarative</a></tt> <tt class="py-keyword">import</tt> <tt id="link-1" class="py-name" targets="Variable acl_database.Base=acl_database-module.html#Base,Variable config_db.Base=config_db-module.html#Base"><a title="acl_database.Base
+config_db.Base" class="py-name" href="#" onclick="return doclink('link-1', 'Base', 'link-1');">Base</a></tt><tt class="py-op">,</tt> <tt id="link-2" class="py-name" targets="Class config_db.User=config_db.User-class.html,Class sqlalchemy_declarative.User=sqlalchemy_declarative.User-class.html,Class test.User=test.User-class.html"><a title="config_db.User
+sqlalchemy_declarative.User
+test.User" class="py-name" href="#" onclick="return doclink('link-2', 'User', 'link-2');">User</a></tt><tt class="py-op">,</tt> <tt id="link-3" class="py-name" targets="Class config_db.Group=config_db.Group-class.html,Class sqlalchemy_declarative.Group=sqlalchemy_declarative.Group-class.html,Class test.Group=test.Group-class.html"><a title="config_db.Group
+sqlalchemy_declarative.Group
+test.Group" class="py-name" href="#" onclick="return doclink('link-3', 'Group', 'link-3');">Group</a></tt><tt class="py-op">,</tt> <tt id="link-4" class="py-name" targets="Variable sqlalchemy_declarative.groups=sqlalchemy_declarative-module.html#groups,Variable test.groups=test-module.html#groups"><a title="sqlalchemy_declarative.groups
+test.groups" class="py-name" href="#" onclick="return doclink('link-4', 'groups', 'link-4');">groups</a></tt> </tt>
+<a name="L7"></a><tt class="py-lineno"> 7</tt>  <tt class="py-line">  </tt>
+<a name="L8"></a><tt class="py-lineno"> 8</tt>  <tt class="py-line"><tt id="link-5" class="py-name" targets="Variable config_db.engine=config_db-module.html#engine,Variable sql_test.engine=sql_test-module.html#engine,Variable sqlalchemy_declarative.engine=sqlalchemy_declarative-module.html#engine,Variable sqlalchemy_insert.engine=sqlalchemy_insert-module.html#engine,Variable test.engine=test-module.html#engine"><a title="config_db.engine
+sql_test.engine
+sqlalchemy_declarative.engine
+sqlalchemy_insert.engine
+test.engine" class="py-name" href="#" onclick="return doclink('link-5', 'engine', 'link-5');">engine</a></tt> <tt class="py-op">=</tt> <tt class="py-name">create_engine</tt><tt class="py-op">(</tt><tt class="py-string">'sqlite:///proxy.db'</tt><tt class="py-op">)</tt> </tt>
+<a name="L9"></a><tt class="py-lineno"> 9</tt>  <tt class="py-line"><tt class="py-comment"># Bind the engine to the metadata of the Base class so that the</tt> </tt>
+<a name="L10"></a><tt class="py-lineno">10</tt>  <tt class="py-line"><tt class="py-comment"># declaratives can be accessed through a DBSession instance</tt> </tt>
+<a name="L11"></a><tt class="py-lineno">11</tt>  <tt class="py-line"><tt id="link-6" class="py-name"><a title="acl_database.Base
+config_db.Base" class="py-name" href="#" onclick="return doclink('link-6', 'Base', 'link-1');">Base</a></tt><tt class="py-op">.</tt><tt class="py-name">metadata</tt><tt class="py-op">.</tt><tt class="py-name">bind</tt> <tt class="py-op">=</tt> <tt id="link-7" class="py-name"><a title="config_db.engine
+sql_test.engine
+sqlalchemy_declarative.engine
+sqlalchemy_insert.engine
+test.engine" class="py-name" href="#" onclick="return doclink('link-7', 'engine', 'link-5');">engine</a></tt> </tt>
+<a name="L12"></a><tt class="py-lineno">12</tt>  <tt class="py-line">  </tt>
+<a name="L13"></a><tt class="py-lineno">13</tt>  <tt class="py-line"><tt id="link-8" class="py-name" targets="Variable sql_test.DBSession=sql_test-module.html#DBSession,Variable sqlalchemy_insert.DBSession=sqlalchemy_insert-module.html#DBSession,Variable test.DBSession=test-module.html#DBSession"><a title="sql_test.DBSession
+sqlalchemy_insert.DBSession
+test.DBSession" class="py-name" href="#" onclick="return doclink('link-8', 'DBSession', 'link-8');">DBSession</a></tt> <tt class="py-op">=</tt> <tt class="py-name">sessionmaker</tt><tt class="py-op">(</tt><tt class="py-name">bind</tt><tt class="py-op">=</tt><tt id="link-9" class="py-name"><a title="config_db.engine
+sql_test.engine
+sqlalchemy_declarative.engine
+sqlalchemy_insert.engine
+test.engine" class="py-name" href="#" onclick="return doclink('link-9', 'engine', 'link-5');">engine</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L14"></a><tt class="py-lineno">14</tt>  <tt class="py-line"><tt class="py-comment"># A DBSession() instance establishes all conversations with the database</tt> </tt>
+<a name="L15"></a><tt class="py-lineno">15</tt>  <tt class="py-line"><tt class="py-comment"># and represents a "staging zone" for all the objects loaded into the</tt> </tt>
+<a name="L16"></a><tt class="py-lineno">16</tt>  <tt class="py-line"><tt class="py-comment"># database session object. Any change made against the objects in the</tt> </tt>
+<a name="L17"></a><tt class="py-lineno">17</tt>  <tt class="py-line"><tt class="py-comment"># session won't be persisted into the database until you call</tt> </tt>
+<a name="L18"></a><tt class="py-lineno">18</tt>  <tt class="py-line"><tt class="py-comment"># session.commit(). If you're not happy about the changes, you can</tt> </tt>
+<a name="L19"></a><tt class="py-lineno">19</tt>  <tt class="py-line"><tt class="py-comment"># revert all of them back to the last commit by calling</tt> </tt>
+<a name="L20"></a><tt class="py-lineno">20</tt>  <tt class="py-line"><tt class="py-comment"># session.rollback()</tt> </tt>
+<a name="L21"></a><tt class="py-lineno">21</tt>  <tt class="py-line"><tt id="link-10" class="py-name" targets="Variable acl_database.Database.session=acl_database.Database-class.html#session,Variable config_db.Database.session=config_db.Database-class.html#session,Variable sql_test.session=sql_test-module.html#session,Variable sqlalchemy_insert.session=sqlalchemy_insert-module.html#session"><a title="acl_database.Database.session
+config_db.Database.session
+sql_test.session
+sqlalchemy_insert.session" class="py-name" href="#" onclick="return doclink('link-10', 'session', 'link-10');">session</a></tt> <tt class="py-op">=</tt> <tt id="link-11" class="py-name"><a title="sql_test.DBSession
+sqlalchemy_insert.DBSession
+test.DBSession" class="py-name" href="#" onclick="return doclink('link-11', 'DBSession', 'link-8');">DBSession</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L22"></a><tt class="py-lineno">22</tt>  <tt class="py-line">  </tt>
+<a name="L23"></a><tt class="py-lineno">23</tt>  <tt class="py-line"><tt class="py-comment"># Insert a Person in the person table</tt> </tt>
+<a name="L24"></a><tt class="py-lineno">24</tt>  <tt class="py-line"><tt id="link-12" class="py-name" targets="Variable sqlalchemy_insert.new_user=sqlalchemy_insert-module.html#new_user"><a title="sqlalchemy_insert.new_user" class="py-name" href="#" onclick="return doclink('link-12', 'new_user', 'link-12');">new_user</a></tt> <tt class="py-op">=</tt> <tt id="link-13" class="py-name"><a title="config_db.User
+sqlalchemy_declarative.User
+test.User" class="py-name" href="#" onclick="return doclink('link-13', 'User', 'link-2');">User</a></tt><tt class="py-op">(</tt><tt id="link-14" class="py-name" targets="Variable config_db.User.username=config_db.User-class.html#username,Variable sqlalchemy_declarative.User.username=sqlalchemy_declarative.User-class.html#username"><a title="config_db.User.username
+sqlalchemy_declarative.User.username" class="py-name" href="#" onclick="return doclink('link-14', 'username', 'link-14');">username</a></tt><tt class="py-op">=</tt><tt class="py-string">'new'</tt><tt class="py-op">,</tt> <tt id="link-15" class="py-name" targets="Variable config_db.User.password=config_db.User-class.html#password,Variable sqlalchemy_declarative.User.password=sqlalchemy_declarative.User-class.html#password"><a title="config_db.User.password
+sqlalchemy_declarative.User.password" class="py-name" href="#" onclick="return doclink('link-15', 'password', 'link-15');">password</a></tt><tt class="py-op">=</tt><tt class="py-string">'xxx'</tt><tt class="py-op">,</tt><tt id="link-16" class="py-name" targets="Variable acl_database.Users.description=acl_database.Users-class.html#description,Variable config_db.Group.description=config_db.Group-class.html#description,Variable config_db.User.description=config_db.User-class.html#description,Variable sqlalchemy_declarative.Group.description=sqlalchemy_declarative.Group-class.html#description,Variable sqlalchemy_declarative.User.description=sqlalchemy_declarative.User-class.html#description,Variable test.User.description=test.User-class.html#description"><a title="acl_database.Users.description
+config_db.Group.description
+config_db.User.description
+sqlalchemy_declarative.Group.description
+sqlalchemy_declarative.User.description
+test.User.description" class="py-name" href="#" onclick="return doclink('link-16', 'description', 'link-16');">description</a></tt><tt class="py-op">=</tt><tt class="py-string">'new person'</tt><tt class="py-op">)</tt> </tt>
+<a name="L25"></a><tt class="py-lineno">25</tt>  <tt class="py-line"><tt id="link-17" class="py-name"><a title="acl_database.Database.session
+config_db.Database.session
+sql_test.session
+sqlalchemy_insert.session" class="py-name" href="#" onclick="return doclink('link-17', 'session', 'link-10');">session</a></tt><tt class="py-op">.</tt><tt class="py-name">add</tt><tt class="py-op">(</tt><tt id="link-18" class="py-name"><a title="sqlalchemy_insert.new_user" class="py-name" href="#" onclick="return doclink('link-18', 'new_user', 'link-12');">new_user</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L26"></a><tt class="py-lineno">26</tt>  <tt class="py-line"><tt id="link-19" class="py-name"><a title="acl_database.Database.session
+config_db.Database.session
+sql_test.session
+sqlalchemy_insert.session" class="py-name" href="#" onclick="return doclink('link-19', 'session', 'link-10');">session</a></tt><tt class="py-op">.</tt><tt id="link-20" class="py-name" targets="Method test.Rows.commit()=test.Rows-class.html#commit"><a title="test.Rows.commit" class="py-name" href="#" onclick="return doclink('link-20', 'commit', 'link-20');">commit</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L27"></a><tt class="py-lineno">27</tt>  <tt class="py-line">  </tt>
+<a name="L28"></a><tt class="py-lineno">28</tt>  <tt class="py-line"><tt class="py-comment"># Insert an Address in the address table</tt> </tt>
+<a name="L29"></a><tt class="py-lineno">29</tt>  <tt class="py-line"> </tt>
+<a name="L30"></a><tt class="py-lineno">30</tt>  <tt class="py-line"><tt id="link-21" class="py-name"><a title="acl_database.Database.session
+config_db.Database.session
+sql_test.session
+sqlalchemy_insert.session" class="py-name" href="#" onclick="return doclink('link-21', 'session', 'link-10');">session</a></tt><tt class="py-op">.</tt><tt id="link-22" class="py-name"><a title="test.Rows.commit" class="py-name" href="#" onclick="return doclink('link-22', 'commit', 'link-20');">commit</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L31"></a><tt class="py-lineno">31</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Thu Nov 28 12:20:22 2013
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

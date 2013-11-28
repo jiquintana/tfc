@@ -30,7 +30,8 @@ import cgi
 # tenemos que instalar la libreria 'requests' procedente de pip: 
 # pip install requests
 
-from requests import *
+#from requests import *
+import requests
 import requests
 import Headers
 import Cache
@@ -72,33 +73,20 @@ class Proxy(BaseHTTPRequestHandler):
     __verbs_safe = 'GET, HEAD, OPTIONS, TRACE'
 
 
-    # http://bugs.python.org/issue14574
-    # Versions:	Python 3.4, Python 3.3, Python 3.2, Python 2.7
-    # Title:	SocketServer doesn't handle client disconnects properly
-    
-    '''    def get_timestamp(self, timestamp=None):
-            if timestamp is None:
-                timestamp = time.time()
-            year, month, day, hh, mm, ss, wd, y, z = time.gmtime(timestamp)
-            s = "%04d.%2d.%2d %02d:%02d:%02d" % (
-                year, month, day, 
-                hh, mm, ss)
-            return s	
-    '''
     def __init__(self, request, client_address, server):
         if not python_OldVersion:
             super().__init__(request, client_address, server)
             #BaseHTTPRequestHandler.__init__(self, request, client_address, server)
         else:
             BaseHTTPRequestHandler.__init__(self, request, client_address, server)
-            
+
         self.content = b''
         self.content_lenght = 0
         self.code = 0
         self.processed_headers [:] = []
         self.content_cached=False 
         self.Allowed = 0
-        
+
     def log_message(self, format, *args):
         return
     '''
@@ -142,9 +130,9 @@ class Proxy(BaseHTTPRequestHandler):
             mensaje=''
         else:
             mensaje=self.int_get_html_message('STOP hndl')
-        
+
         self.int_send_HEADERS(200,mensaje)
-        
+
         if Verb!='HEAD':
             self.int_send_BODY(mensaje)
             Proxy.threadServer.force_shutdown()
@@ -365,7 +353,7 @@ class Proxy(BaseHTTPRequestHandler):
         #self.processed_headers.clear()
         self.content_cached=False 
         self.Allowed = 0
-        
+
         if (what==None):
             self.what='GET'
         else:
@@ -447,19 +435,19 @@ class Proxy(BaseHTTPRequestHandler):
             if self.Allowed == 1:
                 self.client_headers = {}
                 self.client_headers.clear()
-                
+
                 client_headers = Headers.ClientHeaders(self.headers.__str__(),debug=False,
-                                                                      ip=self.client_address[0],
-                                                                      port = self.client_address[1])                
+                                                       ip=self.client_address[0],
+                                                       port = self.client_address[1])                
                 new_client_headers,client_cookies = client_headers.parse()
 
                 if DEBUG: self.logger.pdebug('URL: %s: %s' % (self.client_address[1],self.path))
                 if DEBUG: self.logger.pdebug ('try request')
-                
+
                 fc = Cache.FileCache()
                 # Filtramos el tipo de servicio y llamamos a un bloque o a otro...
                 if ( self.what == 'GET' ):
-                    
+
                     cache_content = b''
                     cache_headers = []
                     cache_headers[:] = []
@@ -476,7 +464,7 @@ class Proxy(BaseHTTPRequestHandler):
                     resp = requests.post(self.path, headers=new_client_headers, data=self.content, stream=True, allow_redirects=True)
                 elif ( self.what == 'HEAD' ):
                     resp = requests.head(self.path, stream=True, allow_redirects=True)
-               
+
                 if self.content_cached:
                     self.content = bytes(cache_content)
                     self.content_lenght = cache_lenght
@@ -486,7 +474,7 @@ class Proxy(BaseHTTPRequestHandler):
                     self.content_lenght = len(resp.content)
                     self.code = resp.status_code
 
-                
+
                 if  (self.code == requests.codes.ok):
                     # enviamos el codigo
                     self.send_response(self.code)
@@ -508,29 +496,29 @@ class Proxy(BaseHTTPRequestHandler):
                             #could_cache=False
                         '''
                         parsed_headers = Headers.ServerHeaders(response=resp, debug=False, 
-                                                 ip=self.client_address[0],
-                                                 port = self.client_address[1])
+                                                               ip=self.client_address[0],
+                                                               port = self.client_address[1])
                         self.processed_headers = parsed_headers.parsed_headers()
-                      
+
                         if could_cache:
                             fc.put(path=self.path, content=resp.content, headers=self.processed_headers, debug=False, ip=self.client_address[0], port=self.client_address[1])
                     else:
                         for header in cache_headers:
                             header_key,header_value = str(header).split(': ',1)
                             self.processed_headers.append([header_key,header_value])
-                    
-                    
+
+
                     # Enviamos todas las cabeceras reescritas
                     for header_key,header_value in self.processed_headers:
                         self.send_header(header_key, str(header_value).rstrip('\n'))
-                    
-                    
+
+
                     # Fin de cabeceras
                     self.end_headers()
-                    
+
                     if self.what != 'HEAD' and self.code==200:
                         self.wfile.write(self.content)
-                        
+
             else:
                 self.int_HEAD_PROXY_AUTH()
         if DEBUG: self.logger.pdebug ("end")
@@ -544,10 +532,10 @@ class Proxy(BaseHTTPRequestHandler):
         if DEBUG:
             self.logger.pdebug (self.parsed_path)
         self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
-                    'Allow: %s, ' % self.Allowed +
-                    'prxUSR: %10s, ' % self.proxy_user[0:9] +
-                    'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
-                    '??? CNT '+ self.path)
+                           'Allow: %s, ' % self.Allowed +
+                           'prxUSR: %10s, ' % self.proxy_user[0:9] +
+                           'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                           '??? CNT '+ self.path)
         # Tenemos schema? => eso nos fija el puerto por defecto en caso de no
         # venir definido en la cadena CONNECT...
         if self.parsed_path.scheme != '':
@@ -585,10 +573,10 @@ class Proxy(BaseHTTPRequestHandler):
 
             #self.logger.pdebug('_Csrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path)		
             self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
-                        'Allow: %s, ' % self.Allowed +
-                        'prxUSR: %10s, ' % self.proxy_user[0:9] +
-                        'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
-                        'PRX CNT '+ self.path)
+                               'Allow: %s, ' % self.Allowed +
+                               'prxUSR: %10s, ' % self.proxy_user[0:9] +
+                               'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                               'PRX CNT '+ self.path)
             salir_bucle = False
             inputs = [self.connection, self.server_socket]            
             while (inputs and not salir_bucle):
@@ -654,10 +642,10 @@ class Proxy(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         self.content = ''
         self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
-                    'Allow: %s, ' % self.Allowed +
-                    'prxUSR: %10s, ' % self.proxy_user[0:9] +
-                    'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
-                    '??? OPT '+ self.path)        
+                           'Allow: %s, ' % self.Allowed +
+                           'prxUSR: %10s, ' % self.proxy_user[0:9] +
+                           'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                           '??? OPT '+ self.path)        
         if (self.path == '*'):
             self.send_response(200)
             self.send_header('Allow',self.__verbs_supported)
@@ -667,38 +655,45 @@ class Proxy(BaseHTTPRequestHandler):
             self.BASIC(what='OPTIONS')
             # TODO:: OPTIONS de url requiere auth... gesionado en BASIC      
             self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
-                        'Allow: %s, ' % self.Allowed +
-                        'prxUSR: %10s, ' % self.proxy_user[0:9] +
-                        'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
-                        'PRX OPT '+ self.path)
+                               'Allow: %s, ' % self.Allowed +
+                               'prxUSR: %10s, ' % self.proxy_user[0:9] +
+                               'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                               'PRX OPT '+ self.path)
         return    
 
     def do_HEAD(self):
         self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
-                    'Allow: %s, ' % self.Allowed +
-                    'prxUSR: %10s, ' % self.proxy_user[0:9] +
-                    'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
-                    '??? HEA '+ self.path)        
+                           'Allow: %s, ' % self.Allowed +
+                           'prxUSR: %10s, ' % self.proxy_user[0:9] +
+                           'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                           '??? HEA '+ self.path)        
         self.content = ''
         self.BASIC(what='HEAD')
         self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
-                    'Allow: %s, ' % self.Allowed +
-                    'prxUSR: %10s, ' % self.proxy_user[0:9] +
-                    'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
-                    'PRX HEA '+ self.path)
+                           'Allow: %s, ' % self.Allowed +
+                           'prxUSR: %10s, ' % self.proxy_user[0:9] +
+                           'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                           'PRX HEA '+ self.path)
         return
 
     def do_TRACE(self):
         self.content = ''
         self.BASIC(what='TRACE')
         self.logger.pdebug( '%s:%s, ' % (self.client_address[0], self.client_address[1]) +
-                    'Allow: %s, ' % self.Allowed +
-                    'prxUSR: %10s, ' % self.proxy_user[0:9] +
-                    'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
-                    'PRX TRC '+ self.path)
+                            'Allow: %s, ' % self.Allowed +
+                            'prxUSR: %10s, ' % self.proxy_user[0:9] +
+                            'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                            'PRX TRC '+ self.path)
         return
 
     def do_GET(self):
+
+        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+                           'Allow: %s, ' % self.Allowed +
+                           'prxUSR: %10s, ' % self.proxy_user[0:9] +
+                           'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                           '??? GET %s' % (self.path)
+                           )
         '''
         parsed_headers = Headers(headers=self.headers.items(), debug=True, 
                                 ip=self.client_address[0],
@@ -706,13 +701,7 @@ class Proxy(BaseHTTPRequestHandler):
         returned_headers = parsed_headers.input_parsed_headers()
         '''
         
-        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
-                    'Allow: %s, ' % self.Allowed +
-                    'prxUSR: %10s, ' % self.proxy_user[0:9] +
-                    'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
-                    '??? GET %s' % (self.path)
-                     )            
-        
+
         if 'Content-Length' in self.headers:
             self.content = self.rfile.read(int(self.headers['Content-Length']))
         else:
@@ -727,30 +716,30 @@ class Proxy(BaseHTTPRequestHandler):
         '''
         if self.content_cached:
             self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
-                        'Allow: %s, ' % self.Allowed +
-                        'prxUSR: %10s, ' % self.proxy_user[0:9] +
-                        'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
-                        'CAC GET %s' % (self.path)
-                        )            
+                               'Allow: %s, ' % self.Allowed +
+                               'prxUSR: %10s, ' % self.proxy_user[0:9] +
+                               'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                               'CAC GET %s' % (self.path)
+                               )            
         else:
             self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
-                        'Allow: %s, ' % self.Allowed +
-                        'prxUSR: %10s, ' % self.proxy_user[0:9] +
-                        'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
-                        'PRX GET %s' % (self.path)
-                        )
-        
+                               'Allow: %s, ' % self.Allowed +
+                               'prxUSR: %10s, ' % self.proxy_user[0:9] +
+                               'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                               'PRX GET %s' % (self.path)
+                               )
+
         return
 
 
     def do_POST(self):
         self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
-                    'Allow: %s, ' % self.Allowed +
-                    'prxUSR: %10s, ' % self.proxy_user[0:9] +
-                    'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
-                    '??? PST %s' % (self.path)
-                    )   
-        
+                           'Allow: %s, ' % self.Allowed +
+                           'prxUSR: %10s, ' % self.proxy_user[0:9] +
+                           'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                           '??? PST %s' % (self.path)
+                           )   
+
         if 'Content-Length' in self.headers:
             self.content = self.rfile.read(int(self.headers['Content-Length']))
         else:
@@ -759,10 +748,10 @@ class Proxy(BaseHTTPRequestHandler):
         if DEBUG: sys.stderr.write('calling BASIC\n')
         self.BASIC(what='POST')
         self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
-                    'Allow: %s, ' % self.Allowed +
-                    'prxUSR: %10s, ' % self.proxy_user[0:9] +
-                    'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
-                    'PRX PST '+ self.path)
+                           'Allow: %s, ' % self.Allowed +
+                           'prxUSR: %10s, ' % self.proxy_user[0:9] +
+                           'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                           'PRX PST '+ self.path)
         return
 
 
@@ -772,9 +761,9 @@ class Proxy(BaseHTTPRequestHandler):
         self.send_header('Allow',self.__verbs_supported)
         self.end_headers
         self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
-                    'Allow: %s, ' % self.Allowed +
-                    'prxUSR: %10s, ' % self.proxy_user[0:9] +
-                    'Cod: %3d, Size: %8d,' % (self.code, self.content_lenght) +
-                    'PRX OTH '+ self.path)
+                           'Allow: %s, ' % self.Allowed +
+                           'prxUSR: %10s, ' % self.proxy_user[0:9] +
+                           'Cod: %3d, Size: %8d,' % (self.code, self.content_lenght) +
+                           'PRX OTH '+ self.path)
 
         return

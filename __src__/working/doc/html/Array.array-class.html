@@ -1,0 +1,858 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Array.array</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="Array-module.html">Module&nbsp;Array</a> ::
+        Class&nbsp;array
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="Array.array-class.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class array</h1><p class="nomargin-top"><span class="codelink"><a href="Array-pysrc.html#array">source&nbsp;code</a></span></p>
+<center>
+<center>  <map id="uml_class_diagram_for_array_ar" name="uml_class_diagram_for_array_ar">
+<area shape="rect" id="node1_16" href="Array.array-class.html#itemsize" title="Array.array.itemsize" alt="" coords="17,31,124,49"/>
+<area shape="rect" id="node1_17" href="Array.array-class.html#typecode" title="Array.array.typecode" alt="" coords="17,49,124,68"/>
+<area shape="rect" id="node1_18" href="Array.array-class.html#append" title="Append new value x to the end of the array." alt="" coords="17,71,124,89"/>
+<area shape="rect" id="node1_19" href="Array.array-class.html#buffer_info" title="Return a tuple (address, length) giving the current memory address and the &#160;length in items of the buffer used to hold array&#39;s contents The length &#160;should be multiplied by the itemsize attribute to calculate the buffer &#160;length in bytes." alt="" coords="17,89,124,108"/>
+<area shape="rect" id="node1_20" href="Array.array-class.html#byteswap" title="Byteswap all items of the array." alt="" coords="17,108,124,127"/>
+<area shape="rect" id="node1_21" href="Array.array-class.html#count" title="Return number of occurrences of x in the array." alt="" coords="17,127,124,145"/>
+<area shape="rect" id="node1_22" href="Array.array-class.html#extend" title="extend(array or iterable)" alt="" coords="17,145,124,164"/>
+<area shape="rect" id="node1_23" href="Array.array-class.html#fromfile" title="Read n objects from the file object f and append them to the end of the &#160;array." alt="" coords="17,164,124,183"/>
+<area shape="rect" id="node1_24" href="Array.array-class.html#fromlist" title="Append items to array from list." alt="" coords="17,183,124,201"/>
+<area shape="rect" id="node1_25" href="Array.array-class.html#fromstring" title="Appends items from the string, interpreting it as an array of machine &#160;values,as if it had been read from a file using the fromfile() method)." alt="" coords="17,201,124,220"/>
+<area shape="rect" id="node1_26" href="Array.array-class.html#fromunicode" title="Extends this array with data from the unicode string ustr." alt="" coords="17,220,124,239"/>
+<area shape="rect" id="node1_27" href="Array.array-class.html#index" title="Return index of first occurrence of x in the array." alt="" coords="17,239,124,257"/>
+<area shape="rect" id="node1_28" href="Array.array-class.html#insert" title="Insert a new item x into the array before position i." alt="" coords="17,257,124,276"/>
+<area shape="rect" id="node1_29" href="Array.array-class.html#pop" title="Return the i&#45;th element and delete it from the array." alt="" coords="17,276,124,295"/>
+<area shape="rect" id="node1_30" href="Array.array-class.html#read" title="Read n objects from the file object f and append them to the end of the &#160;array." alt="" coords="17,295,124,313"/>
+<area shape="rect" id="node1_31" href="Array.array-class.html#write" title="Write all items (as machine values) to the file object f." alt="" coords="17,332,124,351"/>
+<area shape="rect" id="node1" href="Array.array-class.html" title="array(typecode [, initializer]) &#45;&gt; array" alt="" coords="5,6,136,357"/>
+</map>
+  <img src="uml_class_diagram_for_array_ar.png" alt='' usemap="#uml_class_diagram_for_array_ar" ismap="ismap" class="graph-without-title" />
+</center>
+</center>
+<hr />
+<p>array(typecode [, initializer]) -&gt; array</p>
+  <p>Return a new array whose items are restricted by typecode, and 
+  initialized from the optional initializer value, which must be a list, 
+  string or iterable over elements of the appropriate type.</p>
+  <p>Arrays represent basic values and behave very much like lists, except 
+  the type of objects stored in them is constrained.</p>
+  <p>Methods:</p>
+  <p>append() -- append a new item to the end of the array buffer_info() --
+  return information giving the current memory info byteswap() -- byteswap 
+  all the items of the array count() -- return number of occurrences of an 
+  object extend() -- extend array by appending multiple elements from an 
+  iterable fromfile() -- read items from a file object fromlist() -- append
+  items from the list fromstring() -- append items from the string index() 
+  -- return index of first occurrence of an object insert() -- insert a new
+  item into the array at a provided position pop() -- remove and return 
+  item (default last) read() -- DEPRECATED, use fromfile() remove() -- 
+  remove first occurrence of an object reverse() -- reverse the order of 
+  the items in the array tofile() -- write all items to a file object 
+  tolist() -- return the array converted to an ordinary list tostring() -- 
+  return the array converted to a string write() -- DEPRECATED, use 
+  tofile()</p>
+  <p>Attributes:</p>
+  <p>typecode -- the typecode character used to create the array itemsize 
+  -- the length in bytes of one array item</p>
+
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="append"></a><span class="summary-sig-name">append</span>(<span class="summary-sig-arg">x</span>)</span><br />
+      Append new value x to the end of the array.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.append">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">(address, length)</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="buffer_info"></a><span class="summary-sig-name">buffer_info</span>()</span><br />
+      Return a tuple (address, length) giving the current memory address 
+      and the length in items of the buffer used to hold array's contents 
+      The length should be multiplied by the itemsize attribute to 
+      calculate the buffer length in bytes.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.buffer_info">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Array.array-class.html#byteswap" class="summary-sig-name">byteswap</a>()</span><br />
+      Byteswap all items of the array.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.byteswap">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="count"></a><span class="summary-sig-name">count</span>(<span class="summary-sig-arg">x</span>)</span><br />
+      Return number of occurrences of x in the array.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.count">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Array.array-class.html#extend" class="summary-sig-name">extend</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">arg0</span>)</span><br />
+      extend(array or iterable)</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.extend">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Array.array-class.html#fromfile" class="summary-sig-name">fromfile</a>(<span class="summary-sig-arg">f</span>,
+        <span class="summary-sig-arg">n</span>)</span><br />
+      Read n objects from the file object f and append them to the end of 
+      the array.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.fromfile">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="fromlist"></a><span class="summary-sig-name">fromlist</span>(<span class="summary-sig-arg">list</span>)</span><br />
+      Append items to array from list.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.fromlist">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="fromstring"></a><span class="summary-sig-name">fromstring</span>(<span class="summary-sig-arg">string</span>)</span><br />
+      Appends items from the string, interpreting it as an array of machine
+      values,as if it had been read from a file using the fromfile() 
+      method).</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.fromstring">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Array.array-class.html#fromunicode" class="summary-sig-name">fromunicode</a>(<span class="summary-sig-arg">ustr</span>)</span><br />
+      Extends this array with data from the unicode string ustr.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.fromunicode">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="index"></a><span class="summary-sig-name">index</span>(<span class="summary-sig-arg">x</span>)</span><br />
+      Return index of first occurrence of x in the array.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.index">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="insert"></a><span class="summary-sig-name">insert</span>(<span class="summary-sig-arg">i</span>,
+        <span class="summary-sig-arg">x</span>)</span><br />
+      Insert a new item x into the array before position i.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.insert">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Array.array-class.html#pop" class="summary-sig-name">pop</a>(<span class="summary-sig-arg">i</span>=<span class="summary-sig-default">...</span>)</span><br />
+      Return the i-th element and delete it from the array.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.pop">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Array.array-class.html#read" class="summary-sig-name">read</a>(<span class="summary-sig-arg">f</span>,
+        <span class="summary-sig-arg">n</span>)</span><br />
+      Read n objects from the file object f and append them to the end of 
+      the array.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.read">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="remove"></a><span class="summary-sig-name">remove</span>(<span class="summary-sig-arg">x</span>)</span><br />
+      Remove the first occurrence of x in the array.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.remove">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="reverse"></a><span class="summary-sig-name">reverse</span>()</span><br />
+      Reverse the order of the items in the array.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.reverse">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Array.array-class.html#tofile" class="summary-sig-name">tofile</a>(<span class="summary-sig-arg">f</span>)</span><br />
+      Write all items (as machine values) to the file object f.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.tofile">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">list</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="tolist"></a><span class="summary-sig-name">tolist</span>()</span><br />
+      Convert array to an ordinary list with the same items.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.tolist">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">string</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="tostring"></a><span class="summary-sig-name">tostring</span>()</span><br />
+      Convert the array to an array of machine values and return the string
+      representation.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.tostring">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">unicode</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Array.array-class.html#tounicode" class="summary-sig-name">tounicode</a>()</span><br />
+      Convert the array to a unicode string.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.tounicode">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="Array.array-class.html#write" class="summary-sig-name">write</a>(<span class="summary-sig-arg">f</span>)</span><br />
+      Write all items (as machine values) to the file object f.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="Array-pysrc.html#array.write">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
+      <code>__format__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__init__</code>,
+      <code>__new__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="Array.array-class.html#itemsize" class="summary-name">itemsize</a> = <code title="property(None, None, None, &quot;&quot;&quot; the size, in bytes, of one array item &quot;\
+&quot;&quot;)">property(None, None, None, &quot;&quot;&quot; the size, in bytes, <code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="Array.array-class.html#typecode" class="summary-name">typecode</a> = <code title="property(None, None, None, &quot;&quot;&quot; the typecode character used to create t\
+he array &quot;&quot;&quot;)">property(None, None, None, &quot;&quot;&quot; the typecode charact<code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+</table>
+<!-- ==================== PROPERTIES ==================== -->
+<a name="section-Properties"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Properties</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Properties"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="byteswap"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">byteswap</span>()</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Array-pysrc.html#array.byteswap">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Byteswap all items of the array.  If the items in the array are not 1,
+  2, 4, or 8 bytes in size, RuntimeError is raised.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="extend"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">extend</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">arg0</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Array-pysrc.html#array.extend">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>extend(array or iterable)</p>
+  <p>Append items to the end of the array.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="fromfile"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">fromfile</span>(<span class="sig-arg">f</span>,
+        <span class="sig-arg">n</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Array-pysrc.html#array.fromfile">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Read n objects from the file object f and append them to the end of 
+  the array.  Also called as read.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="fromunicode"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">fromunicode</span>(<span class="sig-arg">ustr</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Array-pysrc.html#array.fromunicode">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Extends this array with data from the unicode string ustr. The array 
+  must be a type 'u' array; otherwise a ValueError is raised.  Use 
+  array.fromstring(ustr.decode(...)) to append Unicode data to an array of 
+  some other type.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="pop"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">pop</span>(<span class="sig-arg">i</span>=<span class="sig-default">...</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Array-pysrc.html#array.pop">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Return the i-th element and delete it from the array. i defaults to 
+  -1.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="read"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">read</span>(<span class="sig-arg">f</span>,
+        <span class="sig-arg">n</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Array-pysrc.html#array.read">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Read n objects from the file object f and append them to the end of 
+  the array.  Also called as read.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="tofile"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">tofile</span>(<span class="sig-arg">f</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Array-pysrc.html#array.tofile">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Write all items (as machine values) to the file object f.  Also called
+  as write.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="tounicode"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">tounicode</span>()</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Array-pysrc.html#array.tounicode">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Convert the array to a unicode string.  The array must be a type 'u' 
+  array; otherwise a ValueError is raised.  Use array.tostring().decode() 
+  to obtain a unicode string from an array of some other type.</p>
+  <dl class="fields">
+    <dt>Returns: unicode</dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="write"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">write</span>(<span class="sig-arg">f</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="Array-pysrc.html#array.write">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Write all items (as machine values) to the file object f.  Also called
+  as write.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== CLASS VARIABLE DETAILS ==================== -->
+<a name="section-ClassVariableDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variable Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariableDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="itemsize"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">itemsize</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+property(None, None, None, &quot;&quot;&quot; the size, in bytes, of one array item &quot;<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+&quot;&quot;)
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="typecode"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">typecode</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+property(None, None, None, &quot;&quot;&quot; the typecode character used to create t<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+he array &quot;&quot;&quot;)
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Thu Nov 28 11:47:11 2013
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

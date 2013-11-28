@@ -1,0 +1,38 @@
+<html><head><title>Epydoc Redirect Page</title>
+<meta http-equiv="cache-control" content="no-cache" />
+<meta http-equiv="expires" content="0" />
+<meta http-equiv="pragma" content="no-cache" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+<!--
+var pages = ["sqlalchemy_declarative.Group-c", "sqlalchemy_declarative.User-c", "sqlalchemy_declarative-m", "acl_database.Singleton-c", "acl_database.Database-c", "config_db.Singleton-c", "acl_database.Users-c", "config_db.Database-c", "sqlalchemy_insert-m", "config_db.Groups-c", "test.rules_words-c", "config_db.Group-c", "test.rules_time-c", "test.rules_uris-c", "config_db.User-c", "test.database-c", "acl_database-m", "test._m_g2t-c", "test._m_g2u-c", "test._m_g2w-c", "test._m_u2g-c", "test.Group-c", "test.uBase-c", "config_db-m", "test.Rows-c", "test.User-c", "sql_test-m", "test-m"];
+var dottedName = get_anchor();
+if (dottedName) {
+    var target = redirect_url(dottedName);
+    if (target) window.location.replace(target);
+}
+// -->
+</script>
+
+<h3>Epydoc Auto-redirect page</h3>
+
+<p>When javascript is enabled, this page will redirect URLs of
+the form <tt>redirect.html#<i>dotted.name</i></tt> to the
+documentation for the object with the given fully-qualified
+dotted name.</p>
+<p><a id="message"> &nbsp; </a></p>
+
+<script type="text/javascript">
+<!--
+if (dottedName) {
+    var msg = document.getElementById("message");
+    msg.innerHTML = "No documentation found for <tt>"+
+                    dottedName+"</tt>";
+}
+// -->
+</script>
+
+</body>
+</html>
