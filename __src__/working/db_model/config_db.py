@@ -12,6 +12,8 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Table, or_,
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship,  scoped_session, sessionmaker
 from sqlalchemy import create_engine, MetaData, event
+from db_enum import DeclEnum
+
 if not python_OldVersion:
     import binascii
 
@@ -26,6 +28,36 @@ Base = declarative_base()
 #Base.metadata.bind = engine
 #metadata = MetaData()
 
+HOURS_MASK = {
+    #            2         1         0
+    #         321098765432109876543210
+    'H00_M' : 0b000000000000000000000001,
+    'H01_M' : 0b000000000000000000000010,
+    'H02_M' : 0b000000000000000000000100,
+    'H03_M' : 0b000000000000000000001000,
+    'H04_M' : 0b000000000000000000010000,
+    'H05_M' : 0b000000000000000000100000,
+    'H06_M' : 0b000000000000000001000000,
+    'H07_M' : 0b000000000000000010000000,
+    'H08_M' : 0b000000000000000100000000,
+    'H09_M' : 0b000000000000001000000000,
+    'H10_M' : 0b000000000000010000000000,
+    'H11_M' : 0b000000000000100000000000,
+    'H12_M' : 0b000000000001000000000000,
+    'H13_M' : 0b000000000010000000000000,
+    'H14_M' : 0b000000000100000000000000,
+    'H15_M' : 0b000000001000000000000000,
+    'H16_M' : 0b000000010000000000000000,
+    'H17_M' : 0b000000100000000000000000,
+    'H18_M' : 0b000001000000000000000000,
+    'H19_M' : 0b000010000000000000000000,
+    'H20_M' : 0b000100000000000000000000,
+    'H21_M' : 0b001000000000000000000000,
+    'H22_M' : 0b010000000000000000000000,
+    'H23_M' : 0b100000000000000000000000,
+    'H_ALL' : 0b111111111111111111111111
+    
+} 
 
 @event.listens_for(engine, "connect")
 def _fk_pragma_on_connect(dbapi_con, con_record):
@@ -158,23 +190,13 @@ class Database(Singleton):
         if requestedUser != None:
             storedUser=self.findUserByUsername(requestedUser.username)
             if storedUser != None:
-                theUser = self.session.query(User).filter(User.uid==storedUser.uid).update({'admin': True})
+                theUser = self.session.query(User).filter(User.uid==storedUser.uid).update({'rol': RolType.admin_user})
                 self.session.commit()
             return self.findUserByUsername(requestedUser.username)
         else:
             return None
         
-        
-    def unsetUserAdmin(self,requestedUser):
-        if requestedUser != None:
-            storedUser=self.findUserByUsername(requestedUser.username)
-            if storedUser != None:
-                theUser = self.session.query(User).filter(User.uid==storedUser.uid).update({'admin': False})
-                self.session.commit()
-            return self.findUserByUsername(requestedUser.username)
-        else:
-            return None
-    
+            
     def changeUserPassword(self,requestedUser):
         if requestedUser != None:
             storedUser=self.findUserByUsername(requestedUser.username)
@@ -267,6 +289,11 @@ class Database(Singleton):
         else:
             return None             
     
+class RolType(DeclEnum):
+    admin_user = "A", "Admin User"
+    adv_user   = "V", "Advanced User"
+    kid_user   = "K", "Kid User"
+    guest_user = "G", "Guest User"
 
 class Groups(Base):
     __tablename__ = '_GROUPS'
@@ -302,28 +329,33 @@ class Groups(Base):
     def __repr__(self):
         return "Groups(%r,%r)" % (self.gid,self.uid)
 
-
-
-    
+ 
 class User(Base):
     __tablename__ = 'USER'
     uid = Column(Integer, primary_key=True, autoincrement=True, unique=True, index=True)
     username = Column(String(20), nullable=False, unique=True, index=True)
-    admin = Column(Boolean, unique=False, default=False)
+    #admin = Column(Boolean, unique=False, default=False)
+    rol = Column(RolType.db_type(), default = RolType.guest_user)
     password= Column(String(16), nullable=False)
     description = Column(String(80), nullable=False)
     hours = Column(CHAR(24), default=(chr(0x00)*24))
+    L_AH = Column(Integer, default=HOURS_MASK['H_ALL'])
+    M_AH = Column(Integer, default=HOURS_MASK['H_ALL'])
+    X_AH = Column(Integer, default=HOURS_MASK['H_ALL'])
+    J_AH = Column(Integer, default=HOURS_MASK['H_ALL'])
+    V_AH = Column(Integer, default=HOURS_MASK['H_ALL'])
+    S_AH = Column(Integer, default=HOURS_MASK['H_ALL'])
+    D_AH = Column(Integer, default=HOURS_MASK['H_ALL'])
     usuarios = relationship("Groups", backref="USER")
-    
     
     def __repr__(self):
         if python_OldVersion:
-            return "User(%r,%r,%r,%r,%r, %r)" % (self.uid,self.username,self.admin,self.password,self.description,
+            return "User(%r,%r,%r,%r,%r, %r)" % (self.uid,self.username,self.rol,self.password,self.description,
                                              ':'.join(x.encode('hex') for x in self.hours))
         else:
-            return "User(%r,%r,%r,%r,%r, %r)" % (self.uid,self.username,self.admin,self.password,self.description,
+            return "User(%r,%r,%r,%r,%r, %r)" % (self.uid,self.username,self.rol,self.password,self.description,
                                              binascii.hexlify(self.hours.encode('ascii')))            
-[ bin(ord(ch))[2:].zfill(8) for ch in str2convert ]
+#[ bin(ord(ch))[2:].zfill(8) for ch in str2convert ]
 
 class Group(Base):
     __tablename__ = 'GROUP'
