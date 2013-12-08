@@ -1,11 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# vim: ts=4:sw=4:sts=4:ai:et:fileencoding=utf-8:number
-
-#
-# Enum recipe: http://techspot.zzzeek.org/files/2011/decl_enum.py
-# http://techspot.zzzeek.org/2011/01/14/the-enum-recipe/
-#
 from sqlalchemy.types import SchemaType, TypeDecorator, Enum
 from sqlalchemy import __version__
 import re
@@ -91,7 +83,7 @@ class DeclEnumType(SchemaType, TypeDecorator):
     def process_bind_param(self, value, dialect):
         if value is None:
             return None
-        return value.value
+        return value[0]
 
     def process_result_value(self, value, dialect):
         if value is None:

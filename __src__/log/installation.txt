@@ -3,7 +3,7 @@ wget http://python-distribute.org/distribute_setup.py
 python ./distribute_setup.py
 easy_install requests
 easy_install sqlalchemy
-
+easy_install Sqlalchemy-Enum-Dict
 
 http://www.linas.org/linux/db-rad.html
 ERD tool
