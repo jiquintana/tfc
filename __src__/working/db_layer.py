@@ -76,8 +76,8 @@ HOURS_MASK = {
 }
 
 
-#import json
-import simplejson as json
+import json
+#import simplejson as json
 
 class AlchemyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -725,7 +725,7 @@ if __name__ == "__main__":
     '''
         ed_user = User(username='ed', password='Ed Jones', description='ed')
         #db.session.add(ed_user)
-        #db.session.commit()
+        #db.session.commit()1
 
 
         try:

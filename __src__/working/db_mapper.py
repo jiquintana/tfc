@@ -20,15 +20,22 @@ class db_handler():
         #print(function)
         #answer = function(parms)
         #print(answer)
-        answer =  self.map_query2db(query)(self.map_parms2db(query, parms))
-        #print("---- answer:\n >%s<" % answer)
-        return answer
+        hook = self.map_query2db(query)
+        if hook:
+            answer =  hook(self.map_parms2db(query, parms))
+            return answer
+        else:
+            return ''
 
 
     def map_query2db(self, query):
-        return {
-            'findUser': self.__db__.findUser,
-        }[query]
+        q2db = {
+            'findUser': self.__db__.findUser
+        }
+        if query in q2db.keys():
+            return q2db[query]
+        else:
+            return None
 
     def map_parms2db(self, query, parms):
         #print(parms)

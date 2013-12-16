@@ -135,7 +135,7 @@ class Proxy(BaseHTTPRequestHandler):
         message = ''
 
         if DEBUG: self.logger.pdebug("url parms = %s, %s" % (parms,query))
-        filename=re.sub(r'[^a-zA-Z0-9]\.[a-zA-Z0-9]', "", parms).lower()
+        filename=re.sub(r'[^a-zA-Z0-9]\.[a-zA-Z0-9]', "", parms)
         if os.path.exists('./lib/'+filename):
             source = open('./lib/'+filename, 'rb')
             #mensaje = source.read()

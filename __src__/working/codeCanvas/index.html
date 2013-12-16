@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <title>codeCanvas Desktop</title>
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="./app/bootstrap/css/bootstrap.css" type="text/css" />
+    <!-- pane slitter -->
+    <link rel="stylesheet" href="./app/css/layout-default-latest.css" type="text/css" />
+    <!-- application style -->
+    <link rel="stylesheet" href="./app/css/jTools.css">
+    <!-- code mirror -->
+    <link rel="stylesheet" href="./app/js/codemirror/codemirror.css">
+    <link rel="stylesheet" href="./app/js/codemirror/theme/night.css">
+  </head>
+  <body>
+
+    <!-- canvas iframe -->
+    <iframe id="canvas" class="ui-layout-center" src="./app/canvas/canvas.html"></iframe>
+
+    <!-- user tool iframe -->
+    <div style="position:absolute;width:0;height:0;display:none;">
+      <iframe id="user_jTool_html" style="position:absolute;width:0;height:0;" src="./user/usertools.html"></iframe>
+    </div>
+    
+    <!-- top toolbar -->
+    <div class="ui-layout-north">
+      <div class="btn-group">
+
+        <button id="btnToolbar_new" class="btn btn-small">
+          <i class="cus2-page"></i>
+          New
+        </button>
+
+        <!-- these buttons can be tied to application events if you build the editor into something like App.js Titanium or AIR -->
+        <!-- <button id="btnToolbar_open" class="btn btn-small">
+          <i class="cus-folder_page"></i>
+          Open
+        </button>
+        <button id="btnToolbar_save" class="btn btn-small">
+          <i class="cus-disk"></i>
+          Save
+        </button> -->
+        
+        <button id="btnToolbar_export" class="btn btn-small ">
+          <i class="cus2-script_go"></i>
+          Export
+        </button>
+        <button id="btnToolbar_run" class="btn btn-small ">
+          <i class="cus-lightbulb"></i>
+          Run
+        </button>  
+        <button onClick="makeDonation()" id="btnToolbar_donate" class="btn btn-small ">
+          <i class="cus-heart"></i>
+          Make a donation
+        </button>
+      </div>
+    </div>
+
+    <!-- editor & folderview panes -->
+    <div class="ui-layout-south">
+        <div id="editorPane" class="ui-layout-center">
+
+          <div id="editorTools" class="navbar" style="position:absolute;">
+            <div class="navbar-inner">
+              <ul class="nav">
+                <li class=""><a onclick="codeCanvas.updateSelectedElement();" href="#"><i class="cus-arrow_refresh"></i> Update Canvas</a></li>
+                <li class="divider-vertical"></li>
+                <li class=""><a onclick="codeCanvas.deleteElement();" href="#"><i class="cus-delete"></i> Delete Element</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div id="editorWrapper"><textarea id="jToolsProperties_htmlbox1" rows="2" cols="20" class=""></textarea></div>
+        </div>
+    </div>
+
+    <!-- toolbox -->
+    <div class="jTools_ToolxContainer ui-draggable" id="jTools_ToolxContainer_main">
+        <div class="jTools_ToolxHandle">
+          <div class="jTools_ToolxHandleTitle">Toolbox</div>
+        </div>
+        <div class="clearBoth"></div>
+        <div class="jTools_ToolxBox">
+            <div class="jTools_ToolxBoxInner" id="jTools_ToolxBoxInner">
+              <div class="jTools_ToolxTool jTools_buttonUp" id="jTools_ToolxTool_xSelect">Selector</div>
+              <div class="clearBoth"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- html properties container -->
+    <div id="jTools_ToolxContainer_html_properties" class="jTools_ToolxContainer_prop">
+      <div class="jTools_ToolxHandle_prop"><div class="jTools_ToolxHandleTitle">Tool HTML</div></div>
+      <div class="clearBoth"></div>
+      <div class="jTools_ToolxBox">
+        <div id="jTools_ToolxContainer_html_propertiesInner" class="jTools_ToolxBoxInnerProp">
+          <div id="jTools_ToolxProp_toggle" class="jTools_ToolxProp_toggle">..</div>
+        </div>
+        <div class="clearBoth"></div>
+        <div id="html_properties_exposed"><textarea id="html_properties_exposed_textbox" rows="2" cols="20" class=""></textarea></div><!-- html_properties_exposed -->
+      </div>
+    </div>
+    
+    <!-- confirm dialog -->
+    <div id="confirmDialog" style="display:none;"></div>
+
+    <!-- save dialog -->
+    <div class="modal hide" id="file_saveDialog">
+      <div class="modal-header">
+        <h3 id="file_saveDialogTitle" style="color:#FFFFFF;">Save Project</h3>
+      </div>
+      <div id="file_saveDialogWindowBody" class="modal-body">
+        <div id="file_saveDialogDescription"><p>Please choose a file to save</p></div>
+        <div id="file_saveFilelist"></div>
+        <div style="margin: 9px 0px -18px;">
+          <label class="checkbox">File Name: 
+            <input id="file_saveFileInput" class="input-xlarge" type="text">
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn btn-primary" id="btn_saveFile_saveDialog">Save</a>
+        <a href="#" data-dismiss="modal" class="btn">Close</a>
+      </div>
+    </div>
+
+    <!-- open dialog -->
+    <div class="modal hide" id="file_openDialog">
+      <div class="modal-header">
+        <h3 id="file_openDialogTitle" style="color:#FFFFFF;">Open Project</h3>
+      </div>
+      <div id="file_openDialogWindowBody" class="modal-body">
+        <div id="file_openDialogDescription"><p>Please choose a file to open</p></div>
+        <div id="file_openFilelist"></div>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn btn-primary" id="btn_openProject">Open</a>
+        <a href="#" data-dismiss="modal" class="btn">Close</a>
+      </div>
+    </div>
+
+    <!-- run view -->
+    <div id="runWrapper" style="position:absolute;width:0;height:0;display:none;">
+      <div class="btn-group" style="margin: 8px 0px 0px 25px;">
+        <button id="btn_runClose" class="btn btn-primary">
+          <i class="icon-white icon-ok"></i>
+          Close
+        </button> 
+      </div>
+      <iframe id="runFrame" style="position:absolute;width:0;height:0;" src="./app/canvas/runtime.html"></iframe>
+    </div>
+
+    <!-- export view -->
+    <div id="exportWrapper" style="position:absolute;width:0;height:0;display:none;">
+      <div id="exportTools" class="btn-group">
+        <button id="btn_exportClose" class="btn btn-primary">
+          <i class="icon-white icon-ok"></i>
+          Close Export
+        </button> 
+      </div>
+      <div id="export_editorWrapper"><textarea id="export_editor" rows="2" cols="20" class=""></textarea></div>
+    </div>
+
+    <!-- source libs -->
+    <script language="JavaScript" src="./app/js/libs.js"></script>
+
+    <!-- code mirror libs -->
+    <script src="./app/js/codemirror/codemirror.js"></script>
+    <script src="./app/js/codemirror/util/foldcode.js"></script>
+    <script src="./app/js/codemirror/util/formatting.js"></script>
+    <script src="./app/js/codemirror/util/searchcursor.js"></script>
+    <script src="./app/js/codemirror/mode/css/css.js"></script>
+    <script src="./app/js/codemirror/mode/javascript/javascript.js"></script>
+    <script src="./app/js/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+    <script src="./app/js/codemirror/mode/xml/xml.js"></script>
+
+    <!-- application -->
+    <script language="JavaScript" src="./app/js/source.js"></script>
+
+  </body>
+</html>
