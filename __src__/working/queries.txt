@@ -17,6 +17,9 @@ HEAD /CONFIG HTTP/1.0
 HEAD http://www.google.com HTTP/1.0
 echo -e "HEAD http://127.0.0.1/NOOP/ HTTP/1.0\nAuthorization:Basic VXNlcjpQYXNz\n" | nc 127.0.0.1 8002
 
+
+gnuecho -e "GET http://127.0.0.1/NOOP/ HTTP/1.0\nAuthorization:Basic VXNlcjpQYXNz\n" | nc 127.0.0.1 8002
+
 http://127.0.0.1:8002/POST
 http://127.0.0.1:8002/FILE/post
 redirige los resultados del post a http://localhost/dump.php
@@ -31,3 +34,9 @@ gnuecho -e "http://bs.serving-sys.com/BurstingPipe/adServer.bs?cn=int&iv=2&int=1
 gnuecho -e "GET http://google.com/ HTTP/1.0\nProxy-Authorization:Basic cHJveHlVc2VyOnByb3h5UGFzcw==\n" | nc 127.0.0.1 8002
 gnuecho -e "GET http://www.google.com/search?output=search&sclient=psy-ab&q=&btnK=Submit HTTP/1.0\nProxy-Authorization:Basic cHJveHlVc2VyOnByb3h5UGFzcw==\n" | nc 127.0.0.1 8002
 gnuecho -e "GET http://google.com/ HTTP/1.0\nProxy-Authorization:Basic cHJveHlVc2VyOnByb3h5UGFzcw==\n" | nc 127.0.0.1 8002
+
+
+## Database query:.
+gnuecho -e "GET http://127.0.0.1/db/query?user=none HTTP/1.0\nAuthorization:Basic VXNlcjpQYXNz\n" | nc 127.0.0.1 8002
+gnuecho -e "GET http://127.0.0.1/db/query?user=none HTTP/1.0\nAuthorization:Basic VXNlcjpQYXNz\n" | nc 127.0.0.1 8002
+

@@ -16,18 +16,19 @@ if python_OldVersion:       # Python version 2.7
 else:                       # Python version 3.x
     import urllib, http.server
     from http.server import HTTPServer, BaseHTTPRequestHandler
-    from socketserver import BaseRequestHandler 
+    from socketserver import BaseRequestHandler
 
 import base64, binascii, re, string
 import socket, select, os
 import cgi
+from db_mapper import db_handler
 
 #import logging
 #import http.client
 
 
 
-# tenemos que instalar la libreria 'requests' procedente de pip: 
+# tenemos que instalar la libreria 'requests' procedente de pip:
 # pip install requests
 
 #from requests import *
@@ -40,6 +41,7 @@ from Log import Log
 
 DEBUG_LEVELS = ['CONNECTIONS','HEADERS', 'AUTH']
 DEBUG = False
+DEBUG_BEFORE_HANDLING = False
 
 class Proxy(BaseHTTPRequestHandler):
     threadServer = None
@@ -84,7 +86,7 @@ class Proxy(BaseHTTPRequestHandler):
         self.content_lenght = 0
         self.code = 0
         self.processed_headers [:] = []
-        self.content_cached=False 
+        self.content_cached=False
         self.Allowed = 0
 
     def log_message(self, format, *args):
@@ -104,10 +106,14 @@ class Proxy(BaseHTTPRequestHandler):
 
         if Verb=='HEAD':
             mensaje=''
-        else:    
+        else:
             if DEBUG: self.logger.pdebug("url parms = %s, %s" % (parms,query))
             filename=re.sub(r'[^a-zA-Z0-9]', "", parms).lower()
 
+            if (filename == ""):
+                filename = "index"
+
+            print('./static/'+filename+'.static')
             if os.path.exists('./static/'+filename+'.static'):
                 source = open('./static/'+filename+'.static', 'r')
                 mensaje = source.read()
@@ -124,6 +130,49 @@ class Proxy(BaseHTTPRequestHandler):
 
         return
 
+    def svc_hndl_LIB(self,parms,query, Verb=''):
+        self.logger.pdebug("svc_hndl_LIB called with parms: >%s, %s<" % (Verb, parms))
+        message = ''
+
+        if DEBUG: self.logger.pdebug("url parms = %s, %s" % (parms,query))
+        filename=re.sub(r'[^a-zA-Z0-9]\.[a-zA-Z0-9]', "", parms).lower()
+        if os.path.exists('./lib/'+filename):
+            source = open('./lib/'+filename, 'rb')
+            #mensaje = source.read()
+            self.int_send_HEADERS_FILETYPE(200,filename)
+            if Verb!='HEAD':
+                while 1:
+                    data = source.read(1024)
+                    if not data: break
+                    self.wfile.write(data)
+
+        else:
+            mensaje=self.int_get_html_message('File "<font color="red">'+filename+'</font>" not found')
+            self.int_send_HEADERS(404,mensaje)
+            #self.int_send_BODY(mensaje)
+
+
+    def svc_hndl_DB(self, query, parms, Verb=''):
+        self.logger.pdebug("svc_hndl_DB called with parms: >VERB: %r, %r, %r<" % (Verb, query, parms))
+
+        answer = str(db_handler().handle_request(query, parms))
+        if DEBUG: print(answer)
+        self.int_send_HEADERS_JSON(200, message=answer)
+        self.int_send_BODY(answer)
+        return
+
+    def svc_hndl_CONFIG(self,parms,query, Verb=''):
+        self.logger.pdebug("svc_hndl_CONFIG called with parms: >%s, %s<" % (Verb, parms))
+        if Verb=='HEAD':
+            mensaje=''
+        else:
+            mensaje=self.int_get_html_message('CONFIG hndl')
+        self.int_send_HEADERS_redirect(301, "/lib/index.html")
+        ##HTTP/1.1 301 Moved Permanently
+        ##Location: http://www.example.org/index.asp
+        #self.send_html_message("CONFIG")
+        return
+
     def svc_hndl_STOP(self,parms,query, Verb=''):
         self.logger.pdebug("svc_hndl_STOP called with parms: >%s, %s<" % (Verb, parms))
         if Verb=='HEAD':
@@ -138,21 +187,6 @@ class Proxy(BaseHTTPRequestHandler):
             Proxy.threadServer.force_shutdown()
 
         #self.send_html_message("FORCED SHUTDOWN")
-        return
-
-    def svc_hndl_CONFIG(self,parms,query, Verb=''):
-        self.logger.pdebug("svc_hndl_CONFIG called with parms: >%s, %s<" % (Verb, parms))
-        if Verb=='HEAD':
-            mensaje=''
-        else:
-            mensaje=self.int_get_html_message('CONFIG hndl')
-        self.int_send_HEADERS(200,mensaje)
-
-        if Verb!='HEAD':
-            self.int_send_BODY(mensaje)
-
-
-        #self.send_html_message("CONFIG")
         return
 
     def svc_hndl_POST(self,parms,query, Verb=''):
@@ -183,11 +217,13 @@ class Proxy(BaseHTTPRequestHandler):
 
 
     LocalServices = {
-        re.compile(r"/STOP/",   re.IGNORECASE),
-        re.compile(r"/CONFIG/", re.IGNORECASE),
-        re.compile(r"/POST/",   re.IGNORECASE),
-        re.compile(r"/FILE/",   re.IGNORECASE),
-        re.compile(r"/NOOP/",   re.IGNORECASE)
+        re.compile(r"/STOP", re.IGNORECASE),
+        re.compile(r"/CONFIG", re.IGNORECASE),
+        re.compile(r"/POST/", re.IGNORECASE),
+        re.compile(r"/FILE/", re.IGNORECASE),
+        re.compile(r"/LIB/", re.IGNORECASE),
+        re.compile(r"/DB/", re.IGNORECASE),
+        re.compile(r"/NOOP/", re.IGNORECASE)
     }
 
     ServiceHandle = {
@@ -195,20 +231,79 @@ class Proxy(BaseHTTPRequestHandler):
         "CONFIG": svc_hndl_CONFIG,
         "POST": svc_hndl_POST,
         "FILE": svc_hndl_FILE,
+        "LIB": svc_hndl_LIB,
+        "DB": svc_hndl_DB,
         "NOOP": svc_hndl_NOOP
-    }    
+    }
 
 
     def int_get_html_message(self, what):
         content = "<HTML><BODY><H1>"+what+"</H1></BODY></HTML>\n"
-        return content    
+        return content
+
+    def int_send_HEADERS_redirect(self, code, location):
+        #self.bodySize=len(message)
+        self.send_response(code)
+        self.send_header('Location', location)
+        #self.send_header('Content-Length', self.bodySize)
+        self.end_headers()
+        return
+
+    def map_ext_to_filetype(self, extension):
+        return {
+            'js': 'application/javascript',
+            'txt': 'text/plain',
+            'html': 'text/html',
+            'htm': 'text/html',
+            'css': 'text/css',
+            'asc': 'text/plain',
+            'bmp': 'image/bmp',
+            'class': 'application/octet-stream',
+            'doc': 'application/msword',
+            'gif': 'image/gif',
+            'ico': 'image/x-icon',
+            'jpe': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'jpg': 'image/jpeg',
+            'pdf': 'application/pdf',
+            'png': 'image/png',
+            'xht': 'application/xhtml+xml',
+            'xhtml': 'application/xhtml+xml',
+            'xls': 'application/vnd.ms-excel',
+            'xml': 'application/xml',
+            'xpm': 'image/x-xpixmap',
+            'xsl': 'application/xml',
+            'xslt': 'application/xslt+xml'
+        }[extension]
+
+
+    def int_send_HEADERS_JSON(self, code=200, message=''):
+        if message != '':
+            self.bodySize=len(message)
+        self.send_response(code)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Content-Length', self.bodySize)
+        self.end_headers()
+        return
 
     def int_send_HEADERS(self, code=200, message=''):
         if message != '':
             self.bodySize=len(message)
         self.send_response(code)
         self.send_header('Content-Type', 'text/html;charset=UTF-8')
-        self.send_header('Content-Length', self.bodySize)	
+        self.send_header('Content-Length', self.bodySize)
+        self.end_headers()
+        return
+
+    def int_send_HEADERS_FILETYPE(self, code, filename):
+        self.send_response(code)
+        ext = filename.rsplit('.', 1)[-1]
+
+        #print (".....................")
+        #print (ext)
+        #print (".....................")
+        self.send_header('Content-Type', self.map_ext_to_filetype(ext))
+        #self.send_header('Content-Length', self.bodySize)
         self.end_headers()
         return
 
@@ -217,7 +312,7 @@ class Proxy(BaseHTTPRequestHandler):
             if python_OldVersion:
                 self.wfile.write(message)
             else:
-                self.wfile.write(bytes(message, 'UTF-8'))        
+                self.wfile.write(bytes(message, 'UTF-8'))
 
         except:
             self.logger.pdebug('excepcion en send_body :%s, %s' % (self.what, self.path))
@@ -280,7 +375,7 @@ class Proxy(BaseHTTPRequestHandler):
 
                 except binascii.Error:
                     # Error, entonces KO
-                    return 0 
+                    return 0
 
                 else:
                     # Tenemos usuario & paswd y lo hemos podido decodificar
@@ -292,7 +387,7 @@ class Proxy(BaseHTTPRequestHandler):
                         return 1
                     else:
                         #Autenticacion = KO
-                        return 0	    
+                        return 0
 
         # No está autenticado
         else:
@@ -322,11 +417,11 @@ class Proxy(BaseHTTPRequestHandler):
                         authorization = base64.decodestring(authorization[1])
                     else:
                         authorization = base64.decodestring(bytes(authorization[1],'UTF-8')).decode()
-                    # bytes(content, 'UTF-8')                    
+                    # bytes(content, 'UTF-8')
 
                 except binascii.Error:
                     # Error, entonces KO
-                    return 0 
+                    return 0
 
                 else:
                     # Tenemos usuario & paswd y lo hemos podido decodificar
@@ -338,7 +433,7 @@ class Proxy(BaseHTTPRequestHandler):
                         return 1
                     else:
                         #Autenticacion = KO
-                        return 0	    
+                        return 0
 
         # No está autenticado
         else:
@@ -351,7 +446,7 @@ class Proxy(BaseHTTPRequestHandler):
         self.code = 0
         self.processed_headers [:] = []
         #self.processed_headers.clear()
-        self.content_cached=False 
+        self.content_cached=False
         self.Allowed = 0
 
         if (what==None):
@@ -389,7 +484,7 @@ class Proxy(BaseHTTPRequestHandler):
             self.Allowed = self.handle_HTTP_AUTH()
             if DEBUG: self.logger.pdebug("autorizado by HTTP_AUTH: %s " % self.Allowed)
             if self.Allowed==1:
-                # handler por defecto... 
+                # handler por defecto...
                 service_handle_value="NOOP"
                 service_handle_parms=""
 
@@ -435,11 +530,14 @@ class Proxy(BaseHTTPRequestHandler):
             if self.Allowed == 1:
                 self.client_headers = {}
                 self.client_headers.clear()
+                headers_are_text = False
 
                 client_headers = Headers.ClientHeaders(self.headers.__str__(),debug=False,
                                                        ip=self.client_address[0],
-                                                       port = self.client_address[1])                
-                new_client_headers,client_cookies = client_headers.parse()
+
+                                                       port = self.client_address[1])
+                new_client_headers = client_headers.parse()
+
 
                 if DEBUG: self.logger.pdebug('URL: %s: %s' % (self.client_address[1],self.path))
                 if DEBUG: self.logger.pdebug ('try request')
@@ -468,7 +566,7 @@ class Proxy(BaseHTTPRequestHandler):
                 if self.content_cached:
                     self.content = bytes(cache_content)
                     self.content_lenght = cache_lenght
-                    self.code = cache_code                        
+                    self.code = cache_code
                 else:
                     self.content = resp.content
                     self.content_lenght = len(resp.content)
@@ -483,25 +581,29 @@ class Proxy(BaseHTTPRequestHandler):
                     parsed_headers = []
                     parsed_headers [:] = []
                     could_cache=True
-                    if not self.content_cached:                        
+                    if not self.content_cached:
                         # Procesamos las cabeceras para reescribirlas
                         '''if 'pragma' in resp.headers and resp.headers['pragma'] == 'no-cache':
                             #print('Cache header: pragma ->%s' % resp.headers['pragma'])
                             could_cache=False
                         elif 'expires' in resp.headers and resp.headers['expires'] == '-1':
                             #print('Cache header: expires ->%s' % resp.headers['expires'])
-                            could_cache=False   
+                            could_cache=False
                         #elif 'cache-control' in resp.headers:
                             #print('\tCache header: cache-control ->%s' % resp.headers['cache-control'])
                             #could_cache=False
                         '''
-                        parsed_headers = Headers.ServerHeaders(response=resp, debug=False, 
+                        parsed_headers = Headers.ServerHeaders(response=resp, debug=False,
                                                                ip=self.client_address[0],
                                                                port = self.client_address[1])
                         self.processed_headers = parsed_headers.parsed_headers()
+                        headers_are_text = parsed_headers.is_text()
+                        headers_content_type = parsed_headers.get_content_type()
 
                         if could_cache:
-                            fc.put(path=self.path, content=resp.content, headers=self.processed_headers, debug=False, ip=self.client_address[0], port=self.client_address[1])
+                            print("............ %r %r " %(headers_are_text, headers_content_type))
+                            fc.put(path=self.path, content=resp.content, headers=self.processed_headers, debug=False, strip_text=headers_are_text ,
+                                   ip=self.client_address[0], port=self.client_address[1])
                     else:
                         for header in cache_headers:
                             header_key,header_value = str(header).split(': ',1)
@@ -517,7 +619,13 @@ class Proxy(BaseHTTPRequestHandler):
                     self.end_headers()
 
                     if self.what != 'HEAD' and self.code==200:
-                        self.wfile.write(self.content)
+                        # Este bloque envia la informacion al cliente.
+                        # Si falla el envio por un 'reset by peer' o cierre de la conexion evitamos el error stacktrace
+                        # con el bloque except
+                        try:
+                            self.wfile.write(self.content)
+                        except:
+                            pass
 
             else:
                 self.int_HEAD_PROXY_AUTH()
@@ -556,29 +664,29 @@ class Proxy(BaseHTTPRequestHandler):
         except (socket.error, socket.herror, socket.gaierror) as e:
             if DEBUG: self.logger.pdebug ("Error %s" % e)
             self.send_response(404,'CONNECT error ['+str(e)+'] to '+o_dest+':'+str(o_port))
-            self.end_headers()              
+            self.end_headers()
 
         except socket.timeout as e:
             if DEBUG: self.logger.pdebug ("Error %s" % e)
             self.send_response(504,'CONNECT Timeout ['+str(e)+'] to '+o_dest+':'+str(o_port))
             #self.send_header('Content-Length', '0')
-            self.end_headers()            
+            self.end_headers()
 
-        else:      
+        else:
             self.send_response(200,'CONNECT OK -> '+o_dest+':'+str(o_port))
             self.send_header('Content-Length', '0')
-            self.end_headers() 
+            self.end_headers()
 
-            self.server_wfile = self.server_socket.makefile('wb', self.wbufsize)            
+            self.server_wfile = self.server_socket.makefile('wb', self.wbufsize)
 
-            #self.logger.pdebug('_Csrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path)		
+            #self.logger.pdebug('_Csrc: '+self.client_address[0] +',\tPermit: '+str(self.Allowed)+',\tprxUSR: '+self.proxy_user+',\tPRX: '+self.path)
             self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                                'Allow: %s, ' % self.Allowed +
                                'prxUSR: %10s, ' % self.proxy_user[0:9] +
                                'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
                                'PRX CNT '+ self.path)
             salir_bucle = False
-            inputs = [self.connection, self.server_socket]            
+            inputs = [self.connection, self.server_socket]
             while (inputs and not salir_bucle):
                 # Wait for at least one of the sockets to be ready for processing
 
@@ -603,20 +711,20 @@ class Proxy(BaseHTTPRequestHandler):
                 if r != [] and not salir_bucle:
                     if DEBUG: self.logger.pdebug(r)
                     if (self.connection in r) and not salir_bucle:
-                        if DEBUG: self.logger.pdebug('cliente tiene datos: leyendo cliente')  
+                        if DEBUG: self.logger.pdebug('cliente tiene datos: leyendo cliente')
                         try:
                             sockdata = self.connection.recv(4096)
                             if (sockdata):
                                 self.server_wfile.write(sockdata)
                             else:
                                 if DEBUG: self.logger.pdebug("Cierre de socket cliente ordenado")
-                                salir_bucle=True   
+                                salir_bucle=True
                         except (socket.timeout, socket.error) as e:
                             if DEBUG: self.logger.pdebug("error socket: %s" % (e))
-                            salir_bucle=True   
+                            salir_bucle=True
 
                     if (self.server_socket in r) and not salir_bucle:
-                        if DEBUG: self.logger.pdebug('servidor tiene datos: leyendo servidor')               
+                        if DEBUG: self.logger.pdebug('servidor tiene datos: leyendo servidor')
                         try:
                             sockdata = self.server_socket.recv(4096)
                             if (sockdata):
@@ -626,7 +734,7 @@ class Proxy(BaseHTTPRequestHandler):
                                 salir_bucle=True
                         except (socket.timeout, socket.error) as e:
                             if DEBUG: self.logger.pdebug("error socket: %s" % (e))
-                            salir_bucle=True   
+                            salir_bucle=True
 
                 if w != [] and not salir_bucle:
                     if DEBUG: self.logger.pdebug(w)
@@ -641,32 +749,34 @@ class Proxy(BaseHTTPRequestHandler):
 
     def do_OPTIONS(self):
         self.content = ''
-        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+        if DEBUG_BEFORE_HANDLING:
+            self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                            'Allow: %s, ' % self.Allowed +
                            'prxUSR: %10s, ' % self.proxy_user[0:9] +
                            'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
-                           '??? OPT '+ self.path)        
+                           '??? OPT '+ self.path)
         if (self.path == '*'):
             self.send_response(200)
             self.send_header('Allow',self.__verbs_supported)
-            self.send_header('Content-Length', '0')	
-            self.end_headers            
+            self.send_header('Content-Length', '0')
+            self.end_headers
         else:
             self.BASIC(what='OPTIONS')
-            # TODO:: OPTIONS de url requiere auth... gesionado en BASIC      
+            # TODO:: OPTIONS de url requiere auth... gesionado en BASIC
             self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                                'Allow: %s, ' % self.Allowed +
                                'prxUSR: %10s, ' % self.proxy_user[0:9] +
                                'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
                                'PRX OPT '+ self.path)
-        return    
+        return
 
     def do_HEAD(self):
-        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+        if DEBUG_BEFORE_HANDLING:
+            self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                            'Allow: %s, ' % self.Allowed +
                            'prxUSR: %10s, ' % self.proxy_user[0:9] +
                            'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
-                           '??? HEA '+ self.path)        
+                           '??? HEA '+ self.path)
         self.content = ''
         self.BASIC(what='HEAD')
         self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
@@ -688,26 +798,27 @@ class Proxy(BaseHTTPRequestHandler):
 
     def do_GET(self):
 
-        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+        if DEBUG_BEFORE_HANDLING:
+            self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                            'Allow: %s, ' % self.Allowed +
                            'prxUSR: %10s, ' % self.proxy_user[0:9] +
                            'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
                            '??? GET %s' % (self.path)
                            )
         '''
-        parsed_headers = Headers(headers=self.headers.items(), debug=True, 
+        parsed_headers = Headers(headers=self.headers.items(), debug=True,
                                 ip=self.client_address[0],
                                 port = self.client_address[1])
         returned_headers = parsed_headers.input_parsed_headers()
         '''
-        
+
 
         if 'Content-Length' in self.headers:
             self.content = self.rfile.read(int(self.headers['Content-Length']))
         else:
-            self.content = ''        
+            self.content = ''
         self.BASIC(what='GET')
-        '''       
+        '''
         msg = "%s:%s: " % (self.client_address[0], self.client_address[1])+
                    'Allow: %s, ' % self.Allowed +
                    'prxUSR: %10s, ' % self.proxy_user[0:9] +
@@ -716,29 +827,30 @@ class Proxy(BaseHTTPRequestHandler):
         '''
         if self.content_cached:
             self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
-                               'Allow: %s, ' % self.Allowed +
-                               'prxUSR: %10s, ' % self.proxy_user[0:9] +
-                               'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
-                               'CAC GET %s' % (self.path)
-                               )            
+                           'Allow: %s, ' % self.Allowed +
+                           'prxUSR: %10s, ' % self.proxy_user[0:9] +
+                           'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                           'CAC GET %s' % (self.path)
+                           )
         else:
             self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
-                               'Allow: %s, ' % self.Allowed +
-                               'prxUSR: %10s, ' % self.proxy_user[0:9] +
-                               'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
-                               'PRX GET %s' % (self.path)
-                               )
+                           'Allow: %s, ' % self.Allowed +
+                           'prxUSR: %10s, ' % self.proxy_user[0:9] +
+                           'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                           'PRX GET %s' % (self.path)
+                           )
 
         return
 
 
     def do_POST(self):
-        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+        if DEBUG_BEFORE_HANDLING:
+            self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                            'Allow: %s, ' % self.Allowed +
                            'prxUSR: %10s, ' % self.proxy_user[0:9] +
                            'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
                            '??? PST %s' % (self.path)
-                           )   
+                           )
 
         if 'Content-Length' in self.headers:
             self.content = self.rfile.read(int(self.headers['Content-Length']))

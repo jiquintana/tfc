@@ -13,13 +13,15 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, scoped_session, sessionmaker
 from sqlalchemy import create_engine, MetaData, event
 import datetime
+from sqlalchemy.ext.declarative import DeclarativeMeta
+
 
 if python_OldVersion:
     import string
 else:
     import binascii
 
-TraceSQL = True
+TraceSQL = False
 MAXUSERS = 1024
 MAXGROUPS = 65536
 
@@ -74,6 +76,26 @@ HOURS_MASK = {
 }
 
 
+#import json
+import simplejson as json
+
+class AlchemyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj.__class__, DeclarativeMeta):
+            # an SQLAlchemy class
+            fields = {}
+            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
+                data = obj.__getattribute__(field)
+                try:
+                    json.dumps(data) # this will fail on non-encodable values, like other classes
+                    fields[field] = data
+                except TypeError:
+                    fields[field] = None
+            # a json-encodable dict
+            return fields
+        return json.JSONEncoder.default(self, obj)
+
+
 def __bitwise_not_hours(hours):
     return hours ^ 0xFFFFFF
 
@@ -81,14 +103,7 @@ def __bitwise_not_hours(hours):
 def _fk_pragma_on_connect(dbapi_con, con_record):
     dbapi_con.execute('PRAGMA journal_mode=MEMORY')
 
-class Singleton(object):
-    __instance = None
-    def __new__(cls):
-        if Singleton.__instance is None:
-            Singleton.__instance = object.__new__(cls)
-        return Singleton.__instance
-
-class Database(Singleton):
+class Database:
     __initialized__ = False
     __engine__ = None
     __DBSession__ = None
@@ -96,7 +111,7 @@ class Database(Singleton):
     session = None
     def __init__(self):
         if not self.__initialized__:
-            print("not initialized")
+            #print("not initialized")
             self.__initialized__ = True
             self.__engine__ = engine
             self.__metadata__ = MetaData()
@@ -107,24 +122,22 @@ class Database(Singleton):
             self.__DBSession__.configure(bind=self.__engine__)
             self.session = self.__DBSession__()
 
-        else:
-            print("already initialized")
-
     def findUser(self, str2find):
+        '''
         users_found = self.session.\
             query(User).\
             filter( \
                 or_( User.username==str2find, User.description==str2find )
                 ).\
             all()
-
-        if users_found == []:
-            users_found = self.session.\
-                query(User).\
-                filter( \
-                    or_( User.username.ilike("%"+str2find+"%"), User.description.ilike("%"+str2find+"%"))
-                ).\
-                all()
+        '''
+        #if users_found == []:
+        users_found = self.session.\
+            query(User).\
+            filter( \
+                or_( User.username.ilike("%"+str2find+"%"), User.description.ilike("%"+str2find+"%"))
+            ).\
+            all()
 
         return users_found
 
@@ -482,15 +495,28 @@ class Groups(Base):
     __tablename__ = 'GRUPOS'
     uid=Column(Integer, ForeignKey('USUARIO.uid'), nullable=False, primary_key=True, index=True)
     gid=Column(Integer, ForeignKey('GRUPO.gid'), nullable=False, primary_key=True, index=True)
-    usuario = relationship("User", backref="GRUPOS")
-    grupo = relationship("Group", backref="GRUPOS")
+    #_usuario = relationship("User", backref="GRUPOS")
+    #_grupo = relationship("Group", backref="GRUPOS")
+
 
     def __init__(self, user, group):
         self.uid=user.uid
         self.gid=group.gid
 
+    def fromjson(self, jsondata):
+        dict_data = json.loads(jsondata)
+        self.uid = dict_data.get('uid', 0)
+        self.gid = dict_data.get('gid', 0)
+        return self
+
     def __repr__(self):
+        return "{'uid': %r,\n\t'gid': %r}\n" % (self.uid, self.gid)
+
+    def __toSring__(self):
         return "Groups(%r,%r)" % (self.uid,self.gid)
+
+    def JSONdump(self):
+        return json.dumps(self, cls=AlchemyEncoder)
 
     def __eq__(self, other):
         print(". %r" % self.__repr__())
@@ -509,10 +535,9 @@ class Groups(Base):
         else:
             return False
 
-    def __repr__(self):
-        return "Groups(%r,%r)" % (self.gid,self.uid)
 
 roles = {'A' : 'Admin User', 'V' : 'Advanced User', 'K' : 'Kid User', 'G' : 'Guest User'}
+
 
 class RolType(object):
     def getValue(key):
@@ -549,13 +574,9 @@ class User(Base):
     __tablename__ = 'USUARIO'
     uid = Column(Integer, primary_key=True, autoincrement=True, unique=True, index=True)
     username = Column(String(20), nullable=False, unique=True, index=True)
-    #admin = Column(Boolean, unique=False, default=False)
     rol = Column(Enum('A', 'V', 'K', 'G'), default = 'G')
-    #rol = Column(Enum(RolType.dbTypes()), default = 'G')
-    #rol = Column(Enum(RolType.dbTypes), default = RolType.get_guest_user_key())
     password= Column(String(16), nullable=False)
     description = Column(String(80), nullable=False)
-    # Hours allowed map table by day LMXJVSD; defaults to none hours allowed
     L_AH = Column(Integer, default=HOURS_MASK['NON_M'])
     M_AH = Column(Integer, default=HOURS_MASK['NON_M'])
     X_AH = Column(Integer, default=HOURS_MASK['NON_M'])
@@ -563,9 +584,31 @@ class User(Base):
     V_AH = Column(Integer, default=HOURS_MASK['NON_M'])
     S_AH = Column(Integer, default=HOURS_MASK['NON_M'])
     D_AH = Column(Integer, default=HOURS_MASK['NON_M'])
-    usuarios = relationship("Groups", backref="USUARIO")
+    #_usuarios = relationship("Groups", backref="USUARIO")
+
+    def fromjson(self, jsondata):
+        dict_data = json.loads(jsondata)
+        self.uid = dict_data.get('uid', 0)
+        self.username = dict_data.get('username','')
+        self.rol = dict_data.get('rol', 'G')
+        self.password = dict_data.get('password', '')
+        self.description = dict_data.get('description', '')
+        self.L_AH = dict_data.get('L_AH', 0)
+        self.M_AH = dict_data.get('M_AH', 0)
+        self.X_AH = dict_data.get('X_AH', 0)
+        self.J_AH = dict_data.get('J_AH', 0)
+        self.V_AH = dict_data.get('V_AH', 0)
+        self.S_AH = dict_data.get('S_AH', 0)
+        self.D_AH = dict_data.get('D_AH', 0)
+        return self
 
     def __repr__(self):
+        return ('{"uid": %r,\n\t"username": "%s",\n\t"rol": "%s",\n\t"password": "%s",\n\t"description": "%s",\n\t' %
+                (self.uid,self.username,self.rol,self.password,self.description)+
+                '"L_AH": %r,\n\t"M_AH": %r,\n\t"X_AH": %r,\n\t"J_AH": %r,\n\t"V_AH": %r,\n\t"S_AH": %r,\n\t"D_AH": %r}\n' %
+                (self.L_AH, self.M_AH, self.X_AH, self.J_AH, self.V_AH, self.S_AH, self.D_AH))
+
+    def toString(self):
         if python_OldVersion:
             return ('User(%r,%r,%r,%r,%r)' % (self.uid,self.username,self.rol,self.password,self.description) +
                    '\n\t    %s' % (' 0         1         2   ') +
@@ -593,16 +636,27 @@ class User(Base):
                    '\n\tD:  %r' % ('  {0:24b}'.format(self.D_AH)[::-1]).translate(str.maketrans('01', ' o'))+
                    '\n')
 
-
 class Group(Base):
     __tablename__ = 'GRUPO'
     gid = Column(Integer, primary_key=True, autoincrement=True, unique=True, index=True)
     groupname = Column(String(20), nullable=False, unique=True, index=True)
     description = Column(String(80), nullable=False)
-    grupos = relationship("Groups", backref="GRUPO")
+    #_grupos = relationship("Groups", backref="GRUPO")
+
+    def fromjson(self, jsondata):
+        dict_data = json.loads(jsondata)
+        self.gid = dict_data.get('gid', 0)
+        self.groupname = dict_data.get('groupname','')
+        self.description = dict_data.get('description', '')
+        return self
 
     def __repr__(self):
+        return '{"gid": %r,\n\t"groupname": %r,\n\t"description": %r}\n' % (self.gid, self.groupname, self.description)
+
+    def __toSring__(self):
         return "Group(%r,%r,%r)" % (self.gid, self.groupname, self.description)
+
+
 
 class URIS(Base):
     __tablename__ = 'URIS'
@@ -610,8 +664,20 @@ class URIS(Base):
     gid = Column(Integer, ForeignKey('GRUPO.gid'), nullable=False, primary_key=True, index=True)
     uri = Column(String(250), nullable=False)
 
+    def fromjson(self, jsondata):
+        dict_data = json.loads(jsondata)
+        self.uriid = dict_data.get('uriid', 0)
+        self.gid = dict_data.get('gid', 0)
+        self.uri = dict_data.get('uri', '')
+        return self
+
     def __repr__(self):
+        return '{"uriid": %r,\n\t"gid": %r,\n\t"uri": %r}\n' % (self.uriid, self.gid, self.uri)
+
+    def __toString__(self):
         return "URIS(%r,%r,%r)" % (self.uriid, self.gid, self.uri)
+
+
 
 class WORDS(Base):
     __tablename__ = 'WORDS'
@@ -619,16 +685,43 @@ class WORDS(Base):
     gid = Column(Integer, ForeignKey('GRUPO.gid'), nullable=False, primary_key=True, index=True)
     words = Column(String(250), nullable=False)
 
+    def fromjson(self, jsondata):
+        dict_data = json.loads(jsondata)
+        self.wordsid = dict_data.get('wordsid', 0)
+        self.gid = dict_data.get('gid', 0)
+        self.words = dict_data.get('words', '')
+        return self
+
     def __repr__(self):
-        return "WORDS(%r,%r,%r)" % (self.wordsid, self.gid, self.uri)
+        return '{"wordsid": %r,\n\t"gid": %r,\n\t"words": "%s"}\n' % (self.wordsid, self.gid, self.words)
+
+    def __toString__(self):
+        return "WORDS(%r,%r,%r)" % (self.wordsid, self.gid, self.words)
+
+
 
 if __name__ == "__main__":
 
 
 
     db=Database()
-    newUser = User(username='pepe', password='Ed Jones', description='ed')
-    db.addUser(newUser)
+
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+
+    for instance in db.findUser(""):
+        print("....%r" % instance)
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+
+    for instance in db.findGroup("%e"):
+        print("%r" % instance)
+
+    newUser = User(username='pepe1', password='Ed Jones', description='ed')
+    theUser = db.addUser(newUser)
+
+    theUser = db.findUserByUsername('pepe1')
+    ##print( json.dumps(theUser, cls=AlchemyEncoder))
+    #print(db.findUserByUsername('pepe1'))
+
     '''
         ed_user = User(username='ed', password='Ed Jones', description='ed')
         #db.session.add(ed_user)
