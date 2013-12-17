@@ -7,25 +7,63 @@
 <!-- Import jQuery jqGrid JS files -->
 
 
-<link rel="stylesheet" type="text/css" media="screen" href="js/themes/redmond/jquery-ui.css" />
-<script type="text/javascript" src="js/jquery-1.9.1.js"></script>
-<script type="text/javascript" src="js/ui/jquery-ui.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="/lib/js/themes/redmond/jquery-ui.css" />
+<script type="text/javascript" src="/lib/js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="/lib/js/ui/jquery-ui.js"></script>
 
-<link rel="stylesheet" type="text/css" media="screen" href="js/themes/ui.jqgrid.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="js/themes/ui.multiselect.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/lib/js/themes/ui.jqgrid.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="/lib/js/themes/ui.multiselect.css" />
 <link rel="stylesheet" type="text/css" href="css/base-min.css"/>
 <link rel="stylesheet" type="text/css" href="css/forms-min.css"/>
-<link rel="stylesheet" type="text/css" href="js/themes/redmond/jquery-ui.css"/>
 
+<script type="text/javascript" src="/lib/js/jquery.jqGrid.min.js"></script>
+<script type="text/javascript" src="/lib/js/i18n/grid.locale-en.js"></script>
+<script src="/lib/js/ui/jquery.ui.core.js"></script>
+<script src="/lib/js/ui/jquery.ui.widget.js"></script>
+<script src="/lib/js/ui/jquery.ui.mouse.js"></script>
+<script src="/lib/js/ui/jquery.ui.draggable.js"></script>
+<script src="/lib/js//ui/jquery.ui.position.js"></script>
+<script src="/lib/js/ui/jquery.ui.resizable.js"></script>
+<script src="/lib/js/ui/jquery.ui.button.js"></script>
+<script src="/lib/js/ui/jquery.ui.dialog.js"></script>
 
-<script type="text/javascript" src="js/jquery.jqGrid.min.js"></script>
-<script type="text/javascript" src="js/i18n/grid.locale-en.js"></script>
+<!-- stuff needed to make things complex -->
+<script src="/lib/js/ui/jquery.ui.datepicker.js"></script>
+<script src="/lib/js/ui/jquery.ui.menu.js"></script>
+<script src="/lib/js/ui/jquery.ui.autocomplete.js"></script>
+<script src="/lib/js/ui/jquery.ui.tooltip.js"></script>
 
 <!--//code.jquery.com/ui/1.10.3/jquery-ui.js -->
 
 <script type='text/javascript'>
 //<![CDATA[
-	var userFormData;
+
+	$(function () {
+		var dialog = $( "#dialog" ).dialog({
+				modal: true,
+				width: 500,
+				buttons: [
+					{
+						click: $.noop,
+						icons: {
+							primary: "ui-icon-check"
+						},
+						text: "Ok"
+					},
+					{
+						click: function() {
+							$( this ).dialog( "close" );
+						},
+						icons: {
+							primary: "ui-icon-cancel"
+						},
+						text: "Cancel",
+						showText: false
+					}
+				]
+			}).dialog("option", "height", 600)
+
+	});
 	
 	function disableSelection(target){
 		if (typeof target.onselectstart!="undefined") //IE route
@@ -84,36 +122,19 @@
 
 		});
 	}
-	
-	function getRowIdData(rowId) {
-		var rowData = jQuery('#grid').jqGrid ('getRowData', rowId);		
-		var jsondata=JSON.stringify(rowData);
-		return jsondata;
-	}
-	
-	$(window).load(function(){ 
-		loadData();
-		
-		$("#grid").jqGrid('setGridParam', {ondblClickRow: function(rowid,iRow,iCol,e){
+$(window).load(function(){ 
 
-			userFormData = getRowIdData(rowid);
-			//openDialog("formUser.html", userFormData, 'center:yes, resizable:no ');
-			formUser=window.open("formUser.html", 'userForm', '');
-			//formUser.userFormData = userFormData;
-			//alert('double clicked @'+rowid);
-		}});
-		
-		$("#filtrado" ).bind('input', function() {
-			doreload()
-			//alert( "Handler for .change() called." );
-		});
-	});
+	loadData();
 	
-	$(document).ready(function(){
-        $('#newUser').click(function(){
-           window.open("formUser.html", 'userForm', '');
-        });
-    });
+	$("#grid").jqGrid('setGridParam', {ondblClickRow: function(rowid,iRow,iCol,e){
+		alert('double clicked @'+rowid);
+	}});
+	
+	$("#filtrado" ).bind('input', function() {
+		doreload()
+		//alert( "Handler for .change() called." );
+	});
+});
 //]]>  
 
 </script>
@@ -130,8 +151,13 @@
 </div>
 
 
-<button id="newUser">Nuevo Usuario</button>
 
+
+<div id="dialog" title="Dialogo básico">
+<p>Diálogo básico modal. Puede ser movido, redimensionado y cerrado haciendo clic sobre el botón 'X'.</p>
+</div>
+
+<button id="abrir">Abrir diálogo</button>
 
 
 </body>
