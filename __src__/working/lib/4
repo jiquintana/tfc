@@ -45,24 +45,18 @@
 <body>
 
 <div style="margin-left:45px">
-        <form id="formUser" name="formUser" action="addUser" method="get">
+        <form action="#" id="formUser" name="formUser" action="?" method="get" parsley-validate>
         <fieldset>
                 <legend>Usuario:</legend>
                 <label for="uid">uid :</label>	 
-		<input type="input" id="uid" name="uid">
+		<input type="input" id="uid" name="uid"  data-validation="length">
 
                	<br><label for="username">usuario :</label>
                 <input type="text" id="username" name="username" >
 
                 
 		<br><label for="rol">Rol :</label>
-                <!--input type="input" id="rol" name="rol"-->
-		<select id="rol" name="rol">
-			<option value="G">Invitado</option>
-			<option value="K">Menor</option>
-			<option value="V">Usuario Avanzado</option>
-			<option value="A">Administrador</option>
-		</select>
+                <input type="input" id="rol" name="rol">
                 
 		<br><label for="password">Contraseña :</label>                
                 <input type="input" id="password" name="password">
@@ -166,32 +160,24 @@
         </fieldset>
 
         <!--button onclick="myFunction()">Try it</button-->
-	<input type="submit" value="Submit">
+        <input type="submit" onclick="toForm();">
         <input type="button" value="Recalcular campos" onclick="toForm();" >
-        <input type="button" value="dosubmit" onclick="document.form[0].submit()" >
+        <input type="button" value="validate" onclick="$.validate();" >
         </form>
 	<script  type="text/javascript">
 var validator = new FormValidator('formUser', [{
     name: 'username',
     display: 'username',    
-    rules: 'required|min_length[3]|max_length[20]'
+    rules: 'required'
 }], function(errors, event) {
     if (errors.length > 0) {
-	/*
-	http://rickharrison.github.io/validate.js/
-	errors - An array of errors from the validation object. If the length > 0, the form failed validation
-
-	This array will contain javascript objects with up to three properties:
-	- id: The id attribute of the form element
-	- name: The name attribute of the form element
-	- message: The error message to display
-	- rule: The rule that prompted this error
-	*/
-
+        var errorString = '';
+        
+        for (var i = 0, errorLength = errors.length; i < errorLength; i++) {
+            errorString += errors[i].message + '<br />';
+        }
+        
 	alert(errors[0].message);
-	document.getElementById(errors[0].id).focus();
-	document.getElementById(errors[0].id).select();
-
     }
 });
 	</script>

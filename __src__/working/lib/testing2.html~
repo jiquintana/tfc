@@ -7,15 +7,15 @@
 <!-- Import jQuery jqGrid JS files -->
 
 
-<link rel="stylesheet" type="text/css" media="screen" href="/lib/js/themes/redmond/jquery-ui.css" />
-<script type="text/javascript" src="/lib/js/jquery-1.9.1.js"></script>
-<script type="text/javascript" src="/lib/js/ui/jquery-ui.js"></script>
+<link rel="stylesheet" type="text/css" media="screen" href="js/themes/redmond/jquery-ui.css" />
+<script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="js/ui/jquery-ui.js"></script>
 
-<link rel="stylesheet" type="text/css" media="screen" href="/lib/js/themes/ui.jqgrid.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="/lib/js/themes/ui.multiselect.css" />
-<link rel="stylesheet" type="text/css" href="/lib/css/base-min.css"/>
-<link rel="stylesheet" type="text/css" href="/lib/css/forms-min.css"/>
-<link rel="stylesheet" type="text/css" href="/lib/js/themes/redmond/jquery-ui.css"/>
+<link rel="stylesheet" type="text/css" media="screen" href="js/themes/ui.jqgrid.css" />
+<link rel="stylesheet" type="text/css" media="screen" href="js/themes/ui.multiselect.css" />
+<link rel="stylesheet" type="text/css" href="css/base-min.css"/>
+<link rel="stylesheet" type="text/css" href="css/forms-min.css"/>
+<link rel="stylesheet" type="text/css" href="js/themes/redmond/jquery-ui.css"/>
 
 
 <script type="text/javascript" src="js/jquery.jqGrid.min.js"></script>
@@ -96,8 +96,7 @@
 		$("#grid").jqGrid('setGridParam', {ondblClickRow: function(rowid,iRow,iCol,e){
 			userFormData = getRowIdData(rowid);
 			userFormType = 'getUser'
-			alert(userFormData);
-			window.open("formUser.html", 'userForm', '');
+			formUser=window.open("formUser.html", 'userForm', '');
 
 		}});
 		
@@ -109,7 +108,7 @@
 	$(document).ready(function(){
         $('#newUser').click(function(){
 		userFormType = 'newUser'
-		window.open("formUser.html", 'userForm', '');
+		window.open("formUser.html", 'newUser', '');
         });
     });
 //]]>  

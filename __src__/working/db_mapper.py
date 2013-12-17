@@ -30,7 +30,8 @@ class db_handler():
 
     def map_query2db(self, query):
         q2db = {
-            'findUser': self.__db__.findUser
+            'findUser': self.__db__.findUser,
+            'addUser': self.__db__.addUser,
         }
         if query in q2db.keys():
             return q2db[query]
@@ -40,8 +41,9 @@ class db_handler():
     def map_parms2db(self, query, parms):
         #print(parms)
         parms_dict = dict(cgi.parse_qsl(parms))
-        #print(parms_dict)
+        print(parms_dict)
         return {
+            'findUser': parms_dict.get('username', '%'),
             'findUser': parms_dict.get('username', '%'),
         }[query]
 
