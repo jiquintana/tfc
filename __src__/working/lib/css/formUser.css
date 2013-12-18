@@ -1,0 +1,45 @@
+label {
+	font-weight:bold;
+	padding-top:0.2em;
+	margin-right:0.5em;
+	display: block;
+	width: 140px;
+	color: #2E6E9E;
+	font-weight: bold;
+	display: block;
+	float: left;
+}
+
+input[readonly] {
+	background-color:#C2C2A3 ;
+}
+
+fieldset {
+	border:1px solid #2E6E9E;
+	padding: 1em;
+	font:80%/1 sans-serif;
+}
+
+legend {
+	padding: 0.2em 0.5em;
+	border:1px solid #2E6E9E;
+	color:#2E6E9E;
+	font-size:90%;
+	text-align:right;
+}
+
+
+input[type=button] {
+	color:#08233e;
+	font:2.4em Futura, ‘Century Gothic’, AppleGothic, sans-serif;
+	font-size:70%;
+}
+
+input[type=submit] {
+	background-color: LightSteelBlue;
+	cursor:pointer;
+}
+
+.divcontainer {
+	margin: 20px 45px 20px 45px;
+}
