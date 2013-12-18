@@ -230,7 +230,7 @@ class Database:
         return storedUser
 
     def setUserAdmin(self,requestedUser):
-        print(requestedUser.__repr__())
+        #print(requestedUser.__repr__())
         if requestedUser != None:
             storedUser=self.findUserByUsername(requestedUser.username)
             if storedUser != None:
@@ -244,7 +244,7 @@ class Database:
             return None
 
     def setUserAdvanced(self,requestedUser):
-        print(requestedUser.__repr__())
+        #print(requestedUser.__repr__())
         if requestedUser != None:
             storedUser=self.findUserByUsername(requestedUser.username)
             if storedUser != None:
@@ -258,7 +258,7 @@ class Database:
             return None
 
     def setUserKid(self,requestedUser):
-            print(requestedUser.__repr__())
+            #print(requestedUser.__repr__())
             if requestedUser != None:
                 storedUser=self.findUserByUsername(requestedUser.username)
                 if storedUser != None:
@@ -272,7 +272,7 @@ class Database:
                 return None
 
     def setUserGuest(self,requestedUser):
-            print(requestedUser.__repr__())
+            #print(requestedUser.__repr__())
             if requestedUser != None:
                 storedUser=self.findUserByUsername(requestedUser.username)
                 if storedUser != None:
@@ -586,8 +586,13 @@ class User(Base):
     D_AH = Column(Integer, default=HOURS_MASK['NON_M'])
     #_usuarios = relationship("Groups", backref="USUARIO")
 
+    def stringColumns(self):
+        return ['username', 'rol', 'password', 'description']
+    
+    def intColumns(self):
+        return ['uid', 'L_AH', 'M_AH', 'X_AH', 'J_AH', 'V_AH', 'S_AH', 'D_AH' ]
+    
     def fromdict(self, dict_data):
-        print("+...... %r" % dict_data)
         #dict_data = json.loads(jsondata)
         self.uid = dict_data.get('uid', 0)
         self.username = dict_data.get('username','')
@@ -601,7 +606,6 @@ class User(Base):
         self.V_AH = dict_data.get('V_AH', 0)
         self.S_AH = dict_data.get('S_AH', 0)
         self.D_AH = dict_data.get('D_AH', 0)
-        print("+...... %r" % self)
         return self
 
     def __repr__(self):
@@ -708,11 +712,11 @@ if __name__ == "__main__":
 
     db=Database()
 
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    #print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
     for instance in db.findUser(""):
         print("....%r" % instance)
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    #print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
     for instance in db.findGroup("%e"):
         print("%r" % instance)

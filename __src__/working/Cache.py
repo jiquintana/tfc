@@ -32,12 +32,12 @@ class FileCache:
         tag = False
         quote = False
         out = ""
-
+        '''
         if isinstance(s, bytes):
             print("bytes")
         else:
             print(type(s))
-
+        '''
         for c in s:
             if c == '<' and not quote:
                 tag = True

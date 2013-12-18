@@ -12,17 +12,51 @@ class db_handler():
 
     def __init__(self):
         self.__db__ = db_layer.Database()
+        
+    def answer_wrapper(self, to_type, answer):
+        #print("answer_wrapper.call: (to_type %r, parms: %r)" % (to_type, answer))
+        
+        wrapped_answer = { 'typeinfo': '',
+                           'answer': '',
+                           'size': 0,
+                           'code': 0}
 
-    def map_db2answer(self, answer):
-        return {
-               'findUser': answer,
-               'addUser': self.map_dict2User(parms_dict),
-               'modUser': self.map_dict2User(parms_dict),
-           }[answer]
+        wrapped_answer['typeinfo'] = to_type
+        
+        if to_type == 'json':
+            wrapped_answer['answer'] = answer
+        elif to_type == 'html':
+            wrapped_answer['answer'] = "<HTML><BODY><PRE>%r</PRE</BODY></HTML>" % answer
+        
+        wrapped_answer['size'] = len(str(wrapped_answer['answer']))
+        
+        #print("answer_wrapper.return: (%r)" % wrapped_answer)
 
+        return wrapped_answer
+            
+
+    def map_db2answer(self, query, answer):
+        #print("map_db2answer.call (query: %r, type %r, answer: %r)" % (query, type(answer), answer))
+
+
+        
+        if query == 'findUser':
+            printed_answer =  self.answer_wrapper('json', answer)
+        elif query == 'addUser':
+            printed_answer =   self.answer_wrapper('html', answer)
+        elif query == 'modUser':
+            theUser =  self.map_dict2User(answer)
+            printed_answer =   self.answer_wrapper('html', answer)
+
+
+
+        #print("map_db2answer.return: (%r)" %  printed_answer)
+        return printed_answer
+    
+    
 
     def handle_request(self, query, parms):
-        print("handle_request: query: %r parms: %r" % (query, parms))
+        #print("handle_request.call: (query: %r parms: %r)" % (query, parms))
         #function =
         #print(function)
         #answer = function(parms)
@@ -30,14 +64,17 @@ class db_handler():
 
         hook = self.map_query2db(query)
         if hook:
-            answer =  hook(self.map_parms2db(query, parms))
-            return answer
+            answer =  self.map_db2answer(query, hook(self.map_parms2db(query, parms)))
         else:
-            return ''
+            answer = None
+        
+        #print("handle_request.return: (%r)" % answer )
+           
+        return answer
 
 
     def map_query2db(self, query):
-        print("db_mapper.map_query2db query: %r" % (query))
+        #print("map_query2db.call (query: %r)" % (query))
 
         q2db = {
             'findUser': self.__db__.findUser,
@@ -45,34 +82,55 @@ class db_handler():
             'modUser': self.__db__.addUser,
         }
         if query in q2db.keys():
-            return q2db[query]
+            answer = q2db[query]
         else:
-            return None
+            answer = None
+        
+        #print("map_query2db.return (%r)" % answer)
+        return answer
 
     def map_parms2db(self, query, parms):
-        print("db_mapper.map_parms2db query: %r, parms: %r" % (query, parms))
+        #print("map_parms2db.call: (query: %r parms: %r)" % (query, parms))
         parms_dict = dict(cgi.parse_qsl(parms))
 
-        print(">..... %r" %parms_dict)
+        # print(">..... %r" %parms_dict)
         print("MMMMMMMMMMMMMMMMMM %s" % self.map_dict2User(parms_dict).toString())
-        return {
+        answer = {
             'findUser': parms_dict.get('username', '%'),
             'addUser': self.map_dict2User(parms_dict),
             'modUser': self.map_dict2User(parms_dict),
         }[query]
+        
+        #print("map_parms2db.return (%r)" % answer)
+        return answer          
 
     def map_dict2User(self, parms):
-        for k in parms.keys():
-            print("..... iterate %r, %r" % (k, parms[k]))
-            try:
-                parms[k] = int(parms[k])
-            except:
-                pass
-            print("..... iterate %r, %r" % (k, parms[k]))
+        # print("map_dict2User.call: (type %s parms: %r)" % (type(parms), parms))
+        if parms == None:
+            #priself.map_dict2User(answer)nt("map_dict2User+ %s" % '')
+            answer = None
+        elif(type(parms) == dict):
+            # print(type(parms))
+            
+            newUser = db_layer.User()
+            for k in parms:
+                if k in newUser.intColumns():
+                    #print("..... iterate %r, %r" % (k, parms[k]))
+                    try:
+                        parms[k] = int(parms[k])
+                    except:
+                        pass
+                    #print("..... iterate %r, %r" % (k, parms[k]))
+    
+            
+            newUser.fromdict(parms)
 
-        newUser = db_layer.User()
-        return newUser.fromdict(parms)
-
+            answer = newUser
+            
+        #print("map_dict2User.return (%r)" % answer)
+        return answer          
+        
+        
 if __name__ == "__main__":
 
     handler = db_handler()

@@ -37,10 +37,10 @@ gnuecho -e "GET http://google.com/ HTTP/1.0\nProxy-Authorization:Basic cHJveHlVc
 
 
 ## Database query:.
-gnuecho -e "GET http://127.0.0.1/db/query?user=none HTTP/1.0\nAuthorization:Basic VXNlcjpQYXNz\n" | nc 127.0.0.1 8002
-gnuecho -e "GET http://127.0.0.1/db/query?user=none HTTP/1.0\nAuthorization:Basic VXNlcjpQYXNz\n" | nc 127.0.0.1 8002
+gnuecho -e "GET http://127.0.0.1/db/findUser?username=pepe HTTP/1.0\nAuthorization:Basic VXNlcjpQYXNz\n" | nc 127.0.0.1 8002
+gnuecho -e "GET http://127.0.0.1/db/findUser?username=pepe HTTP/1.0\nAuthorization:Basic VXNlcjpQYXNz\n" | nc 127.0.0.1 8002
 
 
-gnuecho -e "GET http://127.0.0.1/db/modUser?uid=1&username=pepe&rol=G&password=Ed+Jones&description=ed&L_AH=0&M_AH=0&X_AH=0&J_AH=0&V_AH=0&S_AH=0&D_AH=0\nAuthorization:Basic VXNlcjpQYXNz\n" | nc 127.0.0.1 8002
+gnuecho -e "GET http://127.0.0.1/db/modUser?uid=1&username=pepe&rol=G&password=Ed+Jones&description=ed&L_AH=0&M_AH=0&X_AH=0&J_AH=0&V_AH=0&S_AH=0&D_AH=0 HTTP/1.0\nAuthorization:Basic VXNlcjpQYXNz\n" | nc 127.0.0.1 8002
 
-gnuecho -e "GET http://127.0.0.1/db/addUser?username=josi2&rol=G&password=Ed+Jones&description=ed&L_AH=0&M_AH=0&X_AH=0&J_AH=0&V_AH=0&S_AH=0&D_AH=0\nAuthorization:Basic VXNlcjpQYXNz\n" | nc 127.0.0.1 8002
+gnuecho -e "GET http://127.0.0.1/db/addUser?username=josi2&rol=G&password=Ed+Jones&description=ed&L_AH=0&M_AH=0&X_AH=0&J_AH=0&V_AH=0&S_AH=0&D_AH=0 HTTP/1.0\nAuthorization:Basic VXNlcjpQYXNz\n" | nc 127.0.0.1 8002

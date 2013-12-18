@@ -5,6 +5,7 @@
         <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 
         <link rel="stylesheet" type="text/css" href="css/style.css">
+        <link rel="stylesheet" type="text/css" href="css/formUser.css">
         <script type='text/javascript' src='js/test.js'></script>
         <script type='text/javascript' src='js/jquery-1.9.1.js'></script>
         <script type='text/javascript' src='js/validate.js'></script>
@@ -28,10 +29,10 @@
 			} else {
 				document.formUser.action = "/db/"+window.opener.userFormType;
 				if (window.opener.userFormType == 'addUser') {
-					alert("addUser");
+					//alert("addUser");
 					//alert("newuser");
 				} else if (window.opener.userFormType == 'modUser') {
-					alert("modUser");
+					//alert("modUser");
 					data = JSON.parse(window.opener.userFormData);
 					Object.keys(data).forEach(function(key) {
 						document.getElementById(key).value=data[key];
@@ -47,12 +48,12 @@
 
 <body>
 
-<div style="margin-left:45px">
+<div class="divcontainer">
         <form id="formUser" name="formUser" action="#" method="get">
         <fieldset>
                 <legend>Usuario:</legend>
                 <label for="uid">uid :</label>	 
-		<input type="input" id="uid" name="uid">
+		<input type="input" id="uid" name="uid" readonly>
 
                	<br><label for="username">usuario :</label>
                 <input type="text" id="username" name="username" >
@@ -73,6 +74,7 @@
 		<br><label for="description">Descripción :</label>
                 <input type="input" id="description" name="description">
         </fieldset>
+	<div style="display:none">
         <fieldset>
                 <legend>Binary hours:</legend>
                 <label for="L_AH">L :</label>
@@ -90,6 +92,7 @@
                 <label for="D_AH">D :</label>
                 <input type="input" id="D_AH" name="D_AH">
         </fieldset>
+	</div>
         
         <fieldset>
         <legend>Horas:</legend>
@@ -176,9 +179,18 @@
 	<script  type="text/javascript">
 var validator = new FormValidator('formUser', [{
     name: 'username',
-    display: 'username',    
+    display: 'Usuario',    
     rules: 'required|min_length[3]|max_length[20]'
-}], function(errors, event) {
+},{
+    name: 'password',
+    display: 'Contraseña',    
+    rules: 'required|min_length[4]|max_length[16]'
+},{
+    name: 'description',
+    display: 'Descripción',    
+    rules: 'max_length[80]'
+    }
+], function(errors, event) {
     if (errors.length > 0) {
 	/*
 	http://rickharrison.github.io/validate.js/
@@ -194,8 +206,9 @@ var validator = new FormValidator('formUser', [{
 	alert(errors[0].message);
 	document.getElementById(errors[0].id).focus();
 	document.getElementById(errors[0].id).select();
-
-    }
+	} else {
+		toForm()
+	}
 });
 	</script>
         <div id="jsonString">undefined</div>

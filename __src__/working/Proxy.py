@@ -40,7 +40,7 @@ from Log import Log
 #import Log
 
 DEBUG_LEVELS = ['CONNECTIONS','HEADERS', 'AUTH']
-DEBUG = True
+DEBUG = False
 DEBUG_BEFORE_HANDLING = False
 
 class Proxy(BaseHTTPRequestHandler):
@@ -130,15 +130,20 @@ class Proxy(BaseHTTPRequestHandler):
         return
 
     def svc_hndl_LIB(self,parms,query, Verb=''):
-        self.logger.pdebug("svc_hndl_LIB called with parms: >%s, %s<" % (Verb, parms))
+        if DEBUG: self.logger.pdebug("svc_hndl_LIB called with parms: >%s, %s<" % (Verb, parms))
         message = ''
 
-        self.logger.pdebug("url parms = %s, %s" % (parms,query))
+        if DEBUG: self.logger.pdebug("url parms = %s, %s" % (parms,query))
         filename=re.sub(r'[^a-zA-Z0-9]\.[a-zA-Z0-9]', "", parms)
         if os.path.exists('./lib/'+filename):
+            tamagno = os.path.getsize('./lib/'+filename)
+            self.bodySize= tamagno
+            self.code = 200
+            self.content_lenght = tamagno
+                                       
             source = open('./lib/'+filename, 'rb')
             #mensaje = source.read()
-            self.int_send_HEADERS_FILETYPE(200,filename)
+            self.int_send_HEADERS_FILETYPE(200,filename, tamagno)
             if Verb!='HEAD':
                 while 1:
                     data = source.read(1024)
@@ -154,28 +159,37 @@ class Proxy(BaseHTTPRequestHandler):
 
 
     def svc_hndl_DB(self, query, parms, Verb=''):
-        self.logger.pdebug("svc_hndl_DB called with parms: >VERB: %r, %r, %r<" % (Verb, query, parms))
+        if DEBUG: self.logger.pdebug("svc_hndl_DB called with parms: >VERB: %r, %r, %r<" % (Verb, query, parms))
 
-        answer = str(db_handler().handle_request(query, parms))
-        print("FFFFFFFFFFFFFFFFFFFFFFFFFFFF %s", answer)
-        self.int_send_HEADERS_JSON(200, message=answer)
-        self.int_send_BODY(answer)
+        answer = db_handler().handle_request(query, parms)
+        print("FFFFFFFFFFFFFFFFFFFFFFFFFFFF %s" % answer)
+        
+        if answer['typeinfo'] == 'html':
+            mensaje= str(answer['answer'])
+            self.int_send_HEADERS(200, mensaje)
+            
+        elif answer['typeinfo'] == 'json':
+            mensaje= str(answer['answer'])
+            self.int_send_HEADERS_JSON(200, mensaje)
+        
+        #print(">>>>>>>>>>>>>>>>>>>>>>>>>>>> %r" % type(answer['answer']))
+        self.int_send_BODY(mensaje)
         return
 
     def svc_hndl_CONFIG(self,parms,query, Verb=''):
-        self.logger.pdebug("svc_hndl_CONFIG called with parms: >%s, %s<" % (Verb, parms))
+        if DEBUG: sself.logger.pdebug("svc_hndl_CONFIG called with parms: >%s, %s<" % (Verb, parms))
         if Verb=='HEAD':
             mensaje=''
         else:
             mensaje=self.int_get_html_message('CONFIG hndl')
-        self.int_send_HEADERS_redirect(301, "/lib/index.html")
+            self.int_send_HEADERS_redirect(301, "/lib/index.html")
         ##HTTP/1.1 301 Moved Permanently
         ##Location: http://www.example.org/index.asp
         #self.send_html_message("CONFIG")
         return
 
     def svc_hndl_STOP(self,parms,query, Verb=''):
-        self.logger.pdebug("svc_hndl_STOP called with parms: >%s, %s<" % (Verb, parms))
+        if DEBUG: self.logger.pdebug("svc_hndl_STOP called with parms: >%s, %s<" % (Verb, parms))
         if Verb=='HEAD':
             mensaje=''
         else:
@@ -191,7 +205,7 @@ class Proxy(BaseHTTPRequestHandler):
         return
 
     def svc_hndl_POST(self,parms,query, Verb=''):
-        self.logger.pdebug("svc_hndl_POST called with parms: >%s, %s<" % (Verb, parms))
+        if DEBUG: self.logger.pdebug("svc_hndl_POST called with parms: >%s, %s<" % (Verb, parms))
         if Verb=='HEAD':
             mensaje=''
         else:
@@ -204,7 +218,7 @@ class Proxy(BaseHTTPRequestHandler):
         return
 
     def svc_hndl_NOOP(self,parms,query, Verb=''):
-        self.logger.pdebug("svc_hndl_NOOP called with parms: >%s, %s<" % (Verb, parms))
+        if DEBUG: self.logger.pdebug("svc_hndl_NOOP called with parms: >%s, %s<" % (Verb, parms))
         if Verb=='HEAD':
             mensaje=''
         else:
@@ -279,8 +293,12 @@ class Proxy(BaseHTTPRequestHandler):
 
 
     def int_send_HEADERS_JSON(self, code=200, message=''):
+        #print("int_send_HEADERS_JSON -> (%r, %r)" % (code, message))
+        self.code = code
         if message != '':
-            self.bodySize=len(message)
+            self.bodySize= len(str(message))
+            self.content_lenght = self.bodySize
+        
         self.send_response(code)
         self.send_header('Content-Type', 'application/json')
         self.send_header('Content-Length', self.bodySize)
@@ -288,22 +306,32 @@ class Proxy(BaseHTTPRequestHandler):
         return
 
     def int_send_HEADERS(self, code=200, message=''):
+        #print("int_send_HEADERS -> (%r, %r)" % (code, message))
+        
+        self.code = code
         if message != '':
             self.bodySize=len(message)
+            self.content_lenght = self.bodySize
+        
+        #print("int_send_HEADERS -> (%r, %r, %r )" % (code, message, self.bodySize))
+          
         self.send_response(code)
         self.send_header('Content-Type', 'text/html;charset=UTF-8')
         self.send_header('Content-Length', self.bodySize)
         self.end_headers()
         return
 
-    def int_send_HEADERS_FILETYPE(self, code, filename):
+    def int_send_HEADERS_FILETYPE(self, code, filename, tamagno):
         self.send_response(code)
         ext = filename.rsplit('.', 1)[-1]
         self.send_header('Content-Type', self.map_ext_to_filetype(ext))
+        self.send_header('Content-Length', self.bodySize)        
         self.end_headers()
         return
 
     def int_send_BODY(self, message=''):
+        #print("int_send_BODY -> (%r)" % (message))
+        
         try:
             if python_OldVersion:
                 self.wfile.write(message)
@@ -440,7 +468,7 @@ class Proxy(BaseHTTPRequestHandler):
         #self.processed_headers.clear()
         self.content_cached=False
         self.Allowed = 0
-
+        self.selfquery = False
         if (what==None):
             self.what='GET'
         else:
@@ -458,6 +486,8 @@ class Proxy(BaseHTTPRequestHandler):
         if self.parsed_path.netloc in [ '127.0.0.1' , 'localhost', '' ]:
             # or '' ]
             selfquery = True;
+            self.selfquery = True;
+            
 
         # TODO:: DESCOMENTAR
         ## La siguiente linea fuerza el uso de modo proxy
@@ -592,7 +622,7 @@ class Proxy(BaseHTTPRequestHandler):
                         headers_content_type = parsed_headers.get_content_type()
 
                         if could_cache:
-                            print("............ %r %r " %(headers_are_text, headers_content_type))
+                            #print("............ %r %r " %(headers_are_text, headers_content_type))
                             fc.put(path=self.path, content=resp.content, headers=self.processed_headers, debug=False, strip_text=headers_are_text ,
                                    ip=self.client_address[0], port=self.client_address[1])
                     else:
@@ -753,12 +783,23 @@ class Proxy(BaseHTTPRequestHandler):
             self.end_headers
         else:
             self.BASIC(what='OPTIONS')
-            # TODO:: OPTIONS de url requiere auth... gesionado en BASIC
-            self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
-                               'Allow: %s, ' % self.Allowed +
-                               'prxUSR: %10s, ' % self.proxy_user[0:9] +
-                               'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
-                               'PRX OPT '+ self.path)
+            # TODO:: OPTIONS de url requiere auth... gestionado en BASIC
+            
+        # Aqui discriminamos si era una llamada PROXY o HTTP
+        
+        if self.selfquery:
+             auth_str = 'httUSR: %10s, ' % self.http_user[0:9]
+             req_type = 'HTT OPT '
+        else:
+            auth_str = 'prxUSR: %10s, ' % self.proxy_user[0:9]
+            req_type = 'PRX OPT '
+            
+            
+        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+                           'Allow: %s, ' % self.Allowed +
+                           auth_str+
+                           'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                           '%s %s' % (req_type, self.path))
         return
 
     def do_HEAD(self):
@@ -770,21 +811,54 @@ class Proxy(BaseHTTPRequestHandler):
                            '??? HEA '+ self.path)
         self.content = ''
         self.BASIC(what='HEAD')
+        
+        if self.selfquery:
+             auth_str = 'httUSR: %10s, ' % self.http_user[0:9]
+             req_type = 'HTT HEA '
+        else:
+            auth_str = 'prxUSR: %10s, ' % self.proxy_user[0:9]
+            req_type = 'PRX HEA '
+            
+            
+        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+                           'Allow: %s, ' % self.Allowed +
+                           auth_str+
+                           'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                           '%s %s' % (req_type, self.path))
+        '''
         self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                            'Allow: %s, ' % self.Allowed +
                            'prxUSR: %10s, ' % self.proxy_user[0:9] +
                            'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
                            'PRX HEA '+ self.path)
+        '''
         return
 
     def do_TRACE(self):
         self.content = ''
         self.BASIC(what='TRACE')
+        
+        if self.selfquery:
+             auth_str = 'httUSR: %10s, ' % self.http_user[0:9]
+             req_type = 'HTT TRC '
+        else:
+            auth_str = 'prxUSR: %10s, ' % self.proxy_user[0:9]
+            req_type = 'PRX TRC '
+            
+            
+        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+                           'Allow: %s, ' % self.Allowed +
+                           auth_str+
+                           'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                           '%s %s' % (req_type, self.path))
+        
+        '''
         self.logger.pdebug( '%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                             'Allow: %s, ' % self.Allowed +
                             'prxUSR: %10s, ' % self.proxy_user[0:9] +
                             'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
                             'PRX TRC '+ self.path)
+        '''
         return
 
     def do_GET(self):
@@ -824,13 +898,28 @@ class Proxy(BaseHTTPRequestHandler):
                            'CAC GET %s' % (self.path)
                            )
         else:
+            if self.selfquery:
+                 auth_str = 'httUSR: %10s, ' % self.http_user[0:9]
+                 req_type = 'HTT GET '
+            else:
+                auth_str = 'prxUSR: %10s, ' % self.proxy_user[0:9]
+                req_type = 'PRX GET '
+                
+                
+            self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+                               'Allow: %s, ' % self.Allowed +
+                               auth_str+
+                               'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                               '%s %s' % (req_type, self.path))
+
+            '''
             self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                            'Allow: %s, ' % self.Allowed +
                            'prxUSR: %10s, ' % self.proxy_user[0:9] +
                            'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
                            'PRX GET %s' % (self.path)
                            )
-
+            '''
         return
 
 
@@ -850,11 +939,28 @@ class Proxy(BaseHTTPRequestHandler):
 
         if DEBUG: sys.stderr.write('calling BASIC\n')
         self.BASIC(what='POST')
+        
+        if self.selfquery:
+             auth_str = 'httUSR: %10s, ' % self.http_user[0:9]
+             req_type = 'HTT PST '
+        else:
+            auth_str = 'prxUSR: %10s, ' % self.proxy_user[0:9]
+            req_type = 'PRX PST '
+            
+            
+        self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
+                           'Allow: %s, ' % self.Allowed +
+                           auth_str+
+                           'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
+                           '%s %s' % (req_type, self.path))
+        
+        '''
         self.logger.pdebug('%s:%s, ' % (self.client_address[0], self.client_address[1]) +
                            'Allow: %s, ' % self.Allowed +
                            'prxUSR: %10s, ' % self.proxy_user[0:9] +
                            'Cod: %3d, Size: %8d, ' % (self.code, self.content_lenght) +
                            'PRX PST '+ self.path)
+        '''
         return
 
 
