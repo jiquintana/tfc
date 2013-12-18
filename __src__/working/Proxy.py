@@ -40,7 +40,7 @@ from Log import Log
 #import Log
 
 DEBUG_LEVELS = ['CONNECTIONS','HEADERS', 'AUTH']
-DEBUG = False
+DEBUG = True
 DEBUG_BEFORE_HANDLING = False
 
 class Proxy(BaseHTTPRequestHandler):
@@ -102,7 +102,7 @@ class Proxy(BaseHTTPRequestHandler):
     '''
 
     def svc_hndl_FILE(self,parms,query, Verb=''):
-        self.logger.pdebug("svc_hndl_FILE called with parms: >%s, %s<" % (Verb, parms))
+        if DEBUG: self.logger.pdebug("svc_hndl_FILE called with parms: >%s, %s<" % (Verb, parms))
 
         if Verb=='HEAD':
             mensaje=''
@@ -113,7 +113,6 @@ class Proxy(BaseHTTPRequestHandler):
             if (filename == ""):
                 filename = "index"
 
-            print('./static/'+filename+'.static')
             if os.path.exists('./static/'+filename+'.static'):
                 source = open('./static/'+filename+'.static', 'r')
                 mensaje = source.read()
@@ -134,7 +133,7 @@ class Proxy(BaseHTTPRequestHandler):
         self.logger.pdebug("svc_hndl_LIB called with parms: >%s, %s<" % (Verb, parms))
         message = ''
 
-        if DEBUG: self.logger.pdebug("url parms = %s, %s" % (parms,query))
+        self.logger.pdebug("url parms = %s, %s" % (parms,query))
         filename=re.sub(r'[^a-zA-Z0-9]\.[a-zA-Z0-9]', "", parms)
         if os.path.exists('./lib/'+filename):
             source = open('./lib/'+filename, 'rb')
@@ -151,12 +150,14 @@ class Proxy(BaseHTTPRequestHandler):
             self.int_send_HEADERS(404,mensaje)
             #self.int_send_BODY(mensaje)
 
+        return
+
 
     def svc_hndl_DB(self, query, parms, Verb=''):
         self.logger.pdebug("svc_hndl_DB called with parms: >VERB: %r, %r, %r<" % (Verb, query, parms))
 
         answer = str(db_handler().handle_request(query, parms))
-        if DEBUG: print(answer)
+        print("FFFFFFFFFFFFFFFFFFFFFFFFFFFF %s", answer)
         self.int_send_HEADERS_JSON(200, message=answer)
         self.int_send_BODY(answer)
         return
@@ -298,12 +299,7 @@ class Proxy(BaseHTTPRequestHandler):
     def int_send_HEADERS_FILETYPE(self, code, filename):
         self.send_response(code)
         ext = filename.rsplit('.', 1)[-1]
-
-        #print (".....................")
-        #print (ext)
-        #print (".....................")
         self.send_header('Content-Type', self.map_ext_to_filetype(ext))
-        #self.send_header('Content-Length', self.bodySize)
         self.end_headers()
         return
 
@@ -323,9 +319,7 @@ class Proxy(BaseHTTPRequestHandler):
 
     def int_HEAD_PROXY_AUTH(self):
         self.send_response(407,"Proxy Authentication Required. "+self.server_version+": Access to the Web Proxy filter is denied.")
-        #self.send_header('Proxy-Authenticate', 'Negotiate')
         self.send_header('Proxy-Authenticate', 'Basic realm="PROXY autentication required"')
-        #self.send_header('Via', self.server_version)
         self.send_header('Proxy-Connection', 'close')
         self.send_header('Connection', 'close')
         self.end_headers()
@@ -333,9 +327,7 @@ class Proxy(BaseHTTPRequestHandler):
 
     def int_HEAD_HTTP_AUTH(self):
         self.send_response(401,"HTTP authentication Required. "+self.server_version+": Access to the Web Server is denied.")
-        #self.send_header('WWW-Authenticate', 'Negotiate')
         self.send_header('WWW-Authenticate', 'Basic realm="HTTP autentication required"')
-        #self.send_header('Via', self.server_version)
         self.send_header('Connection', 'close')
         self.end_headers()
         return
@@ -488,7 +480,6 @@ class Proxy(BaseHTTPRequestHandler):
                 service_handle_value="NOOP"
                 service_handle_parms=""
 
-                self.logger.pdebug("self.what: %s " % self.what)
                 if self.what in ['GET', 'POST', 'HEAD']:
                     # Para cada uno de los servicios que atenderemos... (LocalServices es una lista de servicios vs handlers)
                     for URL in self.LocalServices:

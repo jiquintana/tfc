@@ -4,13 +4,14 @@
 
         <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 
-        <link rel="stylesheet" type="text/css" href="/lib/css/style.css">
-        <script type='text/javascript' src='/lib/js/test.js'></script>
-        <script type='text/javascript' src='/lib/js/jquery-1.9.1.js'></script>
-        <script type='text/javascript' src='/lib/js/validate.js'></script>
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+        <script type='text/javascript' src='js/test.js'></script>
+        <script type='text/javascript' src='js/jquery-1.9.1.js'></script>
+        <script type='text/javascript' src='js/validate.js'></script>
 
         <script type='text/javascript'>
 		var userFormData;
+		
 		$(window).load(function() {
 			document.forms['formUser'].elements['username'].focus();
 			test_onload();
@@ -25,10 +26,12 @@
 				document.getElementById('D_AH').value=255;
 				fromForm();
 			} else {
-				if (window.opener.userFormType == 'newUser') {
+				document.formUser.action = "/db/"+window.opener.userFormType;
+				if (window.opener.userFormType == 'addUser') {
+					alert("addUser");
 					//alert("newuser");
-				} else if (window.opener.userFormType == 'getUser') {
-					// alert("getUser");
+				} else if (window.opener.userFormType == 'modUser') {
+					alert("modUser");
 					data = JSON.parse(window.opener.userFormData);
 					Object.keys(data).forEach(function(key) {
 						document.getElementById(key).value=data[key];
@@ -45,7 +48,7 @@
 <body>
 
 <div style="margin-left:45px">
-        <form id="formUser" name="formUser" action="addUser" method="get">
+        <form id="formUser" name="formUser" action="#" method="get">
         <fieldset>
                 <legend>Usuario:</legend>
                 <label for="uid">uid :</label>	 
