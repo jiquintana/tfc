@@ -4,6 +4,7 @@
 
         <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 
+        <link rel="stylesheet" type="text/css" href="css/body.css">
         <link rel="stylesheet" type="text/css" href="css/style.css">
         <link rel="stylesheet" type="text/css" href="css/formUser.css">
         <script type='text/javascript' src='js/test.js'></script>
@@ -51,30 +52,30 @@
 <div class="divcontainer">
         <form id="formUser" name="formUser" action="#" method="get">
         <fieldset>
-                <legend>Usuario:</legend>
-                <label for="uid">uid :</label>	 
-		<input type="input" id="uid" name="uid" readonly>
-
-               	<br><label for="username">usuario :</label>
-                <input type="text" id="username" name="username" >
-
-                
-		<br><label for="rol">Rol :</label>
-                <!--input type="input" id="rol" name="rol"-->
-		<select id="rol" name="rol">
-			<option value="G">Invitado</option>
-			<option value="K">Menor</option>
-			<option value="V">Usuario Avanzado</option>
-			<option value="A">Administrador</option>
-		</select>
-                
-		<br><label for="password">Contraseña :</label>                
-                <input type="input" id="password" name="password">
-                
-		<br><label for="description">Descripción :</label>
-                <input type="input" id="description" name="description">
+            <legend>Usuario:</legend>
+            <label for="uid">uid :</label>	 
+            <input type="text" id="uid" name="uid" readonly>
+    
+            <br><label for="username">usuario :</label>
+            <input type="text" id="username" name="username" >
+    
+            
+            <br><label for="rol">Rol :</label>
+            <!--input type="input" id="rol" name="rol"-->
+            <select id="rol" name="rol">
+                <option value="G">Invitado</option>
+                <option value="K">Menor</option>
+                <option value="V">Usuario Avanzado</option>
+                <option value="A">Administrador</option>
+            </select>
+            
+            <br><label for="password">Contraseña :</label>                
+            <input type="text" id="password" name="password">
+            
+            <br><label for="description">Descripción :</label>
+            <input type="text" id="description" name="description">
         </fieldset>
-	<div style="display:none">
+	<div><!--style="display:none"-->
         <fieldset>
                 <legend>Binary hours:</legend>
                 <label for="L_AH">L :</label>
@@ -172,9 +173,9 @@
         </fieldset>
 
         <!--button onclick="myFunction()">Try it</button-->
-	<input type="submit" value="Submit">
-        <input type="button" value="Recalcular campos" onclick="toForm();" >
-        <input type="button" value="dosubmit" onclick="document.form[0].submit()" >
+	<input type="submit" value="Añadir usuario">
+        <!--input type="button" value="Recalcular campos" onclick="toForm();" >
+        <!--input type="button" value="dosubmit" onclick="document.form[0].submit()" >
         </form>
 	<script  type="text/javascript">
 var validator = new FormValidator('formUser', [{

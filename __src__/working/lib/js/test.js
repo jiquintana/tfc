@@ -1,12 +1,12 @@
 function test_onload() {
 	var mousedown = false;
 
-	$(document).mousedown(function() {
+	$('table').mousedown(function() {
 	    mousedown = true;
 	    return false;
 	});
 	
-	$(document).mouseup(function() {
+	$('table').mouseup(function() {
 	    mousedown = false;
 	});
 	
@@ -80,6 +80,14 @@ function fromForm() {
 	
 }
 
+function fromDelForm() {
+	formElements = ["L_AH", "M_AH", "X_AH", "J_AH", "V_AH", "S_AH", "D_AH"];
+	for (var formElement in formElements) {
+	  //alert(formElements[i]);
+	  value = document.getElementById(formElements[formElement]).value;
+	}
+}
+
 function toForm() {
 	var welements = document.getElementsByClassName("cell");
 	var checkboxCount = welements.length;
@@ -107,3 +115,4 @@ function toForm() {
 	document.getElementById("S_AH").value=toDecimal(S_AH);
 	document.getElementById("D_AH").value=toDecimal(D_AH);		
 }
+

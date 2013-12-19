@@ -21,7 +21,7 @@ if python_OldVersion:
 else:
     import binascii
 
-TraceSQL = False
+TraceSQL = True
 MAXUSERS = 1024
 MAXGROUPS = 65536
 
@@ -229,6 +229,34 @@ class Database:
 
         return storedUser
 
+
+    def delUser(self,usertoDelete):
+        ##     session.query(User).filter(User.id==7).delete()
+
+       theUID = None
+       theGID = -1
+       transaction_succesful=False
+
+       theGroups = self.session.\
+           query(Groups).\
+           filter(Groups.uid==usertoDelete.uid).\
+           delete();
+
+       theGroup = self.session.\
+           query(Group).\
+           filter(Group.gid==usertoDelete.uid).\
+           delete();
+
+       theUser = self.session.\
+            query(User).\
+            filter(User.uid==usertoDelete.uid).\
+            delete();
+
+       self.session.commit()
+
+       return None
+
+
     def setUserAdmin(self,requestedUser):
         #print(requestedUser.__repr__())
         if requestedUser != None:
@@ -239,6 +267,31 @@ class Database:
                     update({'rol': RolType.get_adm_user_key()})
 
                 self.session.commit()
+            return self.findUserByUsername(requestedUser.username)
+        else:
+            return None
+
+    def changeUser(self,requestedUser):
+        #print(requestedUser.__repr__())
+        if requestedUser != None:
+            storedUser=self.findUserByUID(requestedUser.uid)
+            if storedUser != None:
+
+                storedUser.username = requestedUser.username
+                storedUser.rol = requestedUser.rol
+                storedUser.password = requestedUser.password
+                storedUser.description = requestedUser.description
+
+                storedUser.L_AH = requestedUser.L_AH
+                storedUser.M_AH = requestedUser.M_AH
+                storedUser.X_AH = requestedUser.X_AH
+                storedUser.J_AH = requestedUser.J_AH
+                storedUser.V_AH = requestedUser.V_AH
+                storedUser.S_AH = requestedUser.S_AH
+                storedUser.D_AH = requestedUser.D_AH
+
+                self.session.commit()
+
             return self.findUserByUsername(requestedUser.username)
         else:
             return None
@@ -588,10 +641,10 @@ class User(Base):
 
     def stringColumns(self):
         return ['username', 'rol', 'password', 'description']
-    
+
     def intColumns(self):
         return ['uid', 'L_AH', 'M_AH', 'X_AH', 'J_AH', 'V_AH', 'S_AH', 'D_AH' ]
-    
+
     def fromdict(self, dict_data):
         #dict_data = json.loads(jsondata)
         self.uid = dict_data.get('uid', 0)
@@ -721,10 +774,12 @@ if __name__ == "__main__":
     for instance in db.findGroup("%e"):
         print("%r" % instance)
 
-    newUser = User(username='pepe1', password='Ed Jones', description='ed')
+    newUser = User(username='pepe3', password='Ed Jones', description='ed')
     theUser = db.addUser(newUser)
 
-    theUser = db.findUserByUsername('pepe1')
+    theUser = db.findUserByUsername('pepe3')
+
+    db.delUser(theUser)
     ##print( json.dumps(theUser, cls=AlchemyEncoder))
     #print(db.findUserByUsername('pepe1'))
 

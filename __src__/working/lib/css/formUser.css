@@ -3,16 +3,13 @@ label {
 	padding-top:0.2em;
 	margin-right:0.5em;
 	display: block;
-	width: 140px;
+	width: 180px;
 	color: #2E6E9E;
 	font-weight: bold;
 	display: block;
 	float: left;
 }
 
-input[readonly] {
-	background-color:#C2C2A3 ;
-}
 
 fieldset {
 	border:1px solid #2E6E9E;
@@ -25,21 +22,52 @@ legend {
 	border:1px solid #2E6E9E;
 	color:#2E6E9E;
 	font-size:90%;
-	text-align:right;
+	text-align:left;
+	font-weight: bold;
+
 }
 
-
-input[type=button] {
-	color:#08233e;
-	font:2.4em Futura, ‘Century Gothic’, AppleGothic, sans-serif;
-	font-size:70%;
-}
-
-input[type=submit] {
-	background-color: LightSteelBlue;
+input[type=text] {
+	background-color: AliceBlue ;
 	cursor:pointer;
 }
 
-.divcontainer {
-	margin: 20px 45px 20px 45px;
+input[readonly] {
+	background-color: Silver;
+}
+
+select {
+	background-color: AliceBlue  ;
+	cursor:pointer;
+	size: 40;
+}
+input[type=button] {
+	margin: 10px 10px 10px 10px;
+	font-size:70%;
+	background-color: LightSkyBlue ;
+	cursor:pointer;
+}
+
+input[type=submit] {
+	margin: 10px 10px 0px 10px;
+	font-size:70%;
+	background-color: LightSkyBlue ;
+	color: purple;
+	font-weight: bold;
+	cursor:pointer;
+}
+
+button {
+	margin: 10px 10px 0px 10px;
+	font-size:70%;
+	background-color: LightSkyBlue ;
+	cursor:pointer;
+}
+
+input[type=text], select
+{
+	width:180px;
+	box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
 }

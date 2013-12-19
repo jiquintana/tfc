@@ -6,6 +6,9 @@
 <!-- Import jQuery UI and jqGrid UI -->
 <!-- Import jQuery jqGrid JS files -->
 
+<link rel="stylesheet" type="text/css" href="css/body.css">
+<link rel="stylesheet" type="text/css" href="css/formUser.css">
+
 
 <link rel="stylesheet" type="text/css" media="screen" href="js/themes/redmond/jquery-ui.css" />
 <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
@@ -13,8 +16,8 @@
 
 <link rel="stylesheet" type="text/css" media="screen" href="js/themes/ui.jqgrid.css" />
 <link rel="stylesheet" type="text/css" media="screen" href="js/themes/ui.multiselect.css" />
-<link rel="stylesheet" type="text/css" href="css/base-min.css"/>
-<link rel="stylesheet" type="text/css" href="css/forms-min.css"/>
+<!--link rel="stylesheet" type="text/css" href="css/base-min.css"/>
+<link rel="stylesheet" type="text/css" href="css/forms-min.css"/-->
 <link rel="stylesheet" type="text/css" href="js/themes/redmond/jquery-ui.css"/>
 
 
@@ -26,6 +29,7 @@
 <script type='text/javascript'>
 //<![CDATA[
 	var userFormData;
+	var rowSelected = 0;
 	var userFormtype;
 	
 	function disableSelection(target){
@@ -46,6 +50,9 @@
 	}
 	
 	function loadData() {
+		$(window).focus(function() {
+   			doreload();
+		});
 		
 		$("#grid").jqGrid({
 			url:'/db/findUser?username='+document.getElementById("filtrado").value,
@@ -60,11 +67,11 @@
 			colNames: ['uid','username', 'rol', 'password','description',
 						'L_AH','M_AH','X_AH','J_AH','V_AH','S_AH','D_AH'],
 			colModel: [
-				{name:'uid', index:'uid', width:30, sorttype:"int", align: "right"},
-				{name:'username',index:'username', width:60  },
+				{name:'uid', index:'uid', width:50, sorttype:"int", align: "right"},
+				{name:'username',index:'username', width:80  },
 				{name:'rol',index:'rol', width:30, align: "center" },
 				{name:'password', index:'password', width:60, hidden: true },
-				{name:'description', index:'description', width:90 },
+				{name:'description', index:'description', width:180 },
 				{name:'L_AH', index:'L_AH', width:40, sorttype:"int", align: "right", hidden: true},
 				{name:'M_AH', index:'M_AH', width:40, sorttype:"int", align: "right", hidden: true},
 				{name:'X_AH', index:'X_AH', width:40, sorttype:"int", align: "right", hidden: true},
@@ -85,19 +92,28 @@
 	}
 	
 	function getRowIdData(rowId) {
-		var rowData = jQuery('#grid').jqGrid ('getRowData', rowId);		
+		var rowData = jQuery('#grid').jqGrid ('getRowData', rowId);
 		var jsondata=JSON.stringify(rowData);
 		return jsondata;
 	}
 	
 	$(window).load(function(){ 
 		loadData();
+		$('#delUser').attr("disabled", "disabled");
 		
 		$("#grid").jqGrid('setGridParam', {ondblClickRow: function(rowid,iRow,iCol,e){
 			userFormData = getRowIdData(rowid);
 			userFormType = 'modUser'
 			window.open("formUser.html", 'userForm', '');
 
+		}});
+		
+		$("#grid").jqGrid('setGridParam', {onSelectRow: function(rowid, status, e){
+			//$('#delUser').attr("disabled", "disabled");
+			$('#delUser').removeAttr("disabled");
+			rowSelected = rowid;
+			//alert(userFormData);
+			//$('#delUser').attr("disabled", "disabled");
 		}});
 		
 		$("#filtrado" ).bind('input', function() {
@@ -111,25 +127,35 @@
 		window.open("formUser.html", 'userForm', '');
         });
     });
+	
+	$(document).ready(function(){
+       $('#delUser').click(function(){
+		userFormType = 'delUser'
+		userFormData = getRowIdData(rowSelected);
+
+		window.open("delUser.html", 'userForm', '');
+		$('#delUser').attr("disabled", "disabled");
+        });
+    });
 //]]>  
 
 </script>
 </head>
 <body>
 
-<div class="pure-form margin" id="useradmin" name="useradmin">
-<br>
- <label for="filtrado">Busqueda Usuarios</label>
- <input class="pure-input-rounded width" name="Filtrado" id="filtrado" type="text"/>
-<br>
-<br>
-<table id="grid"></table>
-<div id="pager"></div>
+<div class="divcontainer">
+    <fieldset>
+    <legend>Buscador usuarios:</legend>
+    <label for="filtrado">Filtrado Usuarios</label>
+    <input class="width" name="Filtrado" id="filtrado" type="text"/>
+    <br><br>
+    <table id="grid"></table>
+    <div id="pager"></div>
+    </fieldset>
+    <button id="newUser">Nuevo Usuario</button>
+    <button id="delUser">Borrar Usuario</button>
+
 </div>
-
-
-<button id="newUser">Nuevo Usuario</button>
-
 
 
 </body>
