@@ -6,7 +6,7 @@ import db_layer
 import json
 import cgi
 
-DEBUG = True
+DEBUG = False
 
 class db_handler():
     __db__ = None

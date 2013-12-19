@@ -21,7 +21,7 @@ if python_OldVersion:
 else:
     import binascii
 
-TraceSQL = True
+TraceSQL = False
 MAXUSERS = 1024
 MAXGROUPS = 65536
 

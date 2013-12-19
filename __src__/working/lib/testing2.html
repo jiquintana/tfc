@@ -47,6 +47,7 @@
 			url:'/db/findUser?username='+document.getElementById("filtrado").value,
 			datatype:"json"
 			}).trigger("reloadGrid");
+		$('#delUser').attr("disabled", "disabled");
 	}
 	
 	function loadData() {
@@ -109,11 +110,8 @@
 		}});
 		
 		$("#grid").jqGrid('setGridParam', {onSelectRow: function(rowid, status, e){
-			//$('#delUser').attr("disabled", "disabled");
 			$('#delUser').removeAttr("disabled");
 			rowSelected = rowid;
-			//alert(userFormData);
-			//$('#delUser').attr("disabled", "disabled");
 		}});
 		
 		$("#filtrado" ).bind('input', function() {
@@ -122,21 +120,21 @@
 	});
 	
 	$(document).ready(function(){
-        $('#newUser').click(function(){
-		userFormType = 'addUser'
-		window.open("formUser.html", 'userForm', '');
-        });
-    });
+			$('#newUser').click(function(){
+			$('#delUser').attr("disabled", "disabled");
+			userFormType = 'addUser'
+			window.open("formUser.html", 'userForm', '');
+		});
+	});
 	
 	$(document).ready(function(){
-       $('#delUser').click(function(){
-		userFormType = 'delUser'
-		userFormData = getRowIdData(rowSelected);
-
-		window.open("delUser.html", 'userForm', '');
-		$('#delUser').attr("disabled", "disabled");
-        });
-    });
+		$('#delUser').click(function(){
+			userFormType = 'delUser'
+			userFormData = getRowIdData(rowSelected);
+			window.open("delUser.html", 'userForm', '');
+			$('#delUser').attr("disabled", "disabled");
+		});
+	});
 //]]>  
 
 </script>
@@ -152,6 +150,7 @@
     <table id="grid"></table>
     <div id="pager"></div>
     </fieldset>
+    <button id="refresh" onclick="doreload();">Refrescar Datos</button>
     <button id="newUser">Nuevo Usuario</button>
     <button id="delUser">Borrar Usuario</button>
 

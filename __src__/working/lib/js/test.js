@@ -29,7 +29,7 @@ function test_onload() {
 
 
 function hasClass(element, cls) {
-return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
+	return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
 }
 
 function myFunction0() {
@@ -43,7 +43,7 @@ function element_name_set_value(elementname, valor) {
 
 /** Convert a decimal number to binary **/
 var toBinary = function(decNum){
-return parseInt(decNum,10).toString(2);
+	return parseInt(decNum,10).toString(2);
 }
 
 /** Convert a binary number to decimal **/
