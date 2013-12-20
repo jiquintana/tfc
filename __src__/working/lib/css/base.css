@@ -93,8 +93,10 @@ P {
 }
 
 .card-container {
-	height: 130px;
-	width: 130px;
+	height: 100%;
+	width: 145px;
+	vertical-align:middle;
+	text-align:center;
 	//perspective: 600;
 	border: 2px DarkBlue solid;
 }

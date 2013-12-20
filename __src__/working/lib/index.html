@@ -4,11 +4,18 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <link rel="stylesheet" type="text/css" href="css/main.css">
   <link rel="stylesheet" type="text/css" href="css/base.css">
+  <script type='text/javascript' src='js/jquery-1.9.1.js'></script>
   <script type="text/javascript" src="js/popit.js"> </script>
   <script type='text/javascript'>
-	$("p").hover(function(){
-		$("p").css("background-color","yellow");
-	}); 
+	$(document).ready(function () {
+		$('.mainlink').hover(function () {
+			$("#botton").text(
+				$(this).attr("title")
+				);
+		}, function () {
+			$("#botton").text('...');
+		});
+	});
   </script>
 </head>
 
@@ -20,27 +27,25 @@
 			<text class="title">Proxy doméstico con protección parental</text></tr>
 		</th><tr>
 
-		<td><div class="card-container" ><A HREF="2_manual.html"
+		<td><div class="card-container" ><A class="mainlink" HREF="2_manual.html"
 			title="Acceso a los manuales de configuración de los exploradores web">
 		<div class="card" ><img src="images/128-books.png" alt="Cómo configurar el browser"></div>
 		</A></div></td>
 
-		<td><div class="card-container" ><A HREF="2_config.html"
+		<td><div class="card-container" ><A class="mainlink" HREF="2_config.html"
 			title="Configuración de los parámetros del Proxy">
                 <div class="card" ><img src="images/128-configure.png" alt="Configuración del Proxy"></div>
                 </A></div></td>
 
-		<td><div class="card-container" ><A HREF="2_logs.html"
+		<td><div class="card-container" ><A class="mainlink" HREF="2_logs.html"
 			title="Acceso a los logs del Proxy">
-
                 <div class="card" ><img src="images/128-logs.png" alt="Logs del Proxy"></div>
 		</A></div></td>
 
 		</tr>
 
-
 		<tr><th colspan="3">
-			<div class="botton">xxxx</div></tr>
+			<div id="botton" class="botton">...</div></tr>
 		</th></tr>
 	</table>
 </td></tr></table>

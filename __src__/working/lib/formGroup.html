@@ -4,13 +4,16 @@
 
         <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 
-        <link rel="stylesheet" type="text/css" href="/lib/css/style.css">
-        <script type='text/javascript' src='/lib/js/test.js'></script>
-        <script type='text/javascript' src='/lib/js/jquery-1.9.1.js'></script>
-        <script type='text/javascript' src='/lib/js/validate.js'></script>
+        <link rel="stylesheet" type="text/css" href="css/body.css">
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+        <link rel="stylesheet" type="text/css" href="css/formUser.css">
+        <script type='text/javascript' src='js/test.js'></script>
+        <script type='text/javascript' src='js/jquery-1.9.1.js'></script>
+        <script type='text/javascript' src='js/validate.js'></script>
 
         <script type='text/javascript'>
 		var userFormData;
+		
 		$(window).load(function() {
 			document.forms['formUser'].elements['username'].focus();
 			test_onload();
@@ -25,10 +28,14 @@
 				document.getElementById('D_AH').value=255;
 				fromForm();
 			} else {
-				if (window.opener.userFormType == 'newUser') {
+				document.formUser.action = "/db/"+window.opener.userFormType;
+				if (window.opener.userFormType == 'addUser') {
+					//alert("addUser");
 					//alert("newuser");
-				} else if (window.opener.userFormType == 'getUser') {
-					// alert("getUser");
+					$("#submit").attr('value', 'Añadir');
+				} else if (window.opener.userFormType == 'modUser') {
+					$("#submit").attr('value', 'Modificar');
+					//alert("modUser");
 					data = JSON.parse(window.opener.userFormData);
 					Object.keys(data).forEach(function(key) {
 						document.getElementById(key).value=data[key];
@@ -44,26 +51,33 @@
 
 <body>
 
-<div style="margin-left:45px">
-        <form action="#" id="formUser" name="formUser" action="?" method="get" parsley-validate>
+<div class="divcontainer">
+        <form id="formUser" name="formUser" action="#" method="get">
         <fieldset>
-                <legend>Usuario:</legend>
-                <label for="uid">uid :</label>	 
-		<input type="input" id="uid" name="uid"  data-validation="length">
-
-               	<br><label for="username">usuario :</label>
-                <input type="text" id="username" name="username" >
-
-                
-		<br><label for="rol">Rol :</label>
-                <input type="input" id="rol" name="rol">
-                
-		<br><label for="password">Contraseña :</label>                
-                <input type="input" id="password" name="password">
-                
-		<br><label for="description">Descripción :</label>
-                <input type="input" id="description" name="description">
+            <legend>Usuario:</legend>
+            <label for="uid">uid :</label>	 
+            <input type="text" id="uid" name="uid" readonly>
+    
+            <br><label for="username">usuario :</label>
+            <input type="text" id="username" name="username" >
+    
+            
+            <br><label for="rol">Rol :</label>
+            <!--input type="input" id="rol" name="rol"-->
+            <select id="rol" name="rol">
+                <option value="G">Invitado</option>
+                <option value="K">Menor</option>
+                <option value="V">Usuario Avanzado</option>
+                <option value="A">Administrador</option>
+            </select>
+            
+            <br><label for="password">Contraseña :</label>                
+            <input type="text" id="password" name="password">
+            
+            <br><label for="description">Descripción :</label>
+            <input type="text" id="description" name="description">
         </fieldset>
+	<div style="display:none">
         <fieldset>
                 <legend>Binary hours:</legend>
                 <label for="L_AH">L :</label>
@@ -81,6 +95,7 @@
                 <label for="D_AH">D :</label>
                 <input type="input" id="D_AH" name="D_AH">
         </fieldset>
+	</div>
         
         <fieldset>
         <legend>Horas:</legend>
@@ -160,28 +175,46 @@
         </fieldset>
 
         <!--button onclick="myFunction()">Try it</button-->
-        <input type="submit" onclick="toForm();">
-        <input type="button" value="Recalcular campos" onclick="toForm();" >
-        <input type="button" value="validate" onclick="$.validate();" >
+	<input id="submit" type="submit" value="Añadir usuario">
+	<input id="cancelar" type="button" value="Cancelar" onclick="self.close();" >
+        <!--input type="button" value="Recalcular campos" onclick="toForm();" >
+        <input type="button" value="dosubmit" onclick="document.form[0].submit();" -->
+
         </form>
 	<script  type="text/javascript">
-var validator = new FormValidator('formUser', [{
-    name: 'username',
-    display: 'username',    
-    rules: 'required'
-}], function(errors, event) {
-    if (errors.length > 0) {
-        var errorString = '';
-        
-        for (var i = 0, errorLength = errors.length; i < errorLength; i++) {
-            errorString += errors[i].message + '<br />';
-        }
-        
-	alert(errors[0].message);
-    }
-});
+		var validator = new FormValidator('formUser', [{
+		    name: 'username',
+		    display: 'Usuario',    
+		    rules: 'required|min_length[3]|max_length[20]'
+		},{
+		    name: 'password',
+		    display: 'Contraseña',    
+		    rules: 'required|min_length[4]|max_length[16]'
+		},{
+		    name: 'description',
+		    display: 'Descripción',    
+		    rules: 'max_length[80]'
+		    }
+		], function(errors, event) {
+		    if (errors.length > 0) {
+			/*
+			http://rickharrison.github.io/validate.js/
+			errors - An array of errors from the validation object. If the length > 0, the form failed validation
+
+			This array will contain javascript objects with up to three properties:
+			- id: The id attribute of the form element
+			- name: The name attribute of the form element
+			- message: The error message to display
+			- rule: The rule that prompted this error
+			*/
+			alert(errors[0].message);
+			document.getElementById(errors[0].id).focus();
+			document.getElementById(errors[0].id).select();
+			} else {
+				toForm()
+			}
+		});
 	</script>
-        <div id="jsonString">undefined</div>
 	</div>
 </body>
 
