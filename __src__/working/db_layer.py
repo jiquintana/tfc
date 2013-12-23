@@ -237,7 +237,28 @@ class Database:
         self.session.add(relacionUsrGrp)
         self.session.commit()
 
-
+    def wr_addRelation(self, theDict):
+        uid = theDict.get('uid')
+        gid = theDict.get('gid')
+        #print(">>>> db.wr_addRelation:: %r, %r" % (uid, gid))
+        return self.addRelation(uid, gid)
+        #return None
+    
+    def delRelation(self, uid, gid):
+        theGroups = self.session.\
+            query(Groups).\
+            filter(Groups.uid==uid).\
+            filter(Groups.gid==gid).\
+            delete()
+        self.session.commit()
+        
+    
+    def wr_delRelation(self, theDict):
+        uid = theDict.get('uid')
+        gid = theDict.get('gid')
+        #print(">>>> db.wr_delRelation:: %r, %r" % (uid, gid))
+        return self.delRelation(uid, gid)
+        #return None
 
     def delUser(self,usertoDelete):
 
@@ -587,7 +608,7 @@ class Database:
         return is_guest
 
     def findGroupsByUser(self, username):
-        print("....%r" % username)
+        #print("....%r" % username)
         membership = []
         if username != '%':
 
@@ -611,7 +632,7 @@ class Database:
         return membership
 
     def findNotGroupsByUser(self, username):
-        print("....%r" % username)
+        #print("....%r" % username)
         notMembership = []
         membership = []
         all_groups = []

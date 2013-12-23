@@ -3,7 +3,7 @@
 	var rowSelected = 0;
 	var userFormtype;
 	var selected_username = "";
-	var selected_uid = "";
+	var selected_uid = 0;
 	var group_membergrid_selected_gid = 0;
 	var group_notmembergrid_selected_gid = 0;
 
@@ -15,6 +15,13 @@
 		else //All other route (ie: Opera)
 			target.onmousedown=function(){return false}
 		target.style.cursor = "default"
+	}
+
+	function users_grids_reload() {
+		$("#usergrid").jqGrid('setGridParam',{
+			url:'/db/findUser?username='+document.getElementById("filtrado").value,
+			datatype:"json"
+			}).trigger("reloadGrid");
 	}
 
 	function membership_grids_reload() {
@@ -30,27 +37,27 @@
 			datatype:"json"
 			}).trigger("reloadGrid");
 	}
+
+	function do_reset_form() {
+		selected_username = '';
+		selected_uid = 0;
+
+		users_grids_reload();
+		membership_grids_reload();
+		//notmembership_grids_reload();
+		do_reset_membership_form();
+	}
 	
-	function do_reload() {
+	function do_reset_membership_form() {
 		group_membergrid_selected_gid = 0;
 		group_notmembergrid_selected_gid = 0;
-		//document.getElementById("memberadd").disabled = true;
-		//document.getElementById("memberdel").disabled = true;
 		
 		$('#addmember').attr('disabled', 'disabled');
 		$('#delmember').attr('disabled', 'disabled');
 		$('#addmember').attr('src','images/24-left-gray.png');
 		$('#delmember').attr('src','images/24-right-gray.png');
-		//getElementById("delmember").src='images/24-right-red.png';
-		//getElementById("memberadd").attr('src','images/24-left-green.png');
-		/*getElementById("memberadd").attr("disabled", true);
-		getElementById("memberdel").attr("disabled", true);
-		$("#memberadd").attr('disabled', 'disabled' );
-		//$("#memberadd").attr('disabled', 'disabled' );
-		*/
 		membership_grids_reload();
 		notmembership_grids_reload();
-
 	}	
 	
 	function loadData() {		
@@ -188,7 +195,7 @@
 	}
 	
 	function updatediv() {
-		$("#seleccionado").text('|'+selected_username+'|'+group_membergrid_selected_gid+'|'+group_notmembergrid_selected_gid+'|');
+		$("#seleccionado").text('|'+selected_username+'|'+selected_uid+'|'+group_membergrid_selected_gid+'|'+group_notmembergrid_selected_gid+'|');
 	}
 	
 	function getNOTMemberRowGidData(rowId) {
@@ -218,13 +225,13 @@
 	}
 	
 	$(window).focus(function() {
-		do_reload();
+		//do_reset_form();
 	});
 	
 	$(window).load(function(){
-		updatediv();
 		loadData();
-		do_reload();
+		do_reset_form();
+		updatediv();
 
 		
 		// !!!!! $('#delUser').attr("disabled", "disabled");
@@ -243,8 +250,9 @@
 		$("#usergrid").jqGrid('setGridParam', {onSelectRow: function(rowid, status, e){
 			var user_selected_data_row = jQuery('#usergrid').jqGrid('getRowData', rowid);
 			selected_username = user_selected_data_row['username'];
-//			alert(selected_username);
-			do_reload();
+			selected_uid = user_selected_data_row['uid'];
+			//alert(selected_uid);
+			do_reset_membership_form();
 			updatediv();
 		}});
 		
@@ -277,19 +285,38 @@
 		}});
 		
 	
-		/*
+		
 		$("#filtrado" ).bind('input', function() {
-			doreload()
+			//doreload()
+			do_reset_form();
+			users_grids_reload();
 		});
-		*/
+
 	});
 		
 	$(document).ready(function(){
 		$('#delmember').click(function(){
-			alert('#delmember');
+			var dataString= 'uid='+selected_uid+'&gid='+group_membergrid_selected_gid;
+			$.ajax({
+				type: "GET",
+				url: '/db/delUserFromGroup',
+				data: dataString
+			});
+			do_reset_form();
+			return false; 
 		});
 		$('#addmember').click(function(){
-			alert('#addmember');
+			var dataString= 'uid='+selected_uid+'&gid='+group_notmembergrid_selected_gid;
+			$.ajax({
+				type: "GET",
+				url: '/db/addUserToGroup',
+				data: dataString
+			});
+			do_reset_form();
+			return false; 
+		});
+		$('#refreshbtn').click(function(){
+			do_reset_form();
 		});
 	});
 //]]>  

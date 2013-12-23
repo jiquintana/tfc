@@ -166,7 +166,7 @@ class Proxy(BaseHTTPRequestHandler):
 
 
         answer = db_handler().handle_request(query, parms)
-        print("FFFFFFFFFFFFFFFFFFFFFFFFFFFF %s" % answer)
+        ##print("FFFFFFFFFFFFFFFFFFFFFFFFFFFF %s" % answer)
 
         if answer['typeinfo'] == 'html':
             mensaje= str(answer['answer'])

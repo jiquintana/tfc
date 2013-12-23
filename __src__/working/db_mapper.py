@@ -54,6 +54,9 @@ class db_handler():
             'delGroup': self.answer_wrapper('html', answer),
             'groupsuserISmember': self.answer_wrapper('json', answer),
             'groupsuserNOTmember': self.answer_wrapper('json', answer),
+            'addUserToGroup': self.answer_wrapper('html', answer),
+            'delUserFromGroup': self.answer_wrapper('html', answer),
+            
         }[query]
 
 
@@ -87,6 +90,7 @@ class db_handler():
         #print(answer)
 
         hook = self.map_query2db(query)
+        #print("->>>> %r" % str(self.map_parms2db(query, parms)))
         if hook:
             answer =  self.map_db2answer(query, hook(self.map_parms2db(query, parms)))
         else:
@@ -111,6 +115,8 @@ class db_handler():
             'delGroup': self.__db__.delGroup,
             'groupsuserISmember': self.__db__.findGroupsByUser,
             'groupsuserNOTmember': self.__db__.findNotGroupsByUser,
+            'addUserToGroup': self.__db__.wr_addRelation,
+            'delUserFromGroup': self.__db__.wr_delRelation,
         }
 
         if query in q2db.keys():
@@ -138,6 +144,9 @@ class db_handler():
             'delGroup': self.map_dict2Group(parms_dict),
             'groupsuserISmember': parms_dict.get('username', '%'),
             'groupsuserNOTmember': parms_dict.get('username', '%'),
+            'addUserToGroup': parms_dict, 
+            'delUserFromGroup': parms_dict,
+            
         }[query]
 
         if DEBUGANSWER: print("map_parms2db.return (%r)" % answer)

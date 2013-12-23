@@ -50,3 +50,7 @@ gnuecho -e "GET http://127.0.0.1/db/groupsuserNOTmember?username=pepe HTTP/1.0\n
 
             'groupsuserISmember': parms_dict.get('username', '%'),
             'groupsuserNOTmember': parms_dict.get('username', '%'),
+            
+
+gnuecho -e "GET http://127.0.0.1/db/delUserFromGroup?uid=1&gid=1025 HTTP/1.0\nAuthorization:Basic VXNlcjpQYXNz\n" | nc 127.0.0.1 8002
+gnuecho -e "GET http://127.0.0.1/db/addUserFromGroup?uid=1&gid=1025 HTTP/1.0\nAuthorization:Basic VXNlcjpQYXNz\n" | nc 127.0.0.1 8002
