@@ -1,3 +1,8 @@
+.not-editable-row {
+	color: LightSteelBlue;
+	font-style:italic;
+}
+  
 label {
 	font-weight:bold;
 	padding-top:0.2em;
@@ -61,14 +66,6 @@ button {
 
 input[type=text], select
 {
-	width:180px;
-	box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-}
-input[type=password], select
-{
-	background-color: AliceBlue ;
 	width:180px;
 	box-sizing: border-box;
     -moz-box-sizing: border-box;

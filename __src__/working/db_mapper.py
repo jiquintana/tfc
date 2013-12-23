@@ -6,7 +6,10 @@ import db_layer
 import json
 import cgi
 
+DEBUGCALL = False
+DEBUGANSWER = False
 DEBUG = False
+
 
 class db_handler():
     __db__ = None
@@ -15,7 +18,7 @@ class db_handler():
         self.__db__ = db_layer.Database()
 
     def answer_wrapper(self, to_type, answer):
-        if DEBUG: print("answer_wrapper.call: (to_type %r, parms: %r)" % (to_type, answer))
+        if DEBUGCALL: print("answer_wrapper.call: (to_type %r, parms: %r)" % (to_type, answer))
 
         wrapped_answer = { 'typeinfo': '',
                            'answer': '',
@@ -31,14 +34,30 @@ class db_handler():
 
         wrapped_answer['size'] = len(str(wrapped_answer['answer']))
 
-        if DEBUG: print("answer_wrapper.return: (%r)" % wrapped_answer)
+        if DEBUGANSWER: print("answer_wrapper.return: (%r)" % wrapped_answer)
 
         return wrapped_answer
 
 
     def map_db2answer(self, query, answer):
-        if DEBUG: print("map_db2answer.call (query: %r, type %r, answer: %r)" % (query, type(answer), answer))
+        if DEBUGCALL: print("map_db2answer.call (query: %r, type %r, answer: %r)" % (query, type(answer), answer))
 
+
+        printed_answer = {
+            'findUser': self.answer_wrapper('json', answer),
+            'addUser': self.answer_wrapper('html', answer),
+            'modUser': self.answer_wrapper('html', answer),
+            'delUser': self.answer_wrapper('html', answer),
+            'findGroup': self.answer_wrapper('json', answer),
+            'addGroup':self.answer_wrapper('html', answer),
+            'modGroup': self.answer_wrapper('html', answer),
+            'delGroup': self.answer_wrapper('html', answer),
+            'groupsuserISmember': self.answer_wrapper('json', answer),
+            'groupsuserNOTmember': self.answer_wrapper('json', answer),
+        }[query]
+
+
+        '''
         if query == 'findUser':
             printed_answer =  self.answer_wrapper('json', answer)
         elif query == 'addUser':
@@ -47,14 +66,21 @@ class db_handler():
             printed_answer =   self.answer_wrapper('html', answer)
         elif query == 'delUser':
             printed_answer =   self.answer_wrapper('html', answer)
+        elif query == 'findGroup':
+            printed_answer =   self.answer_wrapper('json', answer)
+        elif query == 'addGroup':
+            printed_answer =   self.answer_wrapper('html', answer)
+        elif query == 'modGroup':
+            printed_answer =   self.answer_wrapper('html', answer)
+         '''
 
-        if DEBUG: print("map_db2answer.return: (%r)" %  printed_answer)
+        if DEBUGANSWER: print("map_db2answer.return: (%r)" %  printed_answer)
         return printed_answer
 
 
 
     def handle_request(self, query, parms):
-        if DEBUG: print("handle_request.call: (query: %r parms: %r)" % (query, parms))
+        if DEBUGCALL: print("handle_request.call: (query: %r parms: %r)" % (query, parms))
         #function =
         #print(function)
         #answer = function(parms)
@@ -66,48 +92,60 @@ class db_handler():
         else:
             answer = None
 
-        if DEBUG: print("handle_request.return: (%r)" % answer )
+        if DEBUGANSWER: print("handle_request.return: (%r)" % answer )
 
         return answer
 
 
     def map_query2db(self, query):
-        if DEBUG: print("map_query2db.call (query: %r)" % (query))
+        if DEBUGCALL: print("map_query2db.call (query: %r)" % (query))
 
         q2db = {
             'findUser': self.__db__.findUser,
             'addUser': self.__db__.addUser,
             'modUser': self.__db__.changeUser,
-            'delUser': self.__db__.delUser
+            'delUser': self.__db__.delUser,
+            'findGroup': self.__db__.findGroup,
+            'addGroup': self.__db__.addGroup,
+            'modGroup': self.__db__.changeGroup,
+            'delGroup': self.__db__.delGroup,
+            'groupsuserISmember': self.__db__.findGroupsByUser,
+            'groupsuserNOTmember': self.__db__.findNotGroupsByUser,
         }
+
         if query in q2db.keys():
             answer = q2db[query]
         else:
             answer = None
 
-        if DEBUG: print("map_query2db.return (%r)" % answer)
+        if DEBUGANSWER: print("map_query2db.return (%r)" % answer)
         return answer
 
     def map_parms2db(self, query, parms):
-        if DEBUG: print("map_parms2db.call: (query: %r parms: %r)" % (query, parms))
+        if DEBUGCALL: print("map_parms2db.call: (query: %r parms: %r)" % (query, parms))
         parms_dict = dict(cgi.parse_qsl(parms))
 
         # print(">..... %r" %parms_dict)
-        print("MMMMMMMMMMMMMMMMMM %s" % self.map_dict2User(parms_dict).toString())
+        if DEBUG: print("MMMMMMMMMMMMMMMMMM %s" % self.map_dict2User(parms_dict).toString())
         answer = {
             'findUser': parms_dict.get('username', '%'),
             'addUser': self.map_dict2User(parms_dict),
             'modUser': self.map_dict2User(parms_dict),
             'delUser': self.map_dict2User(parms_dict),
+            'findGroup': parms_dict.get('groupname', '%'),
+            'addGroup': self.map_dict2Group(parms_dict),
+            'modGroup': self.map_dict2Group(parms_dict),
+            'delGroup': self.map_dict2Group(parms_dict),
+            'groupsuserISmember': parms_dict.get('username', '%'),
+            'groupsuserNOTmember': parms_dict.get('username', '%'),
         }[query]
 
-        if DEBUG: print("map_parms2db.return (%r)" % answer)
+        if DEBUGANSWER: print("map_parms2db.return (%r)" % answer)
         return answer
 
     def map_dict2User(self, parms):
-        if DEBUG: print("map_dict2User.call: (type %s parms: %r)" % (type(parms), parms))
+        if DEBUGCALL: print("map_dict2User.call: (type %s parms: %r)" % (type(parms), parms))
         if parms == None:
-            #priself.map_dict2User(answer)nt("map_dict2User+ %s" % '')
             answer = None
         elif(type(parms) == dict):
             # print(type(parms))
@@ -127,9 +165,33 @@ class db_handler():
 
             answer = newUser
 
-        if DEBUG: print("map_dict2User.return (%r)" % answer)
+        if DEBUGANSWER: print("map_dict2User.return (%r)" % answer)
         return answer
 
+    def map_dict2Group(self, parms):
+        if DEBUGCALL: print("map_dict2Group.call: (type %s parms: %r)" % (type(parms), parms))
+        if parms == None:
+            answer = None
+        elif(type(parms) == dict):
+            # print(type(parms))
+
+            newGroup = db_layer.Group()
+            for k in parms:
+                if k in newGroup.intColumns():
+                    #print("..... iterate %r, %r" % (k, parms[k]))
+                    try:
+                        parms[k] = int(parms[k])
+                    except:
+                        pass
+                    #print("..... iterate %r, %r" % (k, parms[k]))
+
+
+            newGroup.fromdict(parms)
+
+            answer = newGroup
+
+        if DEBUGANSWER: print("map_dict2Group.return (%r)" % answer)
+        return answer
 
 if __name__ == "__main__":
 

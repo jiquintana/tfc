@@ -229,32 +229,36 @@ class Database:
 
         return storedUser
 
+    def addRelation(self, uid, gid):
+        theUSR = self.findUserByUID(uid)
+        theGRP = self.findGroupByGID(gid)
+
+        relacionUsrGrp = Groups(theUSR, theGRP)
+        self.session.add(relacionUsrGrp)
+        self.session.commit()
+
+
 
     def delUser(self,usertoDelete):
-        ##     session.query(User).filter(User.id==7).delete()
 
-       theUID = None
-       theGID = -1
-       transaction_succesful=False
+        theGroups = self.session.\
+            query(Groups).\
+            filter(Groups.uid==usertoDelete.uid).\
+            delete()
 
-       theGroups = self.session.\
-           query(Groups).\
-           filter(Groups.uid==usertoDelete.uid).\
-           delete();
+        theGroup = self.session.\
+            query(Group).\
+            filter(Group.gid==usertoDelete.uid).\
+            delete()
 
-       theGroup = self.session.\
-           query(Group).\
-           filter(Group.gid==usertoDelete.uid).\
-           delete();
+        theUser = self.session.\
+             query(User).\
+             filter(User.uid==usertoDelete.uid).\
+             delete()
 
-       theUser = self.session.\
-            query(User).\
-            filter(User.uid==usertoDelete.uid).\
-            delete();
+        self.session.commit()
 
-       self.session.commit()
-
-       return None
+        return None
 
 
     def setUserAdmin(self,requestedUser):
@@ -403,8 +407,46 @@ class Database:
             first()
         return groups_found
 
+    def delGroup(self,grouptoDelete):
+
+        theGroups = self.session.\
+            query(Groups).\
+            filter(Groups.gid==grouptoDelete.gid).\
+            delete();
+
+        theGroup = self.session.\
+            query(Group).\
+            filter(Group.gid==grouptoDelete.gid).\
+            delete()
+
+        self.session.commit()
+
+        return None
+
+
+    def changeGroup(self,requestedGroup):
+        #print(requestedGroup.__repr__())
+        if requestedGroup != None:
+            storedGroup=self.findGroupByGID(requestedGroup.gid)
+            if storedGroup != None:
+
+                storedGroup.groupname = requestedGroup.groupname
+                storedGroup.description = requestedGroup.description
+                self.session.commit()
+
+            return self.findGroupByGroupname(requestedGroup.groupname)
+        else:
+            return None
+
     def getAllGroups(self):
         groups_found = self.session.query(Group).all()
+        return groups_found
+
+    def getAllCustomGroups(self):
+        groups_found = self.session.\
+            query(Group).\
+            filter(Group.gid>MAXUSERS).\
+            all()
         return groups_found
 
     def getLowestUnusedGIDfromGroup(self):
@@ -544,6 +586,49 @@ class Database:
                 is_guest = True
         return is_guest
 
+    def findGroupsByUser(self, username):
+        print("....%r" % username)
+        membership = []
+        if username != '%':
+
+            theUser = self.findUserByUsername(username)
+            print(theUser)
+            if theUser != None:
+                membergroups = self.session.\
+                    query(Groups).\
+                    join(User).\
+                    join(Group).\
+                    filter(Groups.gid>MAXUSERS).\
+                    filter(Groups.uid==User.uid).\
+                    filter(Groups.gid==Group.gid).\
+                    filter(User.uid==theUser.uid).\
+                    all()
+
+                for member in membergroups:
+                    theGroup = self.findGroupByGID(member.gid)
+                    membership.append(theGroup)
+                    #membergroups.append(theGroup)
+        return membership
+
+    def findNotGroupsByUser(self, username):
+        print("....%r" % username)
+        notMembership = []
+        membership = []
+        all_groups = []
+        if username != '%':
+            theUser = self.findUserByUsername(username)
+            if theUser != None:
+                all_groups = self.getAllCustomGroups()
+
+                if theUser != None:
+                    membership =  self.findGroupsByUser(theUser.username)
+
+                for member in membership:
+                    the_member_group = self.findGroupByGID(member.gid)
+                    all_groups.remove(the_member_group)
+
+        return all_groups
+
 class Groups(Base):
     __tablename__ = 'GRUPOS'
     uid=Column(Integer, ForeignKey('USUARIO.uid'), nullable=False, primary_key=True, index=True)
@@ -662,9 +747,9 @@ class User(Base):
         return self
 
     def __repr__(self):
-        return ('{"uid": %r,\n\t"username": "%s",\n\t"rol": "%s",\n\t"password": "%s",\n\t"description": "%s",\n\t' %
+        return ('{\n\t"uid": %r,\n\t"username": "%s",\n\t"rol": "%s",\n\t"password": "%s",\n\t"description": "%s",\n\t' %
                 (self.uid,self.username,self.rol,self.password,self.description)+
-                '"L_AH": %r,\n\t"M_AH": %r,\n\t"X_AH": %r,\n\t"J_AH": %r,\n\t"V_AH": %r,\n\t"S_AH": %r,\n\t"D_AH": %r}\n' %
+                '"L_AH": %r,\n\t"M_AH": %r,\n\t"X_AH": %r,\n\t"J_AH": %r,\n\t"V_AH": %r,\n\t"S_AH": %r,\n\t"D_AH": %r\n}\n' %
                 (self.L_AH, self.M_AH, self.X_AH, self.J_AH, self.V_AH, self.S_AH, self.D_AH))
 
     def toString(self):
@@ -702,6 +787,19 @@ class Group(Base):
     description = Column(String(80), nullable=False)
     #_grupos = relationship("Groups", backref="GRUPO")
 
+    def stringColumns(self):
+        return ['groupname', 'description']
+
+    def intColumns(self):
+        return ['gid']
+
+    def fromdict(self, dict_data):
+        #dict_data = json.loads(jsondata)
+        self.gid = dict_data.get('gid', 0)
+        self.groupname = dict_data.get('groupname','')
+        self.description = dict_data.get('description', '')
+        return self
+
     def fromjson(self, jsondata):
         dict_data = json.loads(jsondata)
         self.gid = dict_data.get('gid', 0)
@@ -710,7 +808,7 @@ class Group(Base):
         return self
 
     def __repr__(self):
-        return '{"gid": %r,\n\t"groupname": %r,\n\t"description": %r}\n' % (self.gid, self.groupname, self.description)
+        return '{\n\t"gid": %r,\n\t"groupname": "%s",\n\t"description": "%s"\n}\n' % (self.gid, self.groupname, self.description)
 
     def __toSring__(self):
         return "Group(%r,%r,%r)" % (self.gid, self.groupname, self.description)
@@ -765,24 +863,27 @@ if __name__ == "__main__":
 
     db=Database()
 
+    db.addRelation( 1, 1026)
+
     #print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
-    for instance in db.findUser(""):
-        print("....%r" % instance)
-    #print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
-    for instance in db.findGroup("%e"):
-        print("%r" % instance)
+    '''
+    theUser = db.findUserByUID(1)
 
-    newUser = User(username='pepe3', password='Ed Jones', description='ed')
-    theUser = db.addUser(newUser)
-
-    theUser = db.findUserByUsername('pepe3')
-
-    db.delUser(theUser)
-    ##print( json.dumps(theUser, cls=AlchemyEncoder))
+    print( theUser )
     #print(db.findUserByUsername('pepe1'))
+    mytestGroup=Group(groupname='josi', description='Josi User ')
+    storedGRP=db.addGroup(mytestGroup)
 
+    theMembership= db.findGroupsByUser("aaaaa")
+    print(theMembership)
+
+    print("-----")
+
+    theNotMembership = db.findNotGroupsByUser("aaaaa")
+    print(theNotMembership)
+    '''
     '''
         ed_user = User(username='ed', password='Ed Jones', description='ed')
         #db.session.add(ed_user)

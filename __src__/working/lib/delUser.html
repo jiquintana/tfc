@@ -7,7 +7,9 @@
         <link rel="stylesheet" type="text/css" href="css/body.css">
         <link rel="stylesheet" type="text/css" href="css/style.css">
         <link rel="stylesheet" type="text/css" href="css/formUser.css">
-        <script type='text/javascript' src='js/test.js'></script>
+        <link rel="stylesheet" type="text/css" href="css/base.css">
+
+        <script type='text/javascript' src='js/user.js'></script>
         <script type='text/javascript' src='js/jquery-1.9.1.js'></script>
         <script type='text/javascript' src='js/validate.js'></script>
 
@@ -18,13 +20,6 @@
 			document.forms['formUser'].elements['username'].focus();
 			if (! window.opener) {
 				//alert("no opener")
-				document.getElementById('L_AH').value=1;
-				document.getElementById('M_AH').value=8;
-				document.getElementById('X_AH').value=16;
-				document.getElementById('J_AH').value=32;
-				document.getElementById('V_AH').value=64;
-				document.getElementById('S_AH').value=256;
-				document.getElementById('D_AH').value=255;
 				fromForm();
 			} else {
 				document.formUser.action = "/db/"+window.opener.userFormType;

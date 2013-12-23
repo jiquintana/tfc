@@ -6,37 +6,32 @@
 
         <link rel="stylesheet" type="text/css" href="css/body.css">
         <link rel="stylesheet" type="text/css" href="css/style.css">
-        <link rel="stylesheet" type="text/css" href="css/formUser.css">
-        <script type='text/javascript' src='js/test.js'></script>
+        <link rel="stylesheet" type="text/css" href="css/formGroup.css">
+        <link rel="stylesheet" type="text/css" href="css/base.css">
+        
+        <script type='text/javascript' src='js/group.js'></script>
         <script type='text/javascript' src='js/jquery-1.9.1.js'></script>
         <script type='text/javascript' src='js/validate.js'></script>
 
         <script type='text/javascript'>
-		var userFormData;
+		var groupFormData;
 		
 		$(window).load(function() {
-			document.forms['formUser'].elements['username'].focus();
+			document.forms['formGroup'].elements['groupname'].focus();
 			if (! window.opener) {
 				//alert("no opener")
-				document.getElementById('L_AH').value=1;
-				document.getElementById('M_AH').value=8;
-				document.getElementById('X_AH').value=16;
-				document.getElementById('J_AH').value=32;
-				document.getElementById('V_AH').value=64;
-				document.getElementById('S_AH').value=256;
-				document.getElementById('D_AH').value=255;
 				fromForm();
 			} else {
-				document.formUser.action = "/db/"+window.opener.userFormType;
-				if (window.opener.userFormType == 'delUser') {
-					//alert("modUser");
-					data = JSON.parse(window.opener.userFormData);
+				document.formGroup.action = "/db/"+window.opener.groupFormType;
+				if (window.opener.groupFormType == 'delGroup') {
+					//alert("modGroup");
+					data = JSON.parse(window.opener.groupFormData);
 					Object.keys(data).forEach(function(key) {
 						document.getElementById(key).value=data[key];
 					});
 					fromDelForm();	
 				} else  {
-					alert(window.opener.userFormType);
+					alert(window.opener.groupFormType);
 				}
 			}
 		});
@@ -46,61 +41,30 @@
 <body>
 
 <div class="divcontainer">
-        <form id="formUser" name="formUser" action="#" method="get">
+        <form id="formGroup" name="formGroup" action="#" method="get">
         <fieldset>
-            <legend>Usuario:</legend>
-            <label for="uid">uid :</label>	 
-            <input type="text" id="uid" name="uid" readonly>
+            <legend>Grupo:</legend>
+            <label for="gid">gid :</label>	 
+            <input type="text" id="gid" name="gid" readonly>
     
-            <br><label for="username">usuario :</label>
-            <input type="text" id="username" name="username" readonly>
+            <br><label for="groupname">Grupo:</label>
+            <input type="text" id="groupname" name="groupname" >
     
-            
-            <br><label for="rol">Rol :</label>
-            <!--input type="input" id="rol" name="rol"-->
-            <select id="rol" name="rol" disabled>
-                <option value="G">Invitado</option>
-                <option value="K">Menor</option>
-                <option value="V">Usuario Avanzado</option>
-                <option value="A">Administrador</option>
-            </select>
-            
-            <br><label for="password">Contraseña :</label>                
-            <input type="text" id="password" name="password" readonly>
-            
             <br><label for="description">Descripción :</label>
-            <input type="text" id="description" name="description" readonly>
+            <input type="text" id="description" name="description">
         </fieldset>
 
-    <div style="display:none">
-
-        <fieldset>
-                <legend>Binary hours:</legend>
-                <label for="L_AH">L :</label>
-                <input type="input" id="L_AH" name="L_AH">
-                <label for="M_AH">M :</label>
-                <input type="input" id="M_AH" name="M_AH">
-                <label for="X_AH">X :</label>
-                <input type="input" id="X_AH" name="X_AH">
-                <label for="J_AH">J :</label>
-                <input type="input" id="J_AH" name="J_AH">
-                <label for="V_AH">V :</label>
-                <input type="input" id="V_AH" name="V_AH">
-                <label for="S_AH">S :</label>
-                <input type="input" id="S_AH" name="S_AH">
-                <label for="D_AH">D :</label>
-                <input type="input" id="D_AH" name="D_AH">
-        </fieldset>
-	</div>
-        
         <!--button onclick="myFunction()">Try it</button-->
 		<input type="submit" value="Borrar">
         <input type="button" value="Cancelar" onclick="self.close()" >
+        <!--input type="button" value="Recalcular campos" onclick="toForm();" >
+        <input type="button" value="dosubmit" onclick="document.form[0].submit();" -->
+
         </form>
 	<script  type="text/javascript">
-		var validator = new FormValidator('formUser', [{
-			name: 'username',
-			display: 'Usuario',    
+		var validator = new FormValidator('formGroup', [{
+			name: 'groupname',
+			display: 'Grupo',    
 			rules: 'required|min_length[3]|max_length[20]'
 		},{
 			name: 'password',

@@ -56,7 +56,7 @@ function setCharAt(str,index,chr) {
     return str.substr(0,index) + chr + str.substr(index+1);
 }
 
-function userfromForm() {
+function fromForm() {
 	formElements = ["L_AH", "M_AH", "X_AH", "J_AH", "V_AH", "S_AH", "D_AH"];
 	for (var formElement in formElements) {
 	  //alert(formElements[i]);
@@ -80,7 +80,7 @@ function userfromForm() {
 	
 }
 
-function userfromDelForm() {
+function fromDelForm() {
 	formElements = ["L_AH", "M_AH", "X_AH", "J_AH", "V_AH", "S_AH", "D_AH"];
 	for (var formElement in formElements) {
 	  //alert(formElements[i]);
@@ -88,7 +88,7 @@ function userfromDelForm() {
 	}
 }
 
-function usertoForm() {
+function toForm() {
 	var welements = document.getElementsByClassName("cell");
 	var checkboxCount = welements.length;
 	var L_AH ="", M_AH="", X_AH="", J_AH="", V_AH="", S_AH="", D_AH=""

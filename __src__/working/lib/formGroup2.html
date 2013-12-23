@@ -46,20 +46,37 @@
 <body>
 
 <div class="divcontainer">
-        <form id="formGroup" name="formGroup" action="#" method="get">
+    <form id="formGroup" name="formGroup" action="#" method="get">
+    <fieldset>
+        <legend>Grupo:</legend>
+        <label for="gid">gid :</label>	 
+        <input type="text" id="gid" name="gid" readonly>
+    
+        <br><label for="groupname">Grupo:</label>
+        <input type="text" id="groupname" name="groupname" >
+    
+        <br><label for="description">Descripción :</label>
+        <input type="text" id="description" name="description">
+    </fieldset>
         <fieldset>
-            <legend>Grupo:</legend>
-            <label for="gid">gid :</label>	 
-            <input type="text" id="gid" name="gid" readonly>
-    
-            <br><label for="groupname">Grupo:</label>
-            <input type="text" id="groupname" name="groupname" >
-    
-            <br><label for="description">Descripción :</label>
-            <input type="text" id="description" name="description">
+        <legend>Palabras Prohibidas:</legend>
+        <label for="words">words:</label>	 
+		<textarea id="wordscnt" name="wordscnt">abc</textarea>
+    </fieldset>
         </fieldset>
-
-        <!--button onclick="myFunction()">Try it</button-->
+        <fieldset>
+        <legend>URIS Prohibidas:</legend>
+        <label for="uris">uris:</label>	 
+	<textarea id="wordscnt" name="wordscnt">abc</textarea>
+    </fieldset>
+        </fieldset>
+        <fieldset>
+        <legend>Filetypes Prohibidos:</legend>
+        <label for="files">files:</label>	 
+		<textarea id="filescnt" name="filescnt">abc</textarea>
+    </fieldset>
+    
+    <!--button onclick="myFunction()">Try it</button-->
 	<input id="submit" type="submit" value="Añadir grupo">
 	<input id="cancelar" type="button" value="Cancelar" onclick="self.close();" >
         <!--input type="button" value="Recalcular campos" onclick="toForm();" >
