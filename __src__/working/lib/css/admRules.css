@@ -8,14 +8,16 @@
 #notmembergrid .ui-state-highlight { background: LightGreen  !important; }
 
 .divmain {
-	width: 800px;
-	margin: 10px 40px 40px 45px;
-	border: 1px solid red;
+	//visibility:hidden;
+	width: 400px;
+	margin: 10px 40px 10px 45px;
+	//border: 1px solid red;
 	overflow: hidden; /* will contain if #first is longer than #second */
+	z-index: 1;
 }
 
 .divgroups {
-	border:1px solid blue;
+	//border:1px solid blue;
 	width: 360px;
 	margin: 5px 5px 5px 5px;
 }
@@ -23,21 +25,51 @@
 	border:1px solid orange;
 	margin: 5px 5px 5px 5px;
 	width: 360px;
-	height: 40px;
+	height: 60px;
+	float:left; /* add this */
+	overflow: hidden; /* will contain if #first is longer than #second */
 }
 
 .divrules {
-	border:1px solid green;
+	visibility:hidden;
+	position: absolute;
+	//border:1px solid green;
 	margin: 5px 5px 5px 5px;
-	width: 700px;
+	width: 480px;
+	height: 90%;
+	overflow: hidden; /* will contain if #first is longer than #second */
+	//float:left; /* add this */
+	//z-index: 2;
+}
+
+.rulesbtncontainer {
+	//visibility:hidden;
+	//border:1px solid green ;
+	margin: 10px 0px 0px 0px;
+	width: 98%;
 	float:left; /* add this */
 }
+
+.rulesbtnsbmt {
+	margin: 2px 20px 2px 10px;
+}
+
 .divbutton {
+	//visibility:hidden;
 	border:1px solid black;
-	margin: 10px 45px 10px 45px;
+	margin: 5px 45px 5px 45px;
 	width: 360px;
+	height: 50px;
 	float:left; /* add this */
 }
+
+.rulesbtn {
+	margin: 2px 30px 2px 30px;
+	width: 50px;
+	height: 50px;
+	border: 2px solid blue;
+}
+
 
 thelabel {
 	font-weight:bold;
@@ -57,6 +89,8 @@ fieldset {
 	border:1px solid #2E6E9E;
 	padding: 1em;
 	font:80%/1 sans-serif;
+	height: 90%;
+	width: 90%;
 }
 
 
@@ -68,6 +102,12 @@ legend {
 	text-align:left;
 	font-weight: bold;
 
+}
+
+textarea {
+	height: 85%;
+	width: 98%;
+	font:80%/1 sans-serif;
 }
 
 input[type=text] {

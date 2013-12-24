@@ -19,6 +19,16 @@
 
 </head>
 <body>
+	<div class="divrules">
+		<fieldset>
+			<legend>Reglas</legend>
+			<textarea class="reglas" name="reglas" id="reglas"></textarea>
+			<div class="rulesbtncontainer">
+				<input id="savebtn"	class="rulesbtnsbmt" type="button" name="save" value="Guardar">
+				<input id="cancelbtn"   class="rulesbtnsbmt" type="button" name="cancelbtn" value="Cancelar">
+			</div>
+		</fieldset>
+	</div>
 	<div class="divmain">
 		<div class="divgroups">
 			<fieldset>
@@ -29,14 +39,10 @@
 			<table id="groupgrid"></table>
 			</fieldset>
 		</div>
-		<div class="divaction">
-		</div>
-		<div class="divrules">
-			<fieldset>
-				<legend>Reglas</legend>
-				<textarea class="reglas" name="reglas" id="reglas">
-				</textarea>
-			</fieldset>
+		<div class="divaction" id="divaction">
+			<input id="wordsbtn"  class="rulesbtn" type="image" src="images/48-palabras.png">
+			<input id="urisbtn"   class="rulesbtn" type="image" src="images/48-url.png">
+			<input id="filesbtn"  class="rulesbtn" type="image" src="images/48-filetypes.png">
 		</div>
 	</div>
 	<div class="divbutton" >
